@@ -27,6 +27,7 @@ var button_c = row.insertCell(cnt++);
 
 
 function runUnitTests() {
+    registerOKH(OKH[0]);
     alert("no tests yet!");
 }
 
