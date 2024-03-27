@@ -7,22 +7,28 @@ OKHS[0] = { name: "first OKH" };
 
 OKWS[0] = { name: "first OKW" };
 
-function registerOKH(name,number,desc) {
+function registerOKH(okh) {
+
+//    var xxx = document.getElementById("xxx");
+
+
   var table = document.getElementById("okh_table");
 
   var row = table.insertRow(-1);
 
-  row.id = number;
-  row.setAttribute("class_num", class_num);
-  row.setAttribute("solid_name", name);
+  row.id = okh.number;
+  row.setAttribute("number", okh.number);
+  row.setAttribute("solid_name", okh.name);
 
   var cnt = 0;
-  var name_c = row.insertCell(cnt++);
+    var name_c = row.insertCell(cnt++);
     var desc_c = row.insertCell(cnt++);
 var button_c = row.insertCell(cnt++);
 
+    name_c.innerHTML = okh.name;
+    desc_c.innerHTML = okh.desc;
   button_c.innerHTML = "<button onclick='renderOKH(\""+
-    number+")'>Go</button>";
+    okh.number+")'>Go</button>";
 }
 
 
