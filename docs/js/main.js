@@ -22,7 +22,7 @@ function registerOKH(name,number,desc) {
 var button_c = row.insertCell(cnt++);
 
   button_c.innerHTML = "<button onclick='renderOKH(\""+
-    number")'>Go</button>";
+    number+")'>Go</button>";
 }
 
 
