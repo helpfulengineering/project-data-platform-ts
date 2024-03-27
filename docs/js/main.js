@@ -31,4 +31,4 @@ function runUnitTests() {
     alert("no tests yet!");
 }
 
-$(registerOKH(OKH[0]));
+$(registerOKH(OKHS[0]));
