@@ -29,6 +29,19 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
       src="https://code.jquery.com/jquery-3.7.1.js"
       integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
       crossorigin="anonymous"></script>
+    <!-- WARNING --- using a CDN might not be the best approach, in terms of creating
+         dependencies for us -->
+    <!--
+    <script src="
+https://cdn.jsdelivr.net/npm/@aws-sdk/client-s3@3.552.0/dist-cjs/index.min.js
+"></script>
+-->
+
+     <!-- **DO THIS**: -->
+    <!--   Replace SDK_VERSION_NUMBER with the current SDK version number -->
+    <!--    <script src="https://sdk.amazonaws.com/js/aws-sdk-3.min.js"></script> -->
+
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1031.0.min.js"></script>
 </head>
 <script>
   </script>
@@ -64,6 +77,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
         Execute Tests!</button>
     </p>
 
+<p> This is a test of our ability to read S3 buckets:
+  <div id="viewer"></div>
+</p>
+
     <h2>Licensing</h2>
 
     <img src="https://www.gnu.org/graphics/agplv3-with-text-162x68.png"></img>
@@ -73,5 +90,4 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
     <p>This project is part of <a href="https://helpfulengineering.org/">Helpful Engineering</a>. To assist on this project, contact Robert L. Read &lt; read.robert@gmail.com &gt;</p>
   </section>
     <script src="./js/main.js"></script>
-
 </body>
