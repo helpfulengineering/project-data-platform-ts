@@ -1,0 +1,1 @@
+web: cd packages/front-end && npm run dev
