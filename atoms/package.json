@@ -4,7 +4,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "app": "tsx src/app.ts"
   },
   "keywords": [],
   "author": "",
@@ -17,6 +17,7 @@
   "devDependencies": {
     "@tsconfig/node20": "^20.1.4",
     "@types/node": "^20.12.12",
+    "tsx": "^4.16.0",
     "typescript": "^5.4.5"
   }
 }
