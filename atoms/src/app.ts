@@ -5,7 +5,7 @@ import {
 } from "@aws-sdk/client-s3";
 import * as YAML from 'yaml'
 
-class Atom {
+export class Atom {
   constructor(readonly identifier: string, readonly description?: string, readonly link?: string) {}
 
   toString() {
@@ -15,7 +15,7 @@ class Atom {
   }
 }
 
-function parseAtom(atom: any): Atom | undefined {
+export function parseAtom(atom: any): Atom | undefined {
   if (typeof atom !== "object") { return; }
 
   const identifier = atom["identifier"] as string | undefined;
@@ -25,22 +25,20 @@ function parseAtom(atom: any): Atom | undefined {
   return identifier ? new Atom(identifier, description, link) : undefined;
 }
 
-function isValid<T>(value: T | null | undefined): value is T { return !!value; }
-
-function parseAtomArray(atom: any) {
+export function parseAtomArray(atom: any) {
   return Array.isArray(atom)
-    ? atom.map(parseAtom).filter(isValid)
+    ? atom.map(parseAtom).filter(<T>(value: T | null | undefined): value is T => { return !!value; })
     : [];
 }
 
-interface OkwParty {
+export interface OkwParty {
   title: string;
   supplies?: Atom[];
   tools?: Atom[];
   inventory?: Atom[];
 }
 
-function parseOKW(body: string): OkwParty {
+export function parseOKW(body: string): OkwParty {
   const yaml = YAML.parse(body);
   const title = yaml["title"] as string | undefined;
   if (typeof title !== "string") { throw new Error("Title must be a string"); }
@@ -50,7 +48,7 @@ function parseOKW(body: string): OkwParty {
   return { title, supplies, tools, inventory };
 }
 
-interface OkhDesign {
+export interface OkhDesign {
   title: string;
   product: Atom;
   bom?: Atom[];
@@ -58,7 +56,7 @@ interface OkhDesign {
   bomOutput?: Atom[];
 }
 
-function parseOKH(body: string): OkhDesign | undefined {
+export function parseOKH(body: string): OkhDesign | undefined {
   const yml = YAML.parse(body);
   const title = yml["title"];
   if (typeof title !== "string") { return; }
@@ -71,12 +69,12 @@ function parseOKH(body: string): OkhDesign | undefined {
   return { title, product, bom, tools, bomOutput };
 }
 
-interface SupplyTree {
+export interface SupplyTree {
   readonly product: Atom;
   print(indent: number): void;
 }
 
-class SuppliedSupplyTree implements SupplyTree {
+export class SuppliedSupplyTree implements SupplyTree {
 
   constructor(readonly supplier: OkwParty, readonly product: Atom) { }
 
@@ -85,7 +83,7 @@ class SuppliedSupplyTree implements SupplyTree {
   }
 }
 
-class InventorySupplyTree implements SupplyTree {
+export class InventorySupplyTree implements SupplyTree {
   constructor(readonly maker: OkwParty, readonly product: Atom) { }
 
   print(indent: number): void {
@@ -93,7 +91,7 @@ class InventorySupplyTree implements SupplyTree {
   }
 }
 
-class MadeSupplyTree implements SupplyTree {
+export class MadeSupplyTree implements SupplyTree {
   constructor(readonly product: Atom, readonly design: OkhDesign, readonly maker: OkwParty, readonly supplies: readonly SupplyTree[]) { }
   print(indent: number): void {
     console.log(`${" ".repeat(indent)}Maker: ${this.maker.title}/${this.design.title}`);
@@ -103,7 +101,7 @@ class MadeSupplyTree implements SupplyTree {
   }
 }
 
-class MissingSupplyTree implements SupplyTree {
+export class MissingSupplyTree implements SupplyTree {
   constructor(readonly product: Atom) { }
   print(indent: number): void {
     console.log(`${" ".repeat(indent)}Missing: ${this.product}`);
@@ -111,7 +109,7 @@ class MissingSupplyTree implements SupplyTree {
 }
 
 
-function* supplyTreeQuery(product: Atom, parties: readonly OkwParty[], designs: readonly OkhDesign[]) {
+export function* supplyTreeQuery(product: Atom, parties: readonly OkwParty[], designs: readonly OkhDesign[]) {
   let found = false;
   for (const supplier of parties) {
     if (supplier.supplies?.some(s => s.identifier === product.identifier)) {
