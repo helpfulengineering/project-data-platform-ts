@@ -20,7 +20,8 @@ which are are needed to make needed articles.
 We need volunteers. Although we can use a wide variety of skills we need:
 1. Programmers who can build a website with Azure
 2. Front-end programmers who, using Nuxt/Vue/Boostrap, can implement visual components.
-3. AI programmers who can use vector-matching a LLMs to build a robust matching algorithm.
+   Apply here: https://helpful.directory/opportunity?id=Software-Developer---Typescript-446
+4. AI programmers who can use vector-matching a LLMs to build a robust matching algorithm.
 
 # Older Content (Obsolete below this point.)
 
