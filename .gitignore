@@ -78,6 +78,8 @@ web_modules/
 .env.test.local
 .env.production.local
 .env.local
+.env.*
+!.env.example
 
 # parcel-bundler cache (https://parceljs.org/)
 .cache
@@ -245,3 +247,12 @@ package-lock.json
 /lib/
 
 docs
+
+# Misc
+.DS_Store
+.fleet
+
+# Nuxt dev/build outputs
+.nitro
+.data
+.output
