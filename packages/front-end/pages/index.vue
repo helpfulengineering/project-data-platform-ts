@@ -13,30 +13,17 @@
                   );
 </script>
 
-<template>
-    <h1>XXXXXXXXX</h1>
-    <h1>XXXXXXXXX</h1>
-    <h1>XXXXXXXXX</h1>
-    <h1>XXXXXXXXX</h1>
-    <h1>XXXXXXXXX</h1>
-    <h1>XXXXXXXXX</h1>
-    <h1>XXXXXXXXX</h1>
-    <h1>XXXXXXXXX</h1>
-    <h1>XXXXXXXXX</h1>
-    <h1>XXXXXXXXX</h1>
-    <h1>XXXXXXXXX</h1>
-    <h1>XXXXXXXXX</h1>
-    <h1> LOOK HERE: ->  {{ error }} . </h1>
-    <h1> LOOK HERE: ->  {{ data }} . </h1>
-    <h1> LOOK HERE: ->  {{ status }} . </h1>
-</template>
-
 
 <template>
   <div class="container">
     <h1 class="main-title text-center m-8 text-2xl font-bold">
       HELPFUL TAGLINE / DESCRIPTION
-    </h1>
+</h1>
+    <!--
+    <h1> LOOK HERE: ->  {{ error }} . </h1>
+    <h1> LOOK HERE: ->  {{ data }} . </h1>
+    <h1> LOOK HERE: ->  {{ status }} . </h1>
+-->
     <div class="product-categories">
       <ProductGroup
       :products = medical_products
@@ -57,7 +44,7 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import ProductGroup from "~/components/ProductGroup.vue"; // Import the ProductCard component
 
 export default {
