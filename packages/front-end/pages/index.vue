@@ -1,16 +1,9 @@
 <script setup lang="ts">
      const baseUrl = useRuntimeConfig().public.baseUrl;
-     const url = baseUrl + '/HttpExample';
-//    const url = '/api/HttpExample';
+     const url = baseUrl + '/getOKHs';
      console.log("url",url);
-     const { data, status, error, refresh, clear } =
-    await useFetch(url,
-                   // {fetchOptions:
-                   //  {
-                   //      cache: 'no-cache', // Disable caching
-                   // }
-                   // }
-                  );
+const { data : products, status, error, refresh, clear } =
+    await useFetch(url);
 </script>
 
 
@@ -19,22 +12,17 @@
     <h1 class="main-title text-center m-8 text-2xl font-bold">
       HELPFUL TAGLINE / DESCRIPTION
 </h1>
-    <!--
-    <h1> LOOK HERE: ->  {{ error }} . </h1>
-    <h1> LOOK HERE: ->  {{ data }} . </h1>
-    <h1> LOOK HERE: ->  {{ status }} . </h1>
--->
     <div class="product-categories">
       <ProductGroup
-      :products = medical_products
+:products = products[0].medical_products
       title="MEDICAL SUPPLIES"
       />
       <ProductGroup
-      :products = automotive_products
+      :products =  products[0].automotive_products
       title="AUTOMOTIVE"
       />
       <ProductGroup
-      :products =consumer_products
+      :products =  products[0].consumer_products
       title="CONSUMER GOODS"
       />
     </div>
@@ -50,100 +38,6 @@ import ProductGroup from "~/components/ProductGroup.vue"; // Import the ProductC
 export default {
   components: {
     ProductGroup, // Register the component
-  },
-  data() {
-    return {
-      medical_products: [
-        {
-          id: 1,
-          name: "Product A",
-          image:
-            "https://tailwindui.com/img/ecommerce-images/category-page-04-image-card-01.jpg",
-          shortDescription: "This is Product A",
-        },
-        {
-          id: 2,
-          name: "Product B",
-          image:
-            "https://tailwindui.com/img/ecommerce-images/category-page-04-image-card-02.jpg",
-          shortDescription: "This is Product B",
-        },
-        {
-          id: 3,
-          name: "Product C",
-          image:
-            "https://tailwindui.com/img/ecommerce-images/category-page-04-image-card-03.jpg",
-          shortDescription: "This is Product C",
-        },
-        {
-          id: 4,
-          name: "Product D",
-          image:
-            "https://tailwindui.com/img/ecommerce-images/category-page-04-image-card-04.jpg",
-          shortDescription: "This is Product D",
-        },
-      ],
-      automotive_products: [
-        {
-          id: 5,
-          name: "Product A",
-          image:
-            "https://tailwindui.com/img/ecommerce-images/category-page-05-image-card-01.jpg",
-          shortDescription: "This is Product A",
-        },
-        {
-          id: 6,
-          name: "Product B",
-          image:
-            "https://tailwindui.com/img/ecommerce-images/category-page-05-image-card-05.jpg",
-          shortDescription: "This is Product B",
-        },
-        {
-          id: 7,
-          name: "Product C",
-          image:
-            "https://tailwindui.com/img/ecommerce-images/category-page-05-image-card-07.jpg",
-          shortDescription: "This is Product C",
-        },
-        {
-          id: 8,
-          name: "Product D",
-          image:
-            "https://tailwindui.com/img/ecommerce-images/category-page-05-image-card-08.jpg",
-          shortDescription: "This is Product D",
-        },
-      ],
-      consumer_products: [
-        {
-          id: 9,
-          name: "Product A",
-          image:
-            "https://tailwindui.com/img/ecommerce-images/category-page-07-product-01.jpg",
-          shortDescription: "This is Product A",
-        },
-        {
-          id: 10,
-          name: "Product B",
-          image:
-            "https://tailwindui.com/img/ecommerce-images/category-page-07-product-02.jpg",
-          shortDescription: "This is Product B",
-        },
-        {
-          id: 11,
-          name: "Product C",
-          image:
-            "https://tailwindui.com/img/ecommerce-images/category-page-07-product-03.jpg",
-          shortDescription: "This is Product C",
-        },
-        {
-          id: 12,
-          name: "Product D",
-          image:
-            "https://tailwindui.com/img/ecommerce-images/category-page-07-product-04.jpg",
-          shortDescription: "This is Product D",
-        },
-      ],
-    };
   },
 };
 </script>
