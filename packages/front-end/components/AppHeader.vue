@@ -83,68 +83,73 @@ import {
 </script>
 
 <style>
-.btn-register {
-  background-color: #a6f671;
-  border-radius: 6px;
-  color: #000000;
-  font-size: 14px;
-  font-weight: 700;
-}
-
-.btn-search {
-  background-color: #4ea641;
-  border-radius: 11px;
-  margin: 5px 5px 0 0;
-  padding: 8px;
-}
-
-.container {
-  margin: 0 auto;
-  max-width: 1400px;
-}
-
 .nav {
   background-color: #2a3952;
   position: fixed;
   left: 0;
   top: 0;
   width: 100%;
-}
 
-.nav-link-wrap {
-  justify-content: space-between;
-  padding: 20px 0;
-}
+  .btn-register {
+    background-color: #a6f671;
+    border-radius: 6px;
+    color: #000000;
+    font-size: 14px;
+    font-weight: 700;
+  }
 
-.nav-link {
-  font-size: 14px;
-  font-weight: 700;
-  margin: 5px 8px;
-}
+  .btn-search {
+    background-color: #4ea641;
+    border-radius: 11px;
+    margin: 5px 5px 0 0;
+    padding: 8px;
+  }
 
-.left {
-  display: flex;
-}
+  .container {
+    margin: 0 auto;
+    max-width: 1400px;
+  }
 
-.logo-wrap {
-  align-items: center;
-  display: flex;
-}
+  .nav-link-wrap {
+    justify-content: space-between;
+    padding: 20px 0;
+  }
 
-.search-bar {
-  border-radius: 11px;
-  height: 50px;
-  width: 600px;
-}
+  .nav-link {
+    font-size: 14px;
+    font-weight: 700;
+    margin: 5px 8px;
+  }
 
-.right {
-  display: flex;
-  place-items: center;
-}
+  .left {
+    display: flex;
+  }
 
-.website-name {
-  font-size: 32px;
-  font-weight: 700;
-  letter-spacing: 3px;
+  .right {
+    display: flex;
+    place-items: center;
+  }
+
+  .logo-wrap {
+    align-items: center;
+    display: flex;
+  }
+
+  .search-bar {
+    border-radius: 11px;
+    height: 50px;
+    width: 600px;
+  }
+
+  .right {
+    display: flex;
+    place-items: center;
+  }
+
+  .website-name {
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: 3px;
+  }
 }
 </style>
