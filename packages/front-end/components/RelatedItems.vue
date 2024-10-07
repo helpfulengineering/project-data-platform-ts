@@ -10,7 +10,7 @@
       >
         <img :src="related_product.image" alt="Product Image" class="size-48" />
         <h1 class="name">{{ related_product.name }}</h1>
-      </div>
+    </div>
     </div>
   </div>
 </template>
@@ -20,43 +20,41 @@
 const related_products = [
   {
     id: 1,
-    name: "Product A",
-    description: "Description A",
-    price: 10.0,
+    name: "IV Bag Hook",
     image:
-      "https://tailwindui.com/img/ecommerce-images/category-page-04-image-card-01.jpg",
+      "https://field-ready-projects.openknowhow.org/images/HL003-attC88mXadLwq4sLy-400x300.jpg",
+    shortDescription: "For IV bags to be hung",
   },
   {
     id: 2,
-    name: "Product B",
-    description: "Description B",
-    price: 20.0,
+    name: "Oxygen Supply Fitting",
     image:
-      "https://tailwindui.com/img/ecommerce-images/category-page-04-image-card-02.jpg",
+      "https://field-ready-projects.openknowhow.org/images/HL002-attmlR243asYolZRO-400x300.jpg",
+    shortDescription:
+      "Adapter that connects oxygen supply tubing to standard oxygen systems",
   },
   {
     id: 3,
-    name: "Product C",
-    description: "Description C",
-    price: 10.0,
+    name: "Umbilical Cord Clamp",
     image:
-      "https://tailwindui.com/img/ecommerce-images/category-page-04-image-card-03.jpg",
+      "https://field-ready-projects.openknowhow.org/images/HL001-attG43ftDEHSUFPVG-400x300.jpg",
+    shortDescription:
+      "Enclosure of umbilical cords of newborns to prevent sepsis",
   },
   {
     id: 4,
-    name: "Product D",
-    description: "Description D",
-    price: 20.0,
+    name: "Finger Brace",
     image:
-      "https://tailwindui.com/img/ecommerce-images/category-page-04-image-card-04.jpg",
+      "https://field-ready-projects.openknowhow.org/images/HL005-attgxsUzHxoTnTmSP-400x300.jpg",
+    shortDescription: "In order to keep a injured index finger immobile",
   },
   {
     id: 5,
-    name: "Product A",
-    description: "Description A",
-    price: 10.0,
+    name: "Water Truck Clamp",
     image:
-      "https://tailwindui.com/img/ecommerce-images/category-page-04-image-card-05.jpg",
+      "https://field-ready-projects.openknowhow.org/images/WA012-attbQe9vW0QdVGkqD-400x300.jpg",
+    shortDescription:
+      "Clamps over the hose on the outlet of a water distribution truck to create a seal",
   },
 ];
 </script>
@@ -71,14 +69,14 @@ const related_products = [
   }
 
   .title {
-    color: #2A3952;
+    color: #2a3952;
     font-size: 24px;
     font-weight: 700;
     padding: 20px 0 0 10px;
     text-align: center;
     text-transform: uppercase;
   }
-  
+
   .related-product-wrap {
     display: flex;
     justify-content: space-between;
