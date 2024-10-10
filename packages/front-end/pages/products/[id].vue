@@ -5,18 +5,19 @@
       <div>Specifications</div>
       <div>Detail</div>
     </div>
-    <div class="right">
+    <div class="center">
       <h1 class="title">{{ product.name }}</h1>
       <div class="location">Location, Country</div>
-      <p>{{ product.description }}</p>
+      <p>{{ product.shortDescription }}</p>
       <div class="review-wrap">
         <Reviews />
         <Reviews />
       </div>
       <RelatedItems />
     </div>
-    <div>
-      <button>Order</button>
+    <div class="right">
+      <button class="btn-primary">ORDER</button>
+      <button class="btn-secondary">CONTACT SUPPLIER</button>
     </div>
     <!-- <NuxtLink to="/">Back to List</NuxtLink> -->
   </div>
@@ -133,6 +134,25 @@ const product = products.find((p) => p.id === parseInt(productId));
   margin: 130px auto 40px auto;
   padding: 30px;
 
+.btn-primary {
+  border-radius: 6px;
+  background-color: #A6F671;
+  color: black;
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  padding: 6px 20px;
+  width: 100%;
+}
+
+.btn-secondary {
+  border: 2px solid #D9D9D9;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 6px 20px;
+}
+
   .left {
     width: 300px;
   }
@@ -141,14 +161,21 @@ const product = products.find((p) => p.id === parseInt(productId));
     padding-bottom: 25px;
   }
 
-  .right {
-    width: calc(100% - 300px);
+  .center {
+    width: calc(100% - 500px);
   }
 
   .review-wrap {
     display: flex;
     justify-content: space-between;
     margin: 20px 0;
+  }
+
+  .right {
+    align-items: start;
+    display: flex;
+    flex-direction: column;
+    padding-top: 84px;
   }
 
   .title {
