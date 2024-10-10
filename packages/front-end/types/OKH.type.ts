@@ -2,9 +2,9 @@
 // example OKH from here:
 // https://github.com/helpfulengineering/library/blob/main/alpha/okh/okh-chococolate-chip.yml
 
-import { contactInfo, ATOM, YYYY_MM_DD, versionType } from "./general.type";
+import { CONTACT_TYPE, ATOM, YYYY_MM_DD, VERSION_TYPE } from "./general.type";
 
-type OKH_TYPE = {
+export type OKH_TYPE = {
   title: string;
   description: string;
   "intended-use": string;
@@ -14,14 +14,14 @@ type OKH_TYPE = {
   made: boolean;
   "made-independently": boolean;
   license: string;
-  licensor: contactInfo;
+  licensor: CONTACT_TYPE;
   "okh-manifest-version": string;
   "date-created": YYYY_MM_DD;
   "date-updated": YYYY_MM_DD;
-  "manifest-author": contactInfo;
+  "manifest-author": CONTACT_TYPE;
   "manifest-language": string;
-  contact: contactInfo;
-  version: versionType;
+  contact: CONTACT_TYPE;
+  version: VERSION_TYPE;
   "development-stage": string;
   "documentation-home": string;
   bom: string;
