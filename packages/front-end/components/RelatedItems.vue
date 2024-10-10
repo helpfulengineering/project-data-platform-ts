@@ -2,7 +2,8 @@
   <div class="related-products">
     <h1 class="title">Related to items you’ve viewed</h1>
     <div class="related-product-wrap">
-      <div
+      <NuxtLink
+        :to="`/products/${related_product.id}`"
         class="center m-6"
         v-for="related_product in related_products"
         :key="related_product.id"
@@ -10,7 +11,7 @@
       >
         <img :src="related_product.image" alt="Product Image" class="size-48" />
         <h1 class="name">{{ related_product.name }}</h1>
-    </div>
+      </NuxtLink>
     </div>
   </div>
 </template>
