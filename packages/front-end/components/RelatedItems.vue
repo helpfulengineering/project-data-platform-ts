@@ -9,7 +9,7 @@
         :key="related_product.id"
         :product="related_product"
       >
-        <img :src="related_product.image" alt="Product Image" class="size-48" />
+        <img :src="related_product.image" alt="Product Image" class="img-product" />
         <h1 class="name">{{ related_product.name }}</h1>
       </NuxtLink>
     </div>
