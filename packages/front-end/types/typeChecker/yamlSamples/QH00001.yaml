@@ -1,0 +1,8 @@
+identifier: QH00001
+name: Fabric Mask
+description: Sanatary mask made of fabric intended to avoid infection.
+subclass-of:
+  - identifier: Q161524
+    description: mask
+    link: https://www.wikidata.org/wiki/Q161524
+# https://github.com/helpfulengineering/library/blob/main/atoms/QH00001.yaml
