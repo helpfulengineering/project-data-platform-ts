@@ -1,0 +1,9 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "",
+    "FUNCTIONS_WORKER_RUNTIME": "node",
+    "Azure_Storage_ServiceName": "https://projectdatablobstorage.blob.core.windows.net",
+    "Azure_Storage_ContainerName": "okh"
+  }
+}
