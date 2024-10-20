@@ -89,6 +89,7 @@ import {
   left: 0;
   top: 0;
   width: 100%;
+  z-index: 10;
 
   .btn-register {
     background-color: #a6f671;
