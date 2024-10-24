@@ -1,0 +1,8 @@
+identifier: QH00004
+name: chocolate chip mold
+description: a mold for chocolate chips
+subclass-of:
+  - identifier: Q29349307
+    description: form
+    link: https://www.wikidata.org/wiki/Q29349307
+# https://github.com/helpfulengineering/library/blob/main/atoms/QH00004.yaml
