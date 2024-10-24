@@ -1,29 +1,25 @@
 // OKW sample
 // from https://github.com/helpfulengineering/OKF-Schema/blob/main/okw-schema/okw.schema.json
 
-import { VERSION_TYPE, URL_TYPE } from "./general.type";
+import { type VERSION_TYPE, type URL_TYPE } from "./general.type";
+import { type ATOM_TYPE } from "./ATOM.type";
 
 export type OKW_TYPE = {
-  $schema: string;
   title: string;
-  type: string; // 'object'
-  properties: {
-    title: string;
-    description: string;
-    contact: string;
-    keywords: string[];
-    contributors: string | string[];
-    version: VERSION_TYPE;
-    "development-stage": string;
-    license: string | string[];
-    licensor: string;
-    "documentation-home": URL_TYPE;
-    "archive-download": URL_TYPE;
-    "inventory-atoms": string[];
-    "product-atoms": string[];
-    "tool-list-atoms": string[];
-    processes: string[];
-  };
+  description?: string;
+  contact: string;
+  keywords?: string[];
+  contributors: string | string[];
+  version: VERSION_TYPE;
+  "development-stage": string;
+  license: string | string[];
+  licensor: string;
+  "documentation-home": URL_TYPE;
+  "archive-download"?: URL_TYPE;
+  "inventory-atoms": ATOM_TYPE[];
+  "product-atoms": ATOM_TYPE[];
+  "tool-list-atoms": ATOM_TYPE[];
+  processes: ATOM_TYPE[];
 };
 
 // const sampleOKW = {

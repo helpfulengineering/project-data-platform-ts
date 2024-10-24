@@ -22,11 +22,6 @@ export type CONTACT_TYPE = {
 //   description: chocolate chips
 //   link: https://www.wikidata.org/wiki/Q1329680
 // }
-export type ATOM = {
-  identifier: string;
-  description: string;
-  link: string;
-};
 
 // Perhaps use a library to handle this TODO look up libraries
 export type URL_TYPE = `http${"" | "s"}://${
