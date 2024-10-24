@@ -1,3 +1,5 @@
+// This file should help your TS intellisense detect if there is an issue with the TEST_OKH and OKH_TYPE. It's not meant to be run
+
 import { type OKH_TYPE } from "../OKH.type";
 let TEST_OKH: OKH_TYPE = {
   title: "Character Generator",

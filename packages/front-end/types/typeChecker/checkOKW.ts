@@ -1,6 +1,8 @@
+// This file should help your TS intellisense detect if there is an issue with the TEST_OKH and OKW_TYPE. It's not meant to be run
+
 import type { OKW_TYPE } from "../OKW.type";
 
-let testOKW: OKW_TYPE = {
+let TEST_OKW: OKW_TYPE = {
   title: "Robert's test OKW for Sewing",
   contact: "Robert L. Read, PhD, read.robert@gmail.com",
   contributors: "Robert L. Read",
@@ -70,4 +72,4 @@ let testOKW: OKW_TYPE = {
   ],
 };
 
-console.log(testOKW);
+console.log(TEST_OKW);
