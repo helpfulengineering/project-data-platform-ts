@@ -44,6 +44,8 @@ The [current website](https://helpfulengineering.github.io/project-data-platform
 
 - You must have permissions on the Azure database. Contact admin to make sure you have the right permissions.
 
+- You need to have the Azure CLI installed locally. Please read up here: https://learn.microsoft.com/en-us/cli/azure/install-azure-cli
+
          No Subscription name Subscription ID Tenant
 
          ***
