@@ -36,28 +36,28 @@ const example_products = [
       ],
       automotive_products: [
         {
-          id: 5,
+          id: 6,
           name: "Water Truck Clamp",
           image:
             "https://field-ready-projects.openknowhow.org/images/WA012-attbQe9vW0QdVGkqD-400x300.jpg",
           shortDescription: "Clamps over the hose on the outlet of a water distribution truck to create a seal",
         },
         {
-          id: 6,
+          id: 7,
           name: "Jerry Can Roller",
           image:
             "https://field-ready-projects.openknowhow.org/images/WA013-attjDSod18c5Ru8PN-400x300.jpeg",
           shortDescription: "Transports 80 litres of drinking water",
         },
         {
-          id: 7,
+          id: 8,
           name: "Make-Fit Pipe Fitting",
           image:
             "https://field-ready-projects.openknowhow.org/images/WA016-attP4Uy56ROfYjAjF-400x300.jpg",
           shortDescription: "Using Make-Fit app a range of 3DP pipe fitting can be produced",
         },
         {
-          id: 8,
+          id: 9,
           name: "Straight Coupler",
           image:
             "https://field-ready-projects.openknowhow.org/images/WA010-attuWhYn15CARwJu4-400x300.jpg",
@@ -66,28 +66,28 @@ const example_products = [
       ],
       consumer_products: [
         {
-          id: 9,
+          id: 10,
           name: "Baby Crib",
           image:
             "https://field-ready-projects.openknowhow.org/images/CP002-attt4t66rFpYaqdTj-400x300.jpeg",
           shortDescription: "Provides a safe area for a baby to sleep",
         },
         {
-          id: 10,
+          id: 11,
           name: "Play Pen",
           image:
             "https://field-ready-projects.openknowhow.org/images/CP003-attz3CoRAhIzA5x9v-400x300.jpeg",
           shortDescription: "Provides a safe area for a child to play",
         },
         {
-          id: 11,
+          id: 12,
           name: "Duoband Yagi Antenna",
           image:
             "https://field-ready-projects.openknowhow.org/images/DR002-attJBcwM43eItgWAE-400x300.jpg",
           shortDescription: "3D printed bespoke parts to construct standard antenna design",
         },
         {
-          id: 12,
+          id: 13,
           name: "Rescue Airbag",
           image:
             "https://field-ready-projects.openknowhow.org/images/DR001-att5yL3AEAbc3wDh2-400x300.png",
@@ -98,7 +98,7 @@ const example_products = [
 ];
 
 
-export async function getOKH(request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> {
+export async function getOKHs(request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> {
     context.log(`Http function processed request for url "${request.url}"`);
 
     const name = request.query.get('name') || await request.text() || 'ventilator';
@@ -154,7 +154,7 @@ export async function getOKH(request: HttpRequest, context: InvocationContext): 
         context.log(okh['title' as keyof JSON]);
         context.log(okh['description' as keyof JSON]);
 
-        example_products[0].medical_products.push(
+        example_products[0].medical_products.unshift(
             {
                 id: 5,
                 name: okh['title' as keyof JSON] as string,
@@ -190,10 +190,10 @@ export async function getOKH(request: HttpRequest, context: InvocationContext): 
 app.http('getOKH', {
     methods: ['GET', 'POST'],
     authLevel: 'anonymous',
-    handler: getOKH
+    handler: getOKHs
 });
 
-export async function getOKHs(request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> {
+export async function getOKHs_old(request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> {
     context.log(`Http function processed request for url "${request.url}"`);
 
     return  { jsonBody: example_products };
