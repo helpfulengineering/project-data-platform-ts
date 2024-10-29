@@ -42,6 +42,8 @@ The [current website](https://helpfulengineering.github.io/project-data-platform
 
 1.  In packages/back-end folder, run "az login", login to your account in separate window, and select the default DB. If multiple, select this one:
 
+- You must have permissions on the Azure database. Contact admin to make sure you have the right permissions.
+
          No Subscription name Subscription ID Tenant
 
          ***
