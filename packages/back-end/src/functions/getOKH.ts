@@ -1,6 +1,6 @@
 import { app, HttpRequest, HttpResponseInit, InvocationContext } from "@azure/functions";
 import { downloadBlobToJson, listFilesInContainer } from '../lib/azure-storage.js';
-
+import _ from 'lodash';
 
 const example_products = [
         {
@@ -97,7 +97,6 @@ const example_products = [
         }
 ];
 
-
 export async function getOKHs(request: HttpRequest, context: InvocationContext): Promise<HttpResponseInit> {
     context.log(`Http function processed request for url "${request.url}"`);
 
@@ -154,7 +153,11 @@ export async function getOKHs(request: HttpRequest, context: InvocationContext):
         context.log(okh['title' as keyof JSON]);
         context.log(okh['description' as keyof JSON]);
 
-        example_products[0].medical_products.unshift(
+
+        // Clone so we don't keep modify our fixed sample data.
+        const return_products =  _.cloneDeep(example_products);
+
+        return_products[0].medical_products.unshift(
             {
                 id: 5,
                 name: okh['title' as keyof JSON] as string,
@@ -169,7 +172,7 @@ export async function getOKHs(request: HttpRequest, context: InvocationContext):
 //        context.log("example_products",JSON.stringify(example_products));
         if (!error) {
           return {
-            jsonBody: example_products
+            jsonBody: return_products
           };
         } else {
           return {

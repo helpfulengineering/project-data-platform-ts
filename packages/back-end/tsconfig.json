@@ -4,7 +4,8 @@
     "target": "es6",
     "outDir": "dist",
     "rootDir": ".",
-    "sourceMap": true,
+      "esModuleInterop": true,
+      "sourceMap": true,
     "strict": true
   }
 }
