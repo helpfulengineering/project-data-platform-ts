@@ -2,8 +2,10 @@
 <template>
   <NuxtLink :to="`/products/${product.id}`" class="product-card">
     <img :src="product.image" alt="Product Image" class="product-image" />
-    <h3>{{ product.name }}</h3>
-    <!-- <p>{{ product.shortDescription }}</p> -->
+    <h3 class="title">{{ product.name }}</h3>
+    <p class="author">{{ product.manifestAuthor }}</p>
+    <p class="description">{{ product.shortDescription }}</p>  
+    <p class="project-link">{{ product.projectLink }}</p>
   </NuxtLink>
 </template>
 
@@ -27,14 +29,43 @@ export default {
   margin-bottom: 15px;
   text-align: center;
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-}
 
-.product-image {
-  width: 100%;
-  height: 150px;
-  object-fit: cover;
-  border-radius: 8px;
-  margin-bottom: 10px;
+  .product-image {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 10px;
+  }
+
+  .author {
+    font-size: 14px;
+    /* font-weight: 500; */
+    margin-bottom: 5px;
+    text-align: left;
+  }
+
+  .description {
+    color: #898888;
+    font-size: 12px;
+    font-weight: 500;
+    text-align: left;
+  }
+
+  .project-link {
+    color: #007bff;
+    font-size: 12px;
+    font-weight: 500;
+    text-decoration: underline;
+    text-align: left;
+  }
+
+  .title {
+    color: #2a3952;
+    font-size: 18px;
+    font-weight: 600;
+    text-align: left;
+  }
 }
 
 .view-details {
