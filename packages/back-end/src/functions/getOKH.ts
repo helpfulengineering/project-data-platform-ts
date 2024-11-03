@@ -11,6 +11,9 @@ const example_products = [
           image:
           "https://field-ready-projects.openknowhow.org/images/HL003-attC88mXadLwq4sLy-400x300.jpg",
           shortDescription: "For IV bags to be hung",
+          projectLink: "project-link",
+          manifestAuthor: "manifest-author",
+          
         },
         {
           id: 2,
@@ -18,6 +21,8 @@ const example_products = [
           image:
             "https://field-ready-projects.openknowhow.org/images/HL002-attmlR243asYolZRO-400x300.jpg",
           shortDescription:  "Adapter that connects oxygen supply tubing to standard oxygen systems",
+          projectLink: "project-link",
+          manifestAuthor: "manifest-author",
         },
         {
           id: 3,
@@ -25,6 +30,8 @@ const example_products = [
           image:
             "https://field-ready-projects.openknowhow.org/images/HL001-attG43ftDEHSUFPVG-400x300.jpg",
           shortDescription: "Enclosure of umbilical cords of newborns to prevent sepsis",
+          projectLink: "project-link",
+          manifestAuthor: "manifest-author",
         },
         {
           id: 4,
@@ -32,6 +39,8 @@ const example_products = [
           image:
             "https://field-ready-projects.openknowhow.org/images/HL005-attgxsUzHxoTnTmSP-400x300.jpg",
           shortDescription: "In order to keep a injured index finger immobile",
+          projectLink: "project-link",
+          manifestAuthor: "manifest-author",
         },
       ],
       automotive_products: [
@@ -41,6 +50,8 @@ const example_products = [
           image:
             "https://field-ready-projects.openknowhow.org/images/WA012-attbQe9vW0QdVGkqD-400x300.jpg",
           shortDescription: "Clamps over the hose on the outlet of a water distribution truck to create a seal",
+          projectLink: "project-link",
+          manifestAuthor: "manifest-author",
         },
         {
           id: 7,
@@ -48,6 +59,8 @@ const example_products = [
           image:
             "https://field-ready-projects.openknowhow.org/images/WA013-attjDSod18c5Ru8PN-400x300.jpeg",
           shortDescription: "Transports 80 litres of drinking water",
+          projectLink: "project-link",
+          manifestAuthor: "manifest-author",
         },
         {
           id: 8,
@@ -55,6 +68,8 @@ const example_products = [
           image:
             "https://field-ready-projects.openknowhow.org/images/WA016-attP4Uy56ROfYjAjF-400x300.jpg",
           shortDescription: "Using Make-Fit app a range of 3DP pipe fitting can be produced",
+          projectLink: "project-link",
+          manifestAuthor: "manifest-author",
         },
         {
           id: 9,
@@ -62,6 +77,8 @@ const example_products = [
           image:
             "https://field-ready-projects.openknowhow.org/images/WA010-attuWhYn15CARwJu4-400x300.jpg",
           shortDescription: "20.5/16.5 straight coupler used to join to pipes.",
+          projectLink: "project-link",
+          manifestAuthor: "manifest-author",
         },
       ],
       consumer_products: [
@@ -71,6 +88,8 @@ const example_products = [
           image:
             "https://field-ready-projects.openknowhow.org/images/CP002-attt4t66rFpYaqdTj-400x300.jpeg",
           shortDescription: "Provides a safe area for a baby to sleep",
+          projectLink: "project-link",
+          manifestAuthor: "manifest-author",
         },
         {
           id: 11,
@@ -78,6 +97,8 @@ const example_products = [
           image:
             "https://field-ready-projects.openknowhow.org/images/CP003-attz3CoRAhIzA5x9v-400x300.jpeg",
           shortDescription: "Provides a safe area for a child to play",
+          projectLink: "project-link",
+          manifestAuthor: "manifest-author",
         },
         {
           id: 12,
@@ -85,6 +106,8 @@ const example_products = [
           image:
             "https://field-ready-projects.openknowhow.org/images/DR002-attJBcwM43eItgWAE-400x300.jpg",
           shortDescription: "3D printed bespoke parts to construct standard antenna design",
+          projectLink: "project-link",
+          manifestAuthor: "manifest-author",
         },
         {
           id: 13,
@@ -92,6 +115,8 @@ const example_products = [
           image:
             "https://field-ready-projects.openknowhow.org/images/DR001-att5yL3AEAbc3wDh2-400x300.png",
           shortDescription: "For first responders to remove large blocks of debris",
+          projectLink: "project-link",
+          manifestAuthor: "manifest-author",
         },
       ],
         }
@@ -162,7 +187,9 @@ export async function getOKHs(request: HttpRequest, context: InvocationContext):
                 id: 5,
                 name: okh['title' as keyof JSON] as string,
                 image: "",
-                shortDescription: okh['description' as keyof JSON] as string
+                shortDescription: okh['description' as keyof JSON] as string,
+                projectLink: "project-link",
+                manifestAuthor: "manifest-author",
             }
         );
 
