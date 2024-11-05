@@ -7,6 +7,7 @@ import {
 } from "@azure/functions";
 import {
   downloadBlobToJson,
+  downloadBlobToYaml,
   listFilesInContainer,
 } from "../lib/azure-storage.js";
 import { DICT_TYPE } from "../types/generalTypes.js";
@@ -156,7 +157,11 @@ export async function getOKH(
 
   // get the name of the item
   const name =
-    request.query.get("name") || (await request.text()) || "ventilator";
+    request.query.get("name") ||
+    (await request.text()) ||
+    "okh-ventilator.json";
+  // get the name of the item
+  const yamlFileName = "bread.yml";
 
   try {
     const { error, errorMessage, data } = await listFilesInContainer(
@@ -164,8 +169,8 @@ export async function getOKH(
       OKHcontainerName
     );
 
-    context.log(`Here are the listed container items`);
-    context.log(typeof data, data);
+    // context.log(`Here are the listed container items`);
+    // context.log(typeof data, data);
 
     if (error) {
       return {
@@ -175,15 +180,23 @@ export async function getOKH(
     }
 
     const okh = await getOKHByName(name, OKHcontainerName);
+    //bread.yml
+    // context.log("before bread");
 
-    context.log("OKH", okh);
+    const breadYAML = await getOKHByName(yamlFileName, OKHcontainerName);
+    // context.log("after bread");
+
+    // context.log("OKH", okh);
+    context.log("breadYAML", breadYAML);
 
     // Note okh is of type JSON. Decoding into a type correct
     // object requires a lot of complexity as explained in this issue:
     // https://stackoverflow.com/questions/22885995/how-do-i-initialize-a-typescript-object-with-a-json-object
 
-    context.log(okh["title"]);
-    context.log(okh["description"]);
+    const breadAsJson: any = convertYAMLToJson(breadYAML);
+
+    // context.log(okh["title"]);
+    // context.log(okh["description"]);
 
     example_products[0].medical_products.push({
       id: 5,
@@ -192,6 +205,7 @@ export async function getOKH(
       shortDescription: okh["description"] as string,
     });
 
+    example_products[0].medical_products.push(breadAsJson);
     return {
       jsonBody: example_products,
     };
@@ -269,16 +283,54 @@ export async function listOKWFiles(
 // HELPER FUNCTIONS //////////////////////////////////////////////////////////////////////////////////////////
 
 async function getOKHByName(name: string, containerName: string): Promise<any> {
+  const fileType = name.split(".").pop();
   // // Warning!! This function does NOT match the apparent
   // // documentation: https://learn.microsoft.com/en-us/azure/storage/blobs/storage-blob-download-javascript
   // // I had to figure it out by guessing. The documentation there
   // // gives the arguments as "containerClient, blobName, fileNameWithPath"
   // // I can't explain this discrepancy.
-  return await downloadBlobToJson(
-    process.env?.Azure_Storage_ServiceName as string,
-    containerName,
-    `okh-${name}.json`
-  );
+  if (fileType === "json") {
+    return await downloadBlobToJson(
+      process.env?.Azure_Storage_ServiceName as string,
+      containerName,
+      name
+    );
+  } else if (fileType === "yml" || fileType === "yaml") {
+    return await downloadBlobToYaml(
+      process.env?.Azure_Storage_ServiceName as string,
+      containerName,
+      name
+    );
+  }
+
+  // return await downloadBlobToJson(
+  //   process.env?.Azure_Storage_ServiceName as string,
+  //   containerName,
+  //   name
+  // );
 }
 
 async function getAllFileNamesInContainer() {}
+
+function convertYAMLToJson(yaml: string): Promise<any> {
+  const obj: any = {
+    id: "6",
+    name: "Ghanian Super Bread",
+    image: "",
+    shortDescription: yaml,
+  };
+
+  // context.log(okh["title"]);
+  // context.log(okh["description"]);
+
+  obj.id = "6";
+
+  // medical_products.push({
+  //   id: 5,
+  //   name: okh["title"] as string,
+  //   image: "",
+  //   shortDescription: okh["description"] as string,
+  // });
+
+  return obj;
+}

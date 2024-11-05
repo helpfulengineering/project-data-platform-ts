@@ -4,16 +4,16 @@ import {
   BlobServiceClient,
   ContainerClient,
   SASProtocol,
-  StorageSharedKeyCredential
-} from '@azure/storage-blob';
+  StorageSharedKeyCredential,
+} from "@azure/storage-blob";
 
-import { DefaultAzureCredential } from '@azure/identity';
+import { DefaultAzureCredential } from "@azure/identity";
 
-function getBlobServiceClient(serviceName:string) {
-// Acquire a credential object
-const tokenCredential = new DefaultAzureCredential();
+function getBlobServiceClient(serviceName: string) {
+  // Acquire a credential object
+  const tokenCredential = new DefaultAzureCredential();
 
-const blobServiceClient = new BlobServiceClient(serviceName,tokenCredential);
+  const blobServiceClient = new BlobServiceClient(serviceName, tokenCredential);
   return blobServiceClient;
 }
 
@@ -34,7 +34,7 @@ export async function uploadBlob(
   blob: Buffer
 ): Promise<string> {
   if (!serviceName || !fileName || !containerName || !blob) {
-    return 'Upload function missing parameters';
+    return "Upload function missing parameters";
   }
 
   const blobServiceClient = getBlobServiceClient(serviceName);
@@ -45,8 +45,8 @@ export async function uploadBlob(
   );
   const blockBlobClient = await containerClient.getBlockBlobClient(fileName);
   const response = await blockBlobClient.uploadData(blob);
-  
-  return response.errorCode? response.errorCode : 'Success';
+
+  return response.errorCode ? response.errorCode : "Success";
 }
 
 export const generateSASUrl = async (
@@ -54,11 +54,11 @@ export const generateSASUrl = async (
   serviceKey: string,
   containerName: string,
   fileName: string, // hierarchy of folders and file name: 'folder1/folder2/filename.ext'
-  permissions = 'r', // default read only
+  permissions = "r", // default read only
   timerange = 1 // default 1 minute
 ): Promise<string> => {
   if (!serviceName || !serviceKey || !fileName || !containerName) {
-    return 'Generate SAS function missing parameters';
+    return "Generate SAS function missing parameters";
   }
 
   const blobServiceClient = getBlobServiceClient(serviceName);
@@ -77,7 +77,7 @@ export const generateSASUrl = async (
     startsOn: NOW,
     expiresOn: new Date(new Date().valueOf() + SIXTY_MINUTES),
     permissions: BlobSASPermissions.parse(permissions), // Read only permission to the blob
-    protocol: SASProtocol.Https // Only allow HTTPS access to the blob
+    protocol: SASProtocol.Https, // Only allow HTTPS access to the blob
   });
 
   return accountSasTokenUrl;
@@ -96,8 +96,8 @@ export const listFilesInContainer = async (
   if (!serviceName || !containerName) {
     return {
       error: true,
-      errorMessage: 'List files in container function missing parameters',
-      data: []
+      errorMessage: "List files in container function missing parameters",
+      data: [],
     };
   }
 
@@ -105,7 +105,6 @@ export const listFilesInContainer = async (
   const containerClient = blobServiceClient.getContainerClient(containerName);
 
   const data = [];
-
 
   for await (const response of containerClient
     .listBlobsFlat()
@@ -117,67 +116,99 @@ export const listFilesInContainer = async (
 
   return {
     error: false,
-    errorMessage: '',
-    data
+    errorMessage: "",
+    data,
   };
 };
 
 export const downloadBlobToJson = async (
-    serviceName: string,
-    containerName: string,
-    blobName: string
-  ): Promise<JSON> => {
-    const blobServiceClient = getBlobServiceClient(serviceName);
+  serviceName: string,
+  containerName: string,
+  blobName: string
+): Promise<JSON> => {
+  const blobServiceClient = getBlobServiceClient(serviceName);
 
-    const containerClient = await  blobServiceClient.getContainerClient(containerName);
+  const containerClient = await blobServiceClient.getContainerClient(
+    containerName
+  );
 
-    const downloadResponse = await containerClient.getBlockBlobClient(blobName).download();
-  
-    if (!downloadResponse.errorCode && downloadResponse.readableStreamBody) {
-      const downloaded = await streamToJson(
-        downloadResponse.readableStreamBody
-      );
-      if (downloaded) {
-        console.log('Downloaded blob content:', downloaded);
-        return downloaded;
-      }
+  const downloadResponse = await containerClient
+    .getBlockBlobClient(blobName)
+    .download();
 
-
+  if (!downloadResponse.errorCode && downloadResponse.readableStreamBody) {
+    const downloaded = await streamToJson(downloadResponse.readableStreamBody);
+    if (downloaded) {
+      console.log("Downloaded blob content:", downloaded);
+      return downloaded;
     }
-    return JSON.parse('{}');
   }
+  return JSON.parse(
+    "{error:'downloadBlobToJson could not download blob to JSON}"
+  );
+};
 
-  async function streamToBuffer(readableStream : NodeJS.ReadableStream): Promise<Buffer> {
-    return new Promise((resolve, reject) => {
-      const chunks: Buffer[] = [];
-  
-      readableStream.on('data', (data) => {
-        const content: Buffer = data instanceof Buffer ? data : Buffer.from(data);
-        chunks.push(content);
-      });
-      readableStream.on('end', () => {
-        resolve(Buffer.concat(chunks));
-      });
-      readableStream.on('error', reject);
+export const downloadBlobToYaml = async (
+  serviceName: string,
+  containerName: string,
+  blobName: string
+): Promise<string> => {
+  const blobServiceClient = getBlobServiceClient(serviceName);
+
+  const containerClient = await blobServiceClient.getContainerClient(
+    containerName
+  );
+
+  const downloadResponse = await containerClient
+    .getBlockBlobClient(blobName)
+    .download();
+
+  if (!downloadResponse.errorCode && downloadResponse.readableStreamBody) {
+    const downloaded = await streamToText(downloadResponse.readableStreamBody);
+    if (downloaded) {
+      console.log("Downloaded blob content:", downloaded);
+      return downloaded;
+    }
+  }
+  return JSON.parse(
+    "{error:'downloadBlobToYaml could not download blob to YAML}"
+  );
+};
+
+async function streamToBuffer(
+  readableStream: NodeJS.ReadableStream
+): Promise<Buffer> {
+  return new Promise((resolve, reject) => {
+    const chunks: Buffer[] = [];
+
+    readableStream.on("data", (data) => {
+      const content: Buffer = data instanceof Buffer ? data : Buffer.from(data);
+      chunks.push(content);
     });
-  }
+    readableStream.on("end", () => {
+      resolve(Buffer.concat(chunks));
+    });
+    readableStream.on("error", reject);
+  });
+}
 
-  // Convert stream to text
+// Convert stream to text
 async function streamToText(readable: NodeJS.ReadableStream): Promise<string> {
-    readable.setEncoding('utf8');
-    let data = '';
-    for await (const chunk of readable) {
-      data += chunk;
-    }
-    return data;
+  readable.setEncoding("utf8");
+  let data = "";
+  for await (const chunk of readable) {
+    data += chunk;
   }
-
+  return data;
+}
 
 // Convert stream to JSON
 async function streamToJson(readable: NodeJS.ReadableStream): Promise<JSON> {
-    let data = '';
-    for await (const chunk of readable) {
-        data += chunk;
-    }
-    return JSON.parse(data);
+  let data = "";
+  for await (const chunk of readable) {
+    data += chunk;
+  }
+  return JSON.parse(data);
 }
+
+// TODO create a function that streams to TEXT and then reads AS YAML and converts to JSON... perfect world is typed OKH
