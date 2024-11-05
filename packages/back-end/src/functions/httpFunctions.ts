@@ -35,7 +35,6 @@ const routeFunctions: DICT_TYPE = {
   test,
   getMicroscope,
   getVentilator,
-  // listFiles,
   listOKHFiles,
   listOKWFiles,
 };
