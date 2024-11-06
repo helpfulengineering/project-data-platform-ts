@@ -39,15 +39,28 @@ const routeFunctions: DICT_TYPE = {
   getVentilator,
   listOKHFiles,
   listOKWFiles,
+  "getFile/{containerName:alpha}/{fileName:alpha}/{fileType:alpha}": getFile,
 };
 //create route for each
 for (let key in routeFunctions) {
-  app.http(key, {
+  const func = routeFunctions[key];
+  app.http(func.name, {
     methods: ["GET", "POST"],
     authLevel: "anonymous",
-    handler: routeFunctions[key],
+    route: key,
+    handler: func,
   });
 }
+
+// app.http("params", {
+//   methods: ["GET", "POST"],
+//   authLevel: "anonymous",
+//   route: "params/{containerName:alpha}/{fileName:alpha}",
+//   handler: (request: HttpRequest, context: InvocationContext) => {
+//     context.log(request.params.containerName, request.params.fileName);
+//     return { jsonBody: "params" };
+//   },
+// });
 
 export async function getOKH(
   request: HttpRequest,
@@ -182,29 +195,46 @@ export async function listOKWFiles(
   return { jsonBody: data };
 }
 
+export async function getFile(
+  request: HttpRequest,
+  context: any
+): Promise<HttpResponseInit> {
+  context.log("getFile");
+  context.log(request.params.containerName, request.params.fileName);
+  const { containerName, fileName, fileType } = request.params;
+  context.log(containerName, fileName, fileType);
+
+  if (!containerName || !fileName || !fileType)
+    return { jsonBody: "error, no containerName or fileName" };
+  const data = await getOKHByFileName(fileName, containerName, fileType);
+
+  return { jsonBody: data };
+}
+
 // HELPER FUNCTIONS //////////////////////////////////////////////////////////////////////////////////////////
 
 async function getOKHByFileName(
   name: string,
-  containerName: string
+  containerName: string,
+  fileType?: string
 ): Promise<any> {
-  const fileType = name.split(".").pop();
+  const fileExt = fileType || name.split(".").pop();
   // // Warning!! This function does NOT match the apparent
   // // documentation: https://learn.microsoft.com/en-us/azure/storage/blobs/storage-blob-download-javascript
   // // I had to figure it out by guessing. The documentation there
   // // gives the arguments as "containerClient, blobName, fileNameWithPath"
   // // I can't explain this discrepancy.
-  if (fileType === "json") {
+  if (fileExt === "json") {
     return await downloadBlobToJson(
       process.env?.Azure_Storage_ServiceName as string,
       containerName,
-      name
+      name + "." + fileExt
     );
-  } else if (fileType === "yml" || fileType === "yaml") {
+  } else if (fileExt === "yml" || fileExt === "yaml") {
     return await downloadBlobYamlToJSON(
       process.env?.Azure_Storage_ServiceName as string,
       containerName,
-      name
+      name + "." + fileExt
     );
   }
 
