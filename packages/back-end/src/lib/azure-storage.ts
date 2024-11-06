@@ -9,6 +9,8 @@ import {
 
 import { DefaultAzureCredential } from "@azure/identity";
 
+import { parse as parseYAML } from "yaml";
+
 function getBlobServiceClient(serviceName: string) {
   // Acquire a credential object
   const tokenCredential = new DefaultAzureCredential();
@@ -148,11 +150,11 @@ export const downloadBlobToJson = async (
   );
 };
 
-export const downloadBlobToYaml = async (
+export const downloadBlobYamlToJSON = async (
   serviceName: string,
   containerName: string,
   blobName: string
-): Promise<string> => {
+): Promise<JSON> => {
   const blobServiceClient = getBlobServiceClient(serviceName);
 
   const containerClient = await blobServiceClient.getContainerClient(
@@ -164,7 +166,9 @@ export const downloadBlobToYaml = async (
     .download();
 
   if (!downloadResponse.errorCode && downloadResponse.readableStreamBody) {
-    const downloaded = await streamToText(downloadResponse.readableStreamBody);
+    const downloaded = await streamFromYamlToJson(
+      downloadResponse.readableStreamBody
+    );
     if (downloaded) {
       console.log("Downloaded blob content:", downloaded);
       return downloaded;
@@ -195,20 +199,30 @@ async function streamToBuffer(
 // Convert stream to text
 async function streamToText(readable: NodeJS.ReadableStream): Promise<string> {
   readable.setEncoding("utf8");
-  let data = "";
-  for await (const chunk of readable) {
-    data += chunk;
-  }
+  const data = await readableStreamToText(readable);
   return data;
 }
 
 // Convert stream to JSON
 async function streamToJson(readable: NodeJS.ReadableStream): Promise<JSON> {
-  let data = "";
-  for await (const chunk of readable) {
-    data += chunk;
-  }
+  const data = await readableStreamToText(readable);
   return JSON.parse(data);
 }
 
 // TODO create a function that streams to TEXT and then reads AS YAML and converts to JSON... perfect world is typed OKH
+async function streamFromYamlToJson(
+  readable: NodeJS.ReadableStream
+): Promise<JSON> {
+  const data = await readableStreamToText(readable);
+  return parseYAML(data);
+}
+
+async function readableStreamToText(
+  readable: NodeJS.ReadableStream
+): Promise<string> {
+  let text = "";
+  for await (const chunk of readable) {
+    text += chunk;
+  }
+  return text;
+}
