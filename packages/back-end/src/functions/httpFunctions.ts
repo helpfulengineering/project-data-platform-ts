@@ -37,10 +37,8 @@ const routeFunctions: DICT_TYPE = {
   test,
   getMicroscope,
   getVentilator,
-  listOKHFiles,
-  listOKWFiles,
   "getFile/{containerName}/{fileName}/{fileType}": getFile, // Example: "getFile/okh/bread/yml"
-  "listFiles/{containerName}": listFilesByContainerName,
+  "listFiles/{containerName}": listFilesByContainerName, // Example: http://localhost:7071/api/listFiles/okw OR http://localhost:7071/api/listFiles/okh
 };
 //create route for each
 for (let key in routeFunctions) {
@@ -142,38 +140,6 @@ export async function getVentilator(
   context: InvocationContext
 ): Promise<HttpResponseInit> {
   return { jsonBody: null };
-}
-
-// TODO: Paramaterize this function so that it can handle both OKH and OKW container names
-export async function listOKHFiles(
-  request: HttpRequest,
-  context: InvocationContext
-): Promise<HttpResponseInit> {
-  console.log("list", serviceName, OKHcontainerName);
-  const { error, errorMessage, data } = await listFilesInContainer(
-    serviceName,
-    OKHcontainerName
-  );
-  if (error) {
-    return { jsonBody: error };
-  }
-  return { jsonBody: data };
-}
-
-// TODO: Paramaterize this function so that it can handle both OKH and OKW container names
-export async function listOKWFiles(
-  request: HttpRequest,
-  context: InvocationContext
-): Promise<HttpResponseInit> {
-  console.log("list", serviceName, OKWcontainerName);
-  const { error, errorMessage, data } = await listFilesInContainer(
-    serviceName,
-    OKWcontainerName
-  );
-  if (error) {
-    return { jsonBody: error };
-  }
-  return { jsonBody: data };
 }
 
 export async function listFilesByContainerName(
