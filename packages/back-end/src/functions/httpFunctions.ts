@@ -32,11 +32,11 @@ if (!OKWcontainerName) {
 
 //stores all the route functions/names... must list the functions here
 const routeFunctions: DICT_TYPE = {
+  test,
+  listRoutes,
   getOKH,
   getOKHs,
-  test,
-  getMicroscope,
-  getVentilator,
+  getExampleProducts,
   "getFile/{containerName}/{fileName}/{fileType}": getFile, // Example: "getFile/okh/bread/yml"
   "listFiles/{containerName}": listFilesByContainerName, // Example: http://localhost:7071/api/listFiles/okw OR http://localhost:7071/api/listFiles/okh
 };
@@ -51,55 +51,48 @@ for (let key in routeFunctions) {
   });
 }
 
+export async function listRoutes(
+  request: HttpRequest,
+  context: InvocationContext
+): Promise<HttpResponseInit> {
+  let routes = [];
+
+  for (let r in routeFunctions) {
+    let base = request.url.split("/").slice(0, -1).join("/");
+    routes.push(`${base}/${r}`);
+  }
+  return { jsonBody: routes };
+}
+
+// This route is currently meant for the front-end to provide dummy data (with some real data sprinkled in)
 export async function getOKH(
   request: HttpRequest,
   context: InvocationContext
 ): Promise<HttpResponseInit> {
   context.log(`Http function processed request for url "${request.url}"`);
 
-  // get the name of the item
-  const jsonFileName =
-    request.query.get("name") ||
-    (await request.text()) ||
-    "okh-ventilator.json";
-  // get the name of the item
-  const yamlFileName = "bread.yml";
+  // item from azure
+  // const jsonFileName =
+  // request.query.get("name")
+  // || (await request.text())
 
   try {
-    const { error, errorMessage, data } = await listFilesInContainer(
-      serviceName,
-      OKHcontainerName
-    );
-
-    if (error) {
-      return {
-        status: 500,
-        jsonBody: errorMessage,
-      };
-    }
-
-    const okh = await getOKHByFileName(jsonFileName, OKHcontainerName);
-
-    const breadYAML = await getOKHByFileName(yamlFileName, OKHcontainerName);
-
-    context.log("breadYAML", breadYAML);
-
     // Note okh is of type JSON. Decoding into a type correct
     // object requires a lot of complexity as explained in this issue:
     // https://stackoverflow.com/questions/22885995/how-do-i-initialize-a-typescript-object-with-a-json-object
+    const itemFromAzure = await getOKHByFileName(
+      "okh-ventilator",
+      "okh",
+      "json"
+    );
+    const covertedItem = convertToProduct(itemFromAzure, 5);
 
-    const breadAsJson: any = convertYAMLToJson(breadYAML);
+    const breadData = await getOKHByFileName("bread", "okh", "yml");
+    const convertedBreadItem = convertToProduct(breadData, 6);
 
-    example_products[0].medical_products.push({
-      id: 5,
-      name: okh["title"] as string,
-      image: "https://placecats.com/300/200",
-      shortDescription: okh["description"] as string,
-      projectLink: "",
-      manifestAuthor: "",
-    });
+    example_products[0].medical_products.push(covertedItem);
+    example_products[0].medical_products.push(convertedBreadItem);
 
-    example_products[0].medical_products.push(breadAsJson);
     return {
       jsonBody: example_products,
     };
@@ -109,6 +102,15 @@ export async function getOKH(
       jsonBody: error,
     };
   }
+}
+
+export async function getExampleProducts(
+  request: HttpRequest,
+  context: InvocationContext
+): Promise<HttpResponseInit> {
+  context.log(`Http function processed request for url "${request.url}"`);
+
+  return { jsonBody: example_products };
 }
 
 export async function getOKHs(
@@ -126,20 +128,6 @@ export async function test(
 ): Promise<HttpResponseInit> {
   context.log(`this is a test of the endpoint: "${request.url}"`);
   return { jsonBody: { test: true } };
-}
-
-export async function getMicroscope(
-  request: HttpRequest,
-  context: InvocationContext
-): Promise<HttpResponseInit> {
-  return { jsonBody: null };
-}
-
-export async function getVentilator(
-  request: HttpRequest,
-  context: InvocationContext
-): Promise<HttpResponseInit> {
-  return { jsonBody: null };
 }
 
 export async function listFilesByContainerName(
@@ -206,15 +194,15 @@ async function getOKHByFileName(
   return null;
 }
 
-function convertYAMLToJson(yaml: string): Promise<any> {
-  const obj: any = {
-    id: "6",
-    name: "Ghanian Super Bread",
-    image: "",
-    shortDescription: yaml,
-    projectLink: "project-link",
-    manifestAuthor: "manifest-author",
+// will need proper typing once types have been shared with back-end
+function convertToProduct(obj: any, id: number): any | null {
+  if (!obj || typeof obj !== "object") return null;
+  return {
+    id,
+    name: obj["title"] as string,
+    image: "https://placecats.com/300/200",
+    shortDescription: obj["description"] as string,
+    projectLink: obj["project-link"],
+    manifestAuthor: obj["manifest-author"]?.name || "none",
   };
-
-  return obj;
 }
