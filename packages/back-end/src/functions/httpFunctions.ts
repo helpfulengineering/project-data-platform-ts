@@ -12,6 +12,7 @@ import {
 } from "../lib/azure-storage.js";
 import { DICT_TYPE } from "../types/generalTypes.js";
 import { example_products } from "../dummyData/exampleProducts.js";
+import _ from "lodash";
 
 // make sure important environment variables are present
 const serviceName: string = process.env?.Azure_Storage_ServiceName || "";
@@ -98,16 +99,26 @@ export async function getOKH(
       "okh",
       "json"
     );
-    const covertedItem = convertToProduct(itemFromAzure, 5);
 
     const breadData = await getOKHByFileName("bread", "okh", "yml");
-    const convertedBreadItem = convertToProduct(breadData, 6);
 
-    example_products[0].medical_products.push(covertedItem);
-    example_products[0].medical_products.push(convertedBreadItem);
+    // duplicate example data so you don't modify it
+    const cloned_products = _.cloneDeep(example_products);
+    cloned_products[0].medical_products.push(
+      convertToProduct(
+        itemFromAzure,
+        cloned_products[0].medical_products.length + 1
+      )
+    );
+    cloned_products[0].medical_products.push(
+      convertToProduct(
+        breadData,
+        cloned_products[0].medical_products.length + 1
+      )
+    );
 
     return {
-      jsonBody: example_products,
+      jsonBody: cloned_products,
     };
   } catch (error) {
     return {
