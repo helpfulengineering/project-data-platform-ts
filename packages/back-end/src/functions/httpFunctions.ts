@@ -59,7 +59,20 @@ export async function listRoutes(
 
   for (let r in routeFunctions) {
     let base = request.url.split("/").slice(0, -1).join("/");
-    routes.push(`${base}/${r}`);
+    let route = `${base}/${r}`;
+    routes.push(route);
+    // Adding some example routes.
+    if (r.includes("listFiles")) {
+      routes.push(route.replace("{containerName}", "okh"));
+      routes.push(route.replace("{containerName}", "okw"));
+    } else if (r.includes("getFile")) {
+      routes.push(
+        route
+          .replace("{containerName}", "okh")
+          .replace("{fileName}", "bread")
+          .replace("{fileType}", "yml")
+      );
+    }
   }
   return { jsonBody: routes };
 }
