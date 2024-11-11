@@ -39,7 +39,8 @@ const routeFunctions: DICT_TYPE = {
   getVentilator,
   listOKHFiles,
   listOKWFiles,
-  "getFile/{containerName:alpha}/{fileName:alpha}/{fileType:alpha}": getFile,
+  "getFile/{containerName}/{fileName}/{fileType}": getFile, // Example: "getFile/okh/bread/yml"
+  "listFiles/{containerName}": listFilesByContainerName,
 };
 //create route for each
 for (let key in routeFunctions) {
@@ -51,16 +52,6 @@ for (let key in routeFunctions) {
     handler: func,
   });
 }
-
-// app.http("params", {
-//   methods: ["GET", "POST"],
-//   authLevel: "anonymous",
-//   route: "params/{containerName:alpha}/{fileName:alpha}",
-//   handler: (request: HttpRequest, context: InvocationContext) => {
-//     context.log(request.params.containerName, request.params.fileName);
-//     return { jsonBody: "params" };
-//   },
-// });
 
 export async function getOKH(
   request: HttpRequest,
@@ -82,9 +73,6 @@ export async function getOKH(
       OKHcontainerName
     );
 
-    // context.log(`Here are the listed container items`);
-    // context.log(typeof data, data);
-
     if (error) {
       return {
         status: 500,
@@ -93,13 +81,9 @@ export async function getOKH(
     }
 
     const okh = await getOKHByFileName(jsonFileName, OKHcontainerName);
-    //bread.yml
-    // context.log("before bread");
 
     const breadYAML = await getOKHByFileName(yamlFileName, OKHcontainerName);
-    // context.log("after bread");
 
-    // context.log("OKH", okh);
     context.log("breadYAML", breadYAML);
 
     // Note okh is of type JSON. Decoding into a type correct
@@ -107,9 +91,6 @@ export async function getOKH(
     // https://stackoverflow.com/questions/22885995/how-do-i-initialize-a-typescript-object-with-a-json-object
 
     const breadAsJson: any = convertYAMLToJson(breadYAML);
-
-    // context.log(okh["title"]);
-    // context.log(okh["description"]);
 
     example_products[0].medical_products.push({
       id: 5,
@@ -195,17 +176,34 @@ export async function listOKWFiles(
   return { jsonBody: data };
 }
 
+export async function listFilesByContainerName(
+  request: HttpRequest,
+  context: InvocationContext
+): Promise<HttpResponseInit> {
+  const { containerName } = request.params;
+
+  console.log("listFilesByContainerName", serviceName, containerName);
+  const { error, errorMessage, data } = await listFilesInContainer(
+    serviceName,
+    containerName
+  );
+  if (error) {
+    return { jsonBody: error };
+  }
+  return { jsonBody: data };
+}
+
 export async function getFile(
   request: HttpRequest,
   context: any
 ): Promise<HttpResponseInit> {
   context.log("getFile");
-  context.log(request.params.containerName, request.params.fileName);
   const { containerName, fileName, fileType } = request.params;
   context.log(containerName, fileName, fileType);
 
-  if (!containerName || !fileName || !fileType)
+  if (!containerName || !fileName || !fileType) {
     return { jsonBody: "error, no containerName or fileName" };
+  }
   const data = await getOKHByFileName(fileName, containerName, fileType);
 
   return { jsonBody: data };
@@ -218,12 +216,14 @@ async function getOKHByFileName(
   containerName: string,
   fileType?: string
 ): Promise<any> {
-  const fileExt = fileType || name.split(".").pop();
+  const fileExt: string = fileType || name.split(".").pop() || "";
+
   // // Warning!! This function does NOT match the apparent
   // // documentation: https://learn.microsoft.com/en-us/azure/storage/blobs/storage-blob-download-javascript
   // // I had to figure it out by guessing. The documentation there
   // // gives the arguments as "containerClient, blobName, fileNameWithPath"
   // // I can't explain this discrepancy.
+
   if (fileExt === "json") {
     return await downloadBlobToJson(
       process.env?.Azure_Storage_ServiceName as string,
@@ -237,15 +237,8 @@ async function getOKHByFileName(
       name + "." + fileExt
     );
   }
-
-  // return await downloadBlobToJson(
-  //   process.env?.Azure_Storage_ServiceName as string,
-  //   containerName,
-  //   namelllllllllllllllllllllllllk
-  // );
+  return null;
 }
-
-async function getAllFileNamesInContainer() {}
 
 function convertYAMLToJson(yaml: string): Promise<any> {
   const obj: any = {
