@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const baseUrl = useRuntimeConfig().public.baseUrl;
-const url = baseUrl + "/getOKHs";
+const url = baseUrl + "/getOKH";
 const loading = "loading";
 const success = "success";
 console.log("url", url);
