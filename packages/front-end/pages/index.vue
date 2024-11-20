@@ -1,11 +1,10 @@
 <script setup lang="ts">
 const baseUrl = useRuntimeConfig().public.baseUrl;
-const url = baseUrl + "/getOKH";
+const url = baseUrl + "/listProducts";
 const loading = "loading";
 const success = "success";
 console.log("url", url);
 const { data: products, status, error, refresh, clear } = await useFetch(url);
-
 </script>
 
 <template>
@@ -21,18 +20,15 @@ const { data: products, status, error, refresh, clear } = await useFetch(url);
       <SkeletonCard />
     </div> -->
     <div v-if="success" class="product-categories">
-      <ProductGroup
-        :products="products[0].medical_products"
-        title="MEDICAL SUPPLIES"
-      />
-      <ProductGroup
+      <ProductGroup :products="products" title="MEDICAL SUPPLIES" />
+      <!-- <ProductGroup
         :products="products[0].automotive_products"
         title="AUTOMOTIVE"
       />
       <ProductGroup
         :products="products[0].consumer_products"
         title="CONSUMER GOODS"
-      />
+      /> -->
     </div>
 
     <div v-if="success" class="related-items">

@@ -38,6 +38,7 @@ const routeFunctions: DICT_TYPE = {
   getOKH,
   getOKHs,
   getExampleProducts,
+  listProducts,
   "getFile/{containerName}/{fileName}/{fileType}": getFile, // Example: "getFile/okh/bread/yml"
   "listFiles/{containerName}": listFilesByContainerName, // Example: http://localhost:7071/api/listFiles/okw OR http://localhost:7071/api/listFiles/okh
 };
@@ -169,6 +170,57 @@ export async function listFilesByContainerName(
     return { jsonBody: error };
   }
   return { jsonBody: data };
+}
+
+let productsArray: any[] = [];
+
+export async function listProducts(
+  request: HttpRequest,
+  context: InvocationContext
+): Promise<HttpResponseInit> {
+  if (productsArray.length > 0) {
+    return { jsonBody: productsArray };
+  }
+  const { containerName } = request.params;
+
+  console.log("listProducts", serviceName, "okh");
+  const { error, errorMessage, data } = await listFilesInContainer(
+    serviceName,
+    "okh"
+  );
+  if (error) {
+    return { jsonBody: error };
+  }
+
+  let dict: DICT_TYPE = {};
+
+  for (let fileUrl of data.slice(0, 3)) {
+    let fileName = fileUrl.split("/").pop() || "";
+    let fileType = fileName?.split(".").pop();
+    let baseName = fileName?.split(".").slice(0, -1).join(".");
+    console.log("fileName, fileType, baseName", fileName, fileType, baseName);
+
+    if (!fileType || !baseName) {
+      console.log("no fileType or baseName");
+      continue;
+    }
+    console.log("start getOKHByFileName");
+    const data = await getOKHByFileName(baseName, "okh", fileType);
+    console.log("end getOKHByFileName");
+    if (data) {
+      console.log("data", data);
+      productsArray.push(data);
+      dict[fileName] = data;
+    } else {
+      console.log("no data");
+    }
+  }
+  console.log(dict);
+  let result = productsArray.map((item, index) =>
+    convertToProduct(item, index)
+  );
+
+  return { jsonBody: result };
 }
 
 export async function getFile(
