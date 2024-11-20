@@ -276,7 +276,7 @@ function convertToProduct(obj: any, id: number): any | null {
   return {
     id,
     name: obj["title"] as string,
-    image: "https://placecats.com/300/200",
+    image: obj["image"] || "https://placecats.com/300/200",
     shortDescription: obj["description"] as string,
     projectLink: obj["project-link"],
     manifestAuthor: obj["manifest-author"]?.name || "none",
