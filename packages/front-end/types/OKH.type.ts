@@ -10,12 +10,13 @@ import {
 import { type ATOM_TYPE } from "./ATOM.type";
 
 export type OKH_TYPE = {
+  id: number;
   title: string;
   description: string;
   "intended-use": string;
   keywords?: string[];
   "project-link": string;
-  image: string;
+  image: string | string[] | null;
   made: boolean;
   "made-independently": boolean;
   license:
