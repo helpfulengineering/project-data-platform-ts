@@ -53,7 +53,7 @@
             >
               <NuxtLink to="/contact">Contact</NuxtLink>
             </li>
-            <li
+            <!-- <li
               class="nav-link text-white uppercase [item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white', 'block rounded-md px-3 py-2 text-base font-medium']"
             >
               <NuxtLink to="/login">Sign IN</NuxtLink>
@@ -62,7 +62,7 @@
               class="btn-register text-white uppercase [item.current ? 'bg-gray-900 text-white' : 'text-gray-300', 'block rounded-md px-3 py-2 text-base font-medium']"
             >
               <NuxtLink to="/register">Register</NuxtLink>
-            </li>
+            </li> -->
           </div>
         </ul>
       </Disclosure>
