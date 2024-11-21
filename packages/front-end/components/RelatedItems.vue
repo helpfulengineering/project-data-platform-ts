@@ -4,7 +4,7 @@
     <div class="related-product-wrap">
       <NuxtLink
         :to="`/products/${related_product.id}`"
-        class="center m-6"
+        class="related-okh center mt-6"
         v-for="related_product in related_products"
         :key="related_product.id"
         :product="related_product"
@@ -66,7 +66,12 @@ const related_products = [
   margin-bottom: 40px;
 
   .name {
+    color: #2A3952;
     font-size: 16px;
+  }
+
+  .related-okh {
+    margin: 20px 5px;
   }
 
   .title {
