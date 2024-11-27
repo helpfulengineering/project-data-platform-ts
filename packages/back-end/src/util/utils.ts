@@ -2,7 +2,6 @@ import fs from 'fs';
 import { jsonType } from '../types/generalTypes';
 
 const JSON_FILE_PATH = __dirname + '/../storage/';
-console.log('JSON_FILE_PATH', JSON_FILE_PATH);
 
 export function saveJSON(name: string, data: any): boolean {
   // this needs work to divide the okh and okw files into two folders
