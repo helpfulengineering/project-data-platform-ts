@@ -1,6 +1,8 @@
 <script setup lang="ts">
 const baseUrl = useRuntimeConfig().public.baseUrl;
-const url = baseUrl + "/getOKH";
+// const url = baseUrl + "/getOKH";
+
+const url = baseUrl + "/listFiles/okh";
 const loading = "loading";
 const success = "success";
 console.log("url", url);
@@ -21,18 +23,8 @@ const { data: products, status, error, refresh, clear } = await useFetch(url);
       <SkeletonCard />
     </div> -->
     <div v-if="success" class="product-categories">
-      <ProductGroup
-        :products="products[0].medical_products"
-        title="MEDICAL SUPPLIES"
-      />
-      <ProductGroup
-        :products="products[0].automotive_products"
-        title="AUTOMOTIVE"
-      />
-      <ProductGroup
-        :products="products[0].consumer_products"
-        title="CONSUMER GOODS"
-      />
+    {{ console.log("XXXXXXXXXXXXXXXX",products) }}
+    <p>{{ products }}</p>
     </div>
 
     <div v-if="success" class="related-items">
@@ -70,7 +62,7 @@ export default {
   margin-bottom: 50px;
   width: 450px;
 }
-/* 
+/*
 .product-list.skelton {
   margin: 10px 10px 50px 10px;
 } */

@@ -166,9 +166,12 @@ export async function listFilesByContainerName(
     containerName
   );
   if (error) {
-    return { jsonBody: error };
+      return { jsonBody: error };
+
   }
-  return { jsonBody: data };
+    let productsObj = { products: data };
+    console.log("YYYYYYYYYYYYYYYYYYYYY",productsObj);
+  return { jsonBody: productsObj };
 }
 
 export async function getFile(
