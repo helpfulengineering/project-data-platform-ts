@@ -39,7 +39,8 @@ const routeFunctions: DICT_TYPE = {
   getOKHs,
   getExampleProducts,
   "getFile/{containerName}/{fileName}/{fileType}": getFile, // Example: "getFile/okh/bread/yml"
-  "listFiles/{containerName}": listFilesByContainerName, // Example: http://localhost:7071/api/listFiles/okw OR http://localhost:7071/api/listFiles/okh
+    "listFiles/{containerName}": listFilesByContainerName, // Example: http://localhost:7071/api/listFiles/okw OR http://localhost:7071/api/listFiles/okh
+    listOKHsummaries, // This is specifically meant to provide thumbnails for the frontend
 };
 //create route for each
 for (let key in routeFunctions) {
@@ -171,6 +172,44 @@ export async function listFilesByContainerName(
   }
     let productsObj = { products: data };
     console.log("YYYYYYYYYYYYYYYYYYYYY",productsObj);
+  return { jsonBody: productsObj };
+}
+
+export async function listOKHsummaries(
+  request: HttpRequest,
+  context: InvocationContext
+): Promise<HttpResponseInit> {
+    const containerName = "okh";
+  console.log("listFilesByContainerName", serviceName, containerName);
+  const { error, errorMessage, data } = await listFilesInContainer(
+    serviceName,
+    containerName
+  );
+  if (error) {
+      return { jsonBody: error };
+  }
+    // Now we want to add in the things a product card needs.
+    // "data" now contains the files we need, we need to enumerate over it
+    //
+
+    let summaries = [];
+    let id_cnt = 0;
+    for (let index in data) {
+        const longfilename = data[index];
+        // now we need to get the shortname and the extention from the filename
+        // this should use pattenmatching, and may already be written...
+        const shortname = longfilename.split("/").pop() || "";
+        const fnameAtoms = shortname.split(".");
+        const extension = fnameAtoms.pop() || "";
+        const fname = fnameAtoms.join(".") || "";
+        if (fname != "okh-seat-helpful") {
+            const fdata = await getOKHByFileName(fname, "okh", extension);
+            const product_summary = convertToProduct(fdata, id_cnt++);
+            summaries.push(product_summary);
+            console.log("SUMMARY",product_summary);
+        }
+    }
+    let productsObj = { productSummaries: summaries };
   return { jsonBody: productsObj };
 }
 

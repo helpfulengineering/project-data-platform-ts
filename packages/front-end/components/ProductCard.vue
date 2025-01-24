@@ -4,7 +4,7 @@
     <img :src="product.image" alt="Product Image" class="product-image" />
     <h3 class="title">{{ product.name }}</h3>
     <p class="author">{{ product.manifestAuthor }}</p>
-    <p class="description">{{ product.shortDescription }}</p>  
+    <p class="description">{{ product.shortDescription }}</p>
     <p class="project-link">{{ product.projectLink }}</p>
   </NuxtLink>
 </template>
