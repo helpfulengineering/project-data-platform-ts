@@ -59,8 +59,7 @@ export default {
       );
 
       // Create a tree layout
-     // const treeLayout = d3.tree().size([innerHeight, innerWidth]);
-     const treeLayout = d3.tree()
+      const treeLayout = d3.tree()
         .size([innerHeight, innerWidth - 100])
         .separation((a, b) => (a.parent === b.parent ? 2 : 3)); // Increased spacing
 
@@ -69,11 +68,8 @@ export default {
       root.x0 = innerHeight / 2;
       root.y0 = 0;
 
-      // Collapse all nodes initially
-      root.children?.forEach(this.collapse);
-
-       // Collapse nodes beyond depth 3
-  //root.children?.forEach((child) => this.collapse(child, 2));
+      // Collapse nodes deeper than depth 3
+      root.children?.forEach((child) => this.collapse(child, 1));
 
       // Initial tree update
       this.update(root, g, treeLayout, root);
@@ -113,8 +109,7 @@ export default {
       // Add labels
       nodeEnter
         .append("text")
-        //.attr("dy", this.nodeSize / 2 + 15)
-       .attr("dy", (d) => (d.children ? -this.nodeSize / 2 - 10 : this.nodeSize / 2 + 5)) // Adjust position
+        .attr("dy", (d) => (d.children ? -this.nodeSize / 2 - 10 : this.nodeSize / 2 + 5)) // Adjust position
         .attr("text-anchor", "middle")
         .style("font-size", "12px")
         .text((d) => d.data.name);
@@ -181,12 +176,17 @@ export default {
       this.update(d, g, treeLayout, root);
     },
 
-    // Collapse function
-    collapse(d) {
-      if (d.children) {
-        d._children = d.children;
-        d._children.forEach(this.collapse);
-        d.children = null;
+    // Collapse nodes deeper than depth 3
+    collapse(d, depth) {
+      if (depth >= 3) {
+        if (d.children) {
+          d._children = d.children;
+          d.children = null;
+        }
+      } else {
+        if (d.children) {
+          d.children.forEach((child) => this.collapse(child, depth + 1));
+        }
       }
     },
 
@@ -226,12 +226,7 @@ export default {
 
 .parent-node {
   border-radius: 50%;
-  /* box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2); */
 }
-
-/* .child-node {
-  opacity: 0.9;
-} */
 
 .node text {
   font: 14px sans-serif;
