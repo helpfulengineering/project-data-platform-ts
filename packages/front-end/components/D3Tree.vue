@@ -35,7 +35,7 @@ export default {
       // Clear any existing SVG
       d3.select(this.$refs.tree).selectAll("*").remove();
 
-      const margin = { top: 20, right: 20, bottom: 20, left: 20 };
+      const margin = { top: 100, right: 50, bottom: 50, left: 150 };
       const innerWidth = this.width - margin.left - margin.right;
       const innerHeight = this.height - margin.top - margin.bottom;
 
@@ -59,90 +59,181 @@ export default {
       );
 
       // Create a tree layout
-      const treeLayout = d3.tree().size([innerHeight, innerWidth]);
+     // const treeLayout = d3.tree().size([innerHeight, innerWidth]);
+     const treeLayout = d3.tree()
+        .size([innerHeight, innerWidth - 100])
+        .separation((a, b) => (a.parent === b.parent ? 2 : 3)); // Increased spacing
 
       // Create root hierarchy
-      const root = d3.hierarchy(treeData);
+      const root = d3.hierarchy(treeData, (d) => d.children);
+      root.x0 = innerHeight / 2;
+      root.y0 = 0;
 
-      // Generate tree layout
-      treeLayout(root);
+      // Collapse all nodes initially
+      root.children?.forEach(this.collapse);
 
-      // Links (lines connecting nodes)
-      g.selectAll(".link")
-        .data(root.links())
-        .enter()
-        .append("path")
-        .attr("class", "link")
-        .attr(
-          "d",
-          d3
-            .linkVertical()
-            .x((d) => d.x)
-            .y((d) => d.y)
-        )
-        .style("fill", "none")
-        .style("stroke", "#ccc")
-        .style("stroke-width", 2);
+       // Collapse nodes beyond depth 3
+  //root.children?.forEach((child) => this.collapse(child, 2));
 
-      // Nodes
-      const node = g
-        .selectAll(".node")
-        .data(root.descendants())
+      // Initial tree update
+      this.update(root, g, treeLayout, root);
+    },
+
+    update(source, g, treeLayout, root) {
+      // Assigns the x and y position for the nodes
+      const treeData = treeLayout(root);
+
+      // Compute the new tree layout
+      const nodes = treeData.descendants();
+      const links = treeData.links();
+
+      // Normalize for fixed-depth
+      nodes.forEach((d) => (d.y = d.depth * 140));
+
+      // JOIN: Nodes
+      const node = g.selectAll(".node").data(nodes, (d) => d.id || (d.id = Math.random()));
+
+      // ENTER: Nodes
+      const nodeEnter = node
         .enter()
         .append("g")
-        .attr("class", (d) =>
-          d.children
-            ? "node parent"
-            : `node child ${d.data.className || ""}` // Add class from data
-        )
-        .attr("transform", (d) => `translate(${d.x},${d.y})`);
+        .attr("class", "node")
+        .attr("transform", (d) => `translate(${source.x0},${source.y0})`)
+        .on("click", (event, d) => this.toggleNode(d, g, treeLayout, root));
 
-      // Images for nodes
-      node
+      // Add image to node
+      nodeEnter
         .append("image")
-        .attr("xlink:href", (d) => d.data.image) // Use the 'image' property in data
+        .attr("xlink:href", (d) => d.data.image)
         .attr("width", this.nodeSize)
         .attr("height", this.nodeSize)
-        .attr("x", -this.nodeSize / 2) // Center the image
+        .attr("x", -this.nodeSize / 2)
         .attr("y", -this.nodeSize / 2);
 
-      // Labels for nodes
-      node
+      // Add labels
+      nodeEnter
         .append("text")
-        .attr("dy", this.nodeSize / 2 + 15) // Position below the image
+        //.attr("dy", this.nodeSize / 2 + 15)
+       .attr("dy", (d) => (d.children ? -this.nodeSize / 2 - 10 : this.nodeSize / 2 + 5)) // Adjust position
         .attr("text-anchor", "middle")
         .style("font-size", "12px")
         .text((d) => d.data.name);
+
+      // UPDATE: Transition nodes to their new position
+      const nodeUpdate = nodeEnter.merge(node);
+      nodeUpdate
+        .transition()
+        .duration(500)
+        .attr("transform", (d) => `translate(${d.x},${d.y})`);
+
+      // EXIT: Remove exiting nodes
+      node.exit()
+        .transition()
+        .duration(500)
+        .attr("transform", (d) => `translate(${source.x},${source.y})`)
+        .remove();
+
+      // JOIN: Links
+      const link = g.selectAll(".link").data(links, (d) => d.target.id);
+
+      // ENTER: Links
+      const linkEnter = link
+        .enter()
+        .append("path")
+        .attr("class", "link")
+        .attr("d", (d) => {
+          const o = { x: source.x0, y: source.y0 };
+          return this.diagonal({ source: o, target: o });
+        });
+
+      // UPDATE: Transition links to new positions
+      linkEnter.merge(link)
+        .transition()
+        .duration(500)
+        .attr("d", (d) => this.diagonal(d));
+
+      // EXIT: Remove old links
+      link.exit()
+        .transition()
+        .duration(500)
+        .attr("d", (d) => {
+          const o = { x: source.x, y: source.y };
+          return this.diagonal({ source: o, target: o });
+        })
+        .remove();
+
+      // Store old positions for transition
+      nodes.forEach((d) => {
+        d.x0 = d.x;
+        d.y0 = d.y;
+      });
+    },
+
+    // Toggle node
+    toggleNode(d, g, treeLayout, root) {
+      if (d.children) {
+        d._children = d.children;
+        d.children = null;
+      } else {
+        d.children = d._children;
+        d._children = null;
+      }
+      this.update(d, g, treeLayout, root);
+    },
+
+    // Collapse function
+    collapse(d) {
+      if (d.children) {
+        d._children = d.children;
+        d._children.forEach(this.collapse);
+        d.children = null;
+      }
+    },
+
+    // Create curved diagonal path
+    diagonal(d) {
+      return `M${d.source.x},${d.source.y} C${d.source.x},${(d.source.y + d.target.y) / 2} ${d.target.x},${(d.source.y + d.target.y) / 2} ${d.target.x},${d.target.y}`;
     },
   },
 };
 </script>
 
 <style>
+.tree-container {
+  border: 1px solid #ccc;
+  overflow: hidden;
+}
+
 .link {
   fill: none;
-  stroke: #ccc;
+  stroke: #aaa;
   stroke-width: 2px;
+  transition: stroke 0.3s;
 }
+
+.link:hover {
+  stroke: #4169e1;
+}
+
 .node image {
   cursor: pointer;
+  transition: transform 0.2s;
 }
+
+.node:hover image {
+  transform: scale(1.1);
+}
+
+.parent-node {
+  border-radius: 50%;
+  /* box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2); */
+}
+
+/* .child-node {
+  opacity: 0.9;
+} */
+
 .node text {
-  font: 12px sans-serif;
-}
-
-.node.parent {
-  background-color: red;
-  fill: red;
-  text {
-    background-color: red;
-    fill: red;
-    z-index: 1000;
-    font-size: 20px;
-  }
-}
-
-.node.child {
-
+  font: 14px sans-serif;
 }
 </style>

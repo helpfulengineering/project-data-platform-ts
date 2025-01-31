@@ -4,19 +4,18 @@
       <h1>Cookie Supply Tree 1</h1>
 
       <div class="content">
-      <D3SupplyTree
-        :data="treeData"
-        :width="800"
-        :height="600"
-        class="supply-tree"
-      />
-      
+        <D3SupplyTree
+          :data="treeData"
+          :width="800"
+          :height="600"
+          class="supply-tree"
+        />
+
         <div class="right">
           <button class="btn-primary">ORDER</button>
           <button class="btn-secondary">EDIT SUPPLY TREE</button>
         </div>
-  
-    </div>
+      </div>
       <div class="details">
         <div class="overview">
           <h2 class="title">Overview</h2>
@@ -55,22 +54,34 @@ export default {
     return {
       treeData: {
         name: "Oatmeal raisin cookie",
-       
+
         children: [
           {
             // name: "OKW",
             image: "png_okw.png",
             children: [
-              { name: "cinnamon", class:"test", children: [{image: "png_okw.png"},{image: "png_okw.png"},{image: "png_okw.png"},{image: "png_okw.png"}] },
-              { name: "vanilla extract", children: [{image: "png_okw.png" }] },
-              { name: "white sugar", children: [{image: "png_okw.png" }] },
-              { name: "raisin", children: [{image: "png_okw.png" }] },
-              { name: "egg", children: [{image: "png_okw.png" }] },
+              {
+                name: "cinnamon",
+                class: "test",
+                children: [
+                  { image: "png_okw.png" },
+                  { image: "png_okw.png" },
+                  { image: "png_okw.png" },
+                  { image: "png_okw.png" },
+                ],
+              },
+              { name: "vanilla extract", children: [{ image: "png_okw.png" }] },
+              { name: "white sugar", children: [{ image: "png_okw.png" }] },
+              { name: "raisin", children: [{ image: "png_okw.png" }] },
+              { name: "egg", children: [{ image: "png_okw.png" }] },
               { name: "shipping supply", children: [{ image: "png_okw.png" }] },
-              { name: "butter", children: [{image: "png_okw.png" }] },
-              { name: "oats", children: [{image: "png_okw.png" }] },
-              { name: "all purpose flour", children: [{image: "png_okw.png" }] },
-              { name: "brown sugar", children: [{image: "png_okw.png" }] },
+              { name: "butter", children: [{ image: "png_okw.png" }] },
+              { name: "oats", children: [{ image: "png_okw.png" }] },
+              {
+                name: "all purpose flour",
+                children: [{ image: "png_okw.png" }],
+              },
+              { name: "brown sugar", children: [{ image: "png_okw.png" }] },
             ],
           },
         ],
@@ -87,10 +98,9 @@ export default {
   .supply-tree {
     width: 75%;
     svg {
-    overflow: visible;
+      overflow: visible;
+    }
   }
-  }
- 
 
   .section {
     background-color: white;
