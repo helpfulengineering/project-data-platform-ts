@@ -64,8 +64,25 @@ export default {
                 name: "cinnamon",
                 class: "test",
                 children: [
-                  { image: "png_okw.png" },
-                  { image: "png_okw.png" },
+                  {
+                    image: "png_okw.png",
+                    children: [
+                      {
+                        name: "testA",
+                        children: [
+                          { image: "png_okw.png" },
+                          { image: "png_okw.png" },
+                          { image: "png_okw.png" },
+                          { image: "png_okw.png" },
+                        ],
+                      },
+                    ],
+                  },
+                  { image: "png_okw.png",
+                    children: [
+                      {name: "testB"}
+                    ]
+                   },
                   { image: "png_okw.png" },
                   { image: "png_okw.png" },
                 ],
