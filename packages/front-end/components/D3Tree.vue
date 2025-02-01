@@ -59,7 +59,8 @@ export default {
       );
 
       // Create a tree layout
-      const treeLayout = d3.tree()
+      const treeLayout = d3
+        .tree()
         .size([innerHeight, innerWidth - 100])
         .separation((a, b) => (a.parent === b.parent ? 2 : 3)); // Increased spacing
 
@@ -84,10 +85,15 @@ export default {
       const links = treeData.links();
 
       // Normalize for fixed-depth
-      nodes.forEach((d) => (d.y = d.depth * 140));
+      nodes.forEach((d) => {
+        d.y = d.depth * 140; // Adjust spacing between levels
+        d.x = d.x * 2; // Increase horizontal gap
+      });
 
       // JOIN: Nodes
-      const node = g.selectAll(".node").data(nodes, (d) => d.id || (d.id = Math.random()));
+      const node = g
+        .selectAll(".node")
+        .data(nodes, (d) => d.id || (d.id = Math.random()));
 
       // ENTER: Nodes
       const nodeEnter = node
@@ -109,7 +115,9 @@ export default {
       // Add labels
       nodeEnter
         .append("text")
-        .attr("dy", (d) => (d.children ? -this.nodeSize / 2 - 10 : this.nodeSize / 2 + 5)) // Adjust position
+        .attr("dy", (d) =>
+          d.children ? -this.nodeSize / 2 - 10 : this.nodeSize / 2 + 5
+        ) // Adjust position
         .attr("text-anchor", "middle")
         .style("font-size", "12px")
         .text((d) => d.data.name);
@@ -122,7 +130,8 @@ export default {
         .attr("transform", (d) => `translate(${d.x},${d.y})`);
 
       // EXIT: Remove exiting nodes
-      node.exit()
+      node
+        .exit()
         .transition()
         .duration(500)
         .attr("transform", (d) => `translate(${source.x},${source.y})`)
@@ -142,13 +151,15 @@ export default {
         });
 
       // UPDATE: Transition links to new positions
-      linkEnter.merge(link)
+      linkEnter
+        .merge(link)
         .transition()
         .duration(500)
         .attr("d", (d) => this.diagonal(d));
 
       // EXIT: Remove old links
-      link.exit()
+      link
+        .exit()
         .transition()
         .duration(500)
         .attr("d", (d) => {
@@ -192,7 +203,11 @@ export default {
 
     // Create curved diagonal path
     diagonal(d) {
-      return `M${d.source.x},${d.source.y} C${d.source.x},${(d.source.y + d.target.y) / 2} ${d.target.x},${(d.source.y + d.target.y) / 2} ${d.target.x},${d.target.y}`;
+      return `M${d.source.x},${d.source.y} C${d.source.x},${
+        (d.source.y + d.target.y) / 2
+      } ${d.target.x},${(d.source.y + d.target.y) / 2} ${d.target.x},${
+        d.target.y
+      }`;
     },
   },
 };
