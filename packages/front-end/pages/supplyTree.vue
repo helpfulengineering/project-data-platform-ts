@@ -70,7 +70,9 @@ export default {
                       {
                         name: "testA",
                         children: [
-                          { image: "png_okw.png" },
+                          { image: "png_okw.png", children: [{
+                            name: "test1",
+                          }] },
                           { image: "png_okw.png" },
                           { image: "png_okw.png" },
                           { image: "png_okw.png" },
