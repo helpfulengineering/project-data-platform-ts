@@ -1,73 +1,83 @@
+
+
+
+
 <template>
   <div class="product-detail container center m-10">
     <div class="left">
-      <Slider :images="product?.image" />
-      <div class="specification">Specifications</div>
-      <div class="okh-details">
-        <div>version</div>
-        <div class="value">{{ product?.version }}</div>
+      <Slider :images="data.product?.image" />
+
+    <div class="specification">Specifications</div>
+    <div class="okh-details">
+      <div>version</div>
+      <div class="value">{{ data.product?.version }}</div>
       </div>
-      <div class="okh-details">
+    </div>
+        <div class="center">
+    <div class="okh-details">
         <div>License</div>
-        <div class="value">{{ product?.license }}</div>
+        <div class="value">{{ data.product?.license }}</div>
       </div>
       <div class="okh-details">
         <div>Licensor</div>
         <div class="value">
-          <div>{{ product?.licensor.name }}</div>
-          <div>{{ product?.licensor.email }}</div>
-          <div>{{ product?.licensor.affiliation }}</div>
+          <div>{{ data.product?.licensor.name }}</div>
+          <div>{{ data.product?.licensor.email }}</div>
+          <div>{{ data.product?.licensor.affiliation }}</div>
         </div>
       </div>
       <div class="okh-details">
         <div>manifest author</div>
         <div class="value">
-          <div>{{ product["manifest-author"].name }}</div>
-          <div>{{ product["manifest-author"].email }}</div>
-          <div>{{ product["manifest-author"].affiliation }}</div>
+          <div>{{ data.product["manifest-author"].name }}</div>
+          <div>{{ data.product["manifest-author"].email }}</div>
+          <div>{{ data.product["manifest-author"].affiliation }}</div>
         </div>
       </div>
-      <div class="okh-details">
+
+     <div class="okh-details">
         <div>manifest language</div>
-        <div class="value">{{ product["manifest-language"] }}</div>
+        <div class="value">{{ data.product["manifest-language"] }}</div>
       </div>
       <div class="okh-details">
         <div>okh manifest version</div>
-        <div class="value">{{ product["okh-manifest-version"] }}</div>
+        <div class="value">{{ data.product["okh-manifest-version"] }}</div>
       </div>
       <div class="okh-details">
         <div>date created</div>
-        <div class="value">{{ product["date-created"] }}</div>
+        <div class="value">{{ data.product["date-created"] }}</div>
       </div>
       <div class="okh-details">
         <div>date updated</div>
-        <div class="value">{{ product["date-updated"] }}</div>
+        <div class="value">{{ data.product["date-updated"] }}</div>
       </div>
       <div class="okh-details">
         <div>keywords</div>
-        <div class="value">{{ product?.keywords?.join(', ') }}</div>
+        <div class="value">{{ data.product?.keywords?.join(', ') }}</div>
       </div>
       <div class="okh-details">
         <div>contact</div>
         <div class="value">
-          <div>{{ product.contact.name }}</div>
-          <div>{{ product.contact.email }}</div>
-          <div>{{ product.contact.affiliation }}</div>
+          <div>{{ data.product.contact.name }}</div>
+          <div>{{ data.product.contact.email }}</div>
+          <div>{{ data.product.contact.affiliation }}</div>
         </div>
       </div>
       <div class="okh-details">
         <div>development stage</div>
-        <div class="value">{{ product["development-stage"] }}</div>
+        <div class="value">{{ data.product["development-stage"] }}</div>
       </div>
       <div class="okh-details">
         <div>health safety notice</div>
-        <div class="value">{{ product["health-safety-notice"] }}</div>
+        <div class="value">{{ data.product["health-safety-notice"] }}</div>
       </div>
-    </div>
-    <div class="center">
-      <h1 class="title">{{ product?.title }}</h1>
+
+
+
+    <h1 class="title">{{ data.product?.title }}</h1>
+
       <div class="location">Location, Country</div>
-      <p>{{ product?.description }}</p>
+      <p>{{ data.product?.description }}</p>
       <div class="review-wrap">
         <Reviews />
         <Reviews />
@@ -80,728 +90,35 @@
     </div>
     <!-- <NuxtLink to="/">Back to List</NuxtLink> -->
   </div>
-</template>
+    </template>
 
-<script setup lang="ts">
+
+ <script setup lang="ts">
+
 import { useRoute } from "#app";
 import type { OKH_TYPE } from "../../types/OKH.type";
 
 const route = useRoute();
+
+// changing this to a filename..
+const productFilename = route.params.id as string;
+
+console.log("productFilename",productFilename);
+
 const productId = route.params.id as string;
 
-// Mock product data
-const products: OKH_TYPE[] = [
-  {
-    id: 1,
-    title: "IV Bag Hook",
-    description: "For IV bags to be hung. Lorem ipsum dolor sit amet consectetur. Quis risus enim aliquam feugiat aliquam vulputate placerat sed. Consectetur pellentesque dis nunc sit et odio non viverra. Facilisi vitae sed in massa nibh elit. Bibendum massa nunc lorem mattis bibendum malesuada ac magna lorem. Morbi in a faucibus cum diam aliquam mi faucibus. Dapibus id maecenas aliquet quis arcu tempor nisi risus.",
-    "intended-use": "",
-    keywords: ["IV", "hook", "medical"],
-    "project-link": "",
-    image: [
-      "https://field-ready-projects.openknowhow.org/images/HL003-attC88mXadLwq4sLy-400x300.jpg",
-      "https://field-ready-projects.openknowhow.org/images/HL003-attnOADswJg8Z1Tkr-400x300.jpg",
-      "https://field-ready-projects.openknowhow.org/images/HL003-attTWOBTURxhJke0d-400x300.jpg",
-    ],
-    made: true,
-    "made-independently": false,
-    license: "CC BY-SA 4.0",
-    licensor: {
-      name: "Medical Supply Co.",
-      email: "contact@medicalco.com",
-      affiliation: "",
-    },
-    "okh-manifest-version": "1.0",
-    "date-created": "2024-11-17",
-    "date-updated": "2024-11-17",
-    "manifest-author": {
-      name: "John Doe",
-      email: "johndoe@example.com",
-      affiliation: "",
-    },
-    "manifest-language": "en",
-    contact: {
-      name: "Support Team",
-      email: "support@medicalco.com",
-      affiliation: "",
-    },
-    version: "2.0",
-    "development-stage": "Production",
-    "documentation-home": "",
-    bom: "",
-    "bom-atoms": {
-      identifier: "",
-      description: "",
-      link: "",
-    },
-    "tool-list": "",
-    "tool-list-atoms": {
-      identifier: "",
-      description: "",
-      link: "",
-    },
-    "product-atom": {
-      identifier: "",
-      description: "",
-      link: "",
-    },
-    "making-instructions": [],
-    "maintenance-instructions": "",
-    "health-safety-notice": "",
-    "standards-used": "",
-  },
-  {
-    id: 2,
-    title: "Oxygen Supply Fitting",
-    description:
-      "Adapter that connects oxygen supply tubing to standard oxygen systems",
-    "intended-use": "",
-    keywords: ["IV", "hook", "medical"],
-    "project-link": "",
-    image: [
-      "https://field-ready-projects.openknowhow.org/images/HL002-attmlR243asYolZRO-400x300.jpg",
-      "https://field-ready-projects.openknowhow.org/images/HL002-attEl2ohzRMv9ARYL-400x300.jpg",
-      "https://field-ready-projects.openknowhow.org/images/HL002-att6KspJ44bsDBbTY-400x300.jpg",
-    ],
-    made: true,
-    "made-independently": false,
-    license: "CC BY-SA 4.0",
-    licensor: {
-      name: "Medical Supply Co.",
-      email: "contact@medicalco.com",
-      affiliation: "",
-    },
-    "okh-manifest-version": "1.0",
-    "date-created": "2024-11-17",
-    "date-updated": "2024-11-17",
-    "manifest-author": {
-      name: "John Doe",
-      email: "johndoe@example.com",
-      affiliation: "",
-    },
-    "manifest-language": "en",
-    contact: {
-      name: "Support Team",
-      email: "support@medicalco.com",
-      affiliation: "",
-    },
-    version: 2.0,
-    "development-stage": "",
-    "documentation-home": "",
-    bom: "",
-    "bom-atoms": {
-      identifier: "",
-      description: "",
-      link: "",
-    },
-    "tool-list": "",
-    "tool-list-atoms": {
-      identifier: "",
-      description: "",
-      link: "",
-    },
-    "product-atom": {
-      identifier: "",
-      description: "",
-      link: "",
-    },
-    "making-instructions": [],
-    "maintenance-instructions": "",
-    "health-safety-notice": "",
-    "standards-used": "",
-  },
-  {
-    id: 3,
-    title: "Umbilical Cord Clamp",
-    "intended-use": "",
-    keywords: ["IV", "hook", "medical"],
-    "project-link": "",
-    image: [
-      "https://field-ready-projects.openknowhow.org/images/HL001-attG43ftDEHSUFPVG-400x300.jpg",
-      "https://field-ready-projects.openknowhow.org/images/HL001-attf3p6aS1A0NgjXH-400x300.jpg",
-      "https://field-ready-projects.openknowhow.org/images/HL001-attQY27dM3l2ON5Ao-400x300.jpg",
-    ],
-    description: "Enclosure of umbilical cords of newborns to prevent sepsis",
-    made: true,
-    "made-independently": false,
-    license: "CC BY-SA 4.0",
-    licensor: {
-      name: "Medical Supply Co.",
-      email: "contact@medicalco.com",
-      affiliation: "",
-    },
-    "okh-manifest-version": "1.0",
-    "date-created": "2024-11-17",
-    "date-updated": "2024-11-17",
-    "manifest-author": {
-      name: "John Doe",
-      email: "johndoe@example.com",
-      affiliation: "",
-    },
-    "manifest-language": "en",
-    contact: {
-      name: "Support Team",
-      email: "support@medicalco.com",
-      affiliation: "",
-    },
-    version: 2.0,
-    "development-stage": "",
-    "documentation-home": "",
-    bom: "",
-    "bom-atoms": {
-      identifier: "",
-      description: "",
-      link: "",
-    },
-    "tool-list": "",
-    "tool-list-atoms": {
-      identifier: "",
-      description: "",
-      link: "",
-    },
-    "product-atom": {
-      identifier: "",
-      description: "",
-      link: "",
-    },
-    "making-instructions": [],
-    "maintenance-instructions": "",
-    "health-safety-notice": "",
-    "standards-used": "",
-  },
-  {
-    id: 4,
-    title: "Finger Brace",
-    "intended-use": "",
-    keywords: ["IV", "hook", "medical"],
-    "project-link": "",
-    image: [
-      "https://field-ready-projects.openknowhow.org/images/HL005-attgxsUzHxoTnTmSP-400x300.jpg",
-      "https://field-ready-projects.openknowhow.org/images/HL005-att5gRPVVqNrEdNzQ-400x300.jpg",
-      "https://field-ready-projects.openknowhow.org/images/HL005-att7KSVbxiaJwycvm-400x300.jpg",
-    ],
-    description: "In order to keep a injured index finger immobile",
-    made: true,
-    "made-independently": false,
-    license: "CC BY-SA 4.0",
-    licensor: {
-      name: "Medical Supply Co.",
-      email: "contact@medicalco.com",
-      affiliation: "",
-    },
-    "okh-manifest-version": "1.0",
-    "date-created": "2024-11-17",
-    "date-updated": "2024-11-17",
-    "manifest-author": {
-      name: "John Doe",
-      email: "johndoe@example.com",
-      affiliation: "",
-    },
-    "manifest-language": "en",
-    contact: {
-      name: "Support Team",
-      email: "support@medicalco.com",
-      affiliation: "",
-    },
-    version: 2.0,
-    "development-stage": "",
-    "documentation-home": "",
-    bom: "",
-    "bom-atoms": {
-      identifier: "",
-      description: "",
-      link: "",
-    },
-    "tool-list": "",
-    "tool-list-atoms": {
-      identifier: "",
-      description: "",
-      link: "",
-    },
-    "product-atom": {
-      identifier: "",
-      description: "",
-      link: "",
-    },
-    "making-instructions": [],
-    "maintenance-instructions": "",
-    "health-safety-notice": "",
-    "standards-used": "",
-  },
-  {
-    id: 5,
-    title: "Water Truck Clamp",
-    "intended-use": "",
-    keywords: ["IV", "hook", "medical"],
-    "project-link": "",
-    image: [
-      "https://field-ready-projects.openknowhow.org/images/WA012-attbQe9vW0QdVGkqD-400x300.jpg",
-      "https://field-ready-projects.openknowhow.org/images/WA012-attOlLPPqg7ONAQBC-400x300.jpg",
-      "https://field-ready-projects.openknowhow.org/images/WA012-attr7TkuBVgBqtkoP-400x300.jpg",
-    ],
-    description:
-      "Clamps over the hose on the outlet of a water distribution truck to create a seal",
-    made: true,
-    "made-independently": false,
-    license: "CC BY-SA 4.0",
-    licensor: {
-      name: "Medical Supply Co.",
-      email: "contact@medicalco.com",
-      affiliation: "",
-    },
-    "okh-manifest-version": "1.0",
-    "date-created": "2024-11-17",
-    "date-updated": "2024-11-17",
-    "manifest-author": {
-      name: "John Doe",
-      email: "johndoe@example.com",
-      affiliation: "",
-    },
-    "manifest-language": "en",
-    contact: {
-      name: "Support Team",
-      email: "support@medicalco.com",
-      affiliation: "",
-    },
-    version: 2.0,
-    "development-stage": "",
-    "documentation-home": "",
-    bom: "",
-    "bom-atoms": {
-      identifier: "",
-      description: "",
-      link: "",
-    },
-    "tool-list": "",
-    "tool-list-atoms": {
-      identifier: "",
-      description: "",
-      link: "",
-    },
-    "product-atom": {
-      identifier: "",
-      description: "",
-      link: "",
-    },
-    "making-instructions": [],
-    "maintenance-instructions": "",
-    "health-safety-notice": "",
-    "standards-used": "",
-  },
-  {
-    id: 6,
-    title: "Jerry Can Roller",
-    "intended-use": "",
-    keywords: ["IV", "hook", "medical"],
-    "project-link": "",
-    image: [
-      "https://field-ready-projects.openknowhow.org/images/WA013-attjDSod18c5Ru8PN-400x300.jpeg",
-    ],
-    description: "Transports 80 litres of drinking water",
-    made: true,
-    "made-independently": false,
-    license: "CC BY-SA 4.0",
-    licensor: {
-      name: "Medical Supply Co.",
-      email: "contact@medicalco.com",
-      affiliation: "",
-    },
-    "okh-manifest-version": "1.0",
-    "date-created": "2024-11-17",
-    "date-updated": "2024-11-17",
-    "manifest-author": {
-      name: "John Doe",
-      email: "johndoe@example.com",
-      affiliation: "",
-    },
-    "manifest-language": "en",
-    contact: {
-      name: "Support Team",
-      email: "support@medicalco.com",
-      affiliation: "",
-    },
-    version: 2.0,
-    "development-stage": "",
-    "documentation-home": "",
-    bom: "",
-    "bom-atoms": {
-      identifier: "",
-      description: "",
-      link: "",
-    },
-    "tool-list": "",
-    "tool-list-atoms": {
-      identifier: "",
-      description: "",
-      link: "",
-    },
-    "product-atom": {
-      identifier: "",
-      description: "",
-      link: "",
-    },
-    "making-instructions": [],
-    "maintenance-instructions": "",
-    "health-safety-notice": "",
-    "standards-used": "",
-  },
-  {
-    id: 7,
-    title: "Make-Fit Pipe Fitting",
-    "intended-use": "",
-    keywords: ["IV", "hook", "medical"],
-    "project-link": "",
-    image: [
-      "https://field-ready-projects.openknowhow.org/images/WA016-attP4Uy56ROfYjAjF-400x300.jpg",
-    ],
-    description:
-      "Using Make-Fit app a range of 3DP pipe fitting can be produced",
-    made: true,
-    "made-independently": false,
-    license: "CC BY-SA 4.0",
-    licensor: {
-      name: "Medical Supply Co.",
-      email: "contact@medicalco.com",
-      affiliation: "",
-    },
-    "okh-manifest-version": "1.0",
-    "date-created": "2024-11-17",
-    "date-updated": "2024-11-17",
-    "manifest-author": {
-      name: "John Doe",
-      email: "johndoe@example.com",
-      affiliation: "",
-    },
-    "manifest-language": "en",
-    contact: {
-      name: "Support Team",
-      email: "support@medicalco.com",
-      affiliation: "",
-    },
-    version: 2.0,
-    "development-stage": "",
-    "documentation-home": "",
-    bom: "",
-    "bom-atoms": {
-      identifier: "",
-      description: "",
-      link: "",
-    },
-    "tool-list": "",
-    "tool-list-atoms": {
-      identifier: "",
-      description: "",
-      link: "",
-    },
-    "product-atom": {
-      identifier: "",
-      description: "",
-      link: "",
-    },
-    "making-instructions": [],
-    "maintenance-instructions": "",
-    "health-safety-notice": "",
-    "standards-used": "",
-  },
-  {
-    id: 8,
-    title: "Straight Coupler",
-    "intended-use": "",
-    keywords: ["IV", "hook", "medical"],
-    "project-link": "",
-    image: [
-      "https://field-ready-projects.openknowhow.org/images/WA010-attuWhYn15CARwJu4-400x300.jpg",
-    ],
-    description: "20.5/16.5 straight coupler used to join to pipes.",
-    made: true,
-    "made-independently": false,
-    license: "CC BY-SA 4.0",
-    licensor: {
-      name: "Medical Supply Co.",
-      email: "contact@medicalco.com",
-      affiliation: "",
-    },
-    "okh-manifest-version": "1.0",
-    "date-created": "2024-11-17",
-    "date-updated": "2024-11-17",
-    "manifest-author": {
-      name: "John Doe",
-      email: "johndoe@example.com",
-      affiliation: "",
-    },
-    "manifest-language": "en",
-    contact: {
-      name: "Support Team",
-      email: "support@medicalco.com",
-      affiliation: "",
-    },
-    version: 2.0,
-    "development-stage": "",
-    "documentation-home": "",
-    bom: "",
-    "bom-atoms": {
-      identifier: "",
-      description: "",
-      link: "",
-    },
-    "tool-list": "",
-    "tool-list-atoms": {
-      identifier: "",
-      description: "",
-      link: "",
-    },
-    "product-atom": {
-      identifier: "",
-      description: "",
-      link: "",
-    },
-    "making-instructions": [],
-    "maintenance-instructions": "",
-    "health-safety-notice": "",
-    "standards-used": "",
-  },
-  {
-    id: 9,
-    title: "Baby Crib",
-    "intended-use": "",
-    keywords: ["IV", "hook", "medical"],
-    "project-link": "",
-    image: [
-      "https://field-ready-projects.openknowhow.org/images/CP002-attt4t66rFpYaqdTj-400x300.jpeg",
-    ],
-    description: "Provides a safe area for a baby to sleep",
-    made: true,
-    "made-independently": false,
-    license: "CC BY-SA 4.0",
-    licensor: {
-      name: "Medical Supply Co.",
-      email: "contact@medicalco.com",
-      affiliation: "",
-    },
-    "okh-manifest-version": "1.0",
-    "date-created": "2024-11-17",
-    "date-updated": "2024-11-17",
-    "manifest-author": {
-      name: "John Doe",
-      email: "johndoe@example.com",
-      affiliation: "",
-    },
-    "manifest-language": "en",
-    contact: {
-      name: "Support Team",
-      email: "support@medicalco.com",
-      affiliation: "",
-    },
-    version: 2.0,
-    "development-stage": "",
-    "documentation-home": "",
-    bom: "",
-    "bom-atoms": {
-      identifier: "",
-      description: "",
-      link: "",
-    },
-    "tool-list": "",
-    "tool-list-atoms": {
-      identifier: "",
-      description: "",
-      link: "",
-    },
-    "product-atom": {
-      identifier: "",
-      description: "",
-      link: "",
-    },
-    "making-instructions": [],
-    "maintenance-instructions": "",
-    "health-safety-notice": "",
-    "standards-used": "",
-  },
-  {
-    id: 10,
-    title: "Play Pen",
-    "intended-use": "",
-    keywords: ["IV", "hook", "medical"],
-    "project-link": "",
-    image: [
-      "https://field-ready-projects.openknowhow.org/images/CP003-attz3CoRAhIzA5x9v-400x300.jpeg",
-    ],
-    description: "Provides a safe area for a child to play",
-    made: true,
-    "made-independently": false,
-    license: "CC BY-SA 4.0",
-    licensor: {
-      name: "Medical Supply Co.",
-      email: "contact@medicalco.com",
-      affiliation: "",
-    },
-    "okh-manifest-version": "1.0",
-    "date-created": "2024-11-17",
-    "date-updated": "2024-11-17",
-    "manifest-author": {
-      name: "John Doe",
-      email: "johndoe@example.com",
-      affiliation: "",
-    },
-    "manifest-language": "en",
-    contact: {
-      name: "Support Team",
-      email: "support@medicalco.com",
-      affiliation: "",
-    },
-    version: 2.0,
-    "development-stage": "",
-    "documentation-home": "",
-    bom: "",
-    "bom-atoms": {
-      identifier: "",
-      description: "",
-      link: "",
-    },
-    "tool-list": "",
-    "tool-list-atoms": {
-      identifier: "",
-      description: "",
-      link: "",
-    },
-    "product-atom": {
-      identifier: "",
-      description: "",
-      link: "",
-    },
-    "making-instructions": [],
-    "maintenance-instructions": "",
-    "health-safety-notice": "",
-    "standards-used": "",
-  },
-  {
-    id: 11,
-    title: "Duoband Yagi Antenna",
-    "intended-use": "",
-    keywords: ["IV", "hook", "medical"],
-    "project-link": "",
-    image: [
-      "https://field-ready-projects.openknowhow.org/images/DR002-attJBcwM43eItgWAE-400x300.jpg",
-    ],
-    description:
-      "3D printed bespoke parts to construct standard antenna design",
-    made: true,
-    "made-independently": false,
-    license: "CC BY-SA 4.0",
-    licensor: {
-      name: "Medical Supply Co.",
-      email: "contact@medicalco.com",
-      affiliation: "",
-    },
-    "okh-manifest-version": "1.0",
-    "date-created": "2024-11-17",
-    "date-updated": "2024-11-17",
-    "manifest-author": {
-      name: "John Doe",
-      email: "johndoe@example.com",
-      affiliation: "",
-    },
-    "manifest-language": "en",
-    contact: {
-      name: "Support Team",
-      email: "support@medicalco.com",
-      affiliation: "",
-    },
-    version: 2.0,
-    "development-stage": "",
-    "documentation-home": "",
-    bom: "",
-    "bom-atoms": {
-      identifier: "",
-      description: "",
-      link: "",
-    },
-    "tool-list": "",
-    "tool-list-atoms": {
-      identifier: "",
-      description: "",
-      link: "",
-    },
-    "product-atom": {
-      identifier: "",
-      description: "",
-      link: "",
-    },
-    "making-instructions": [],
-    "maintenance-instructions": "",
-    "health-safety-notice": "",
-    "standards-used": "",
-  },
-  {
-    id: 12,
-    title: "Rescue Airbag",
-    "intended-use": "",
-    keywords: ["IV", "hook", "medical"],
-    "project-link": "",
-    image: [
-      "https://field-ready-projects.openknowhow.org/images/DR001-att5yL3AEAbc3wDh2-400x300.png",
-    ],
-    description: "For first responders to remove large blocks of debris",
-    made: true,
-    "made-independently": false,
-    license: "CC BY-SA 4.0",
-    licensor: {
-      name: "Medical Supply Co.",
-      email: "contact@medicalco.com",
-      affiliation: "",
-    },
-    "okh-manifest-version": "1.0",
-    "date-created": "2024-11-17",
-    "date-updated": "2024-11-17",
-    "manifest-author": {
-      name: "John Doe",
-      email: "johndoe@example.com",
-      affiliation: "",
-    },
-    "manifest-language": "en",
-    contact: {
-      name: "Support Team",
-      email: "support@medicalco.com",
-      affiliation: "",
-    },
-    version: 2.0,
-    "development-stage": "",
-    "documentation-home": "",
-    bom: "",
-    "bom-atoms": {
-      identifier: "",
-      description: "",
-      link: "",
-    },
-    "tool-list": "",
-    "tool-list-atoms": {
-      identifier: "",
-      description: "",
-      link: "",
-    },
-   "product-atom": {
-      identifier: "",
-      description: "",
-      link: "",
-    },
-    "making-instructions": [],
-    "maintenance-instructions": "",
-    "health-safety-notice": "",
-    "standards-used": "",
-  },
-  // Add more products here
-];
+const baseUrl = useRuntimeConfig().public.baseUrl;
 
-const product = products.find((p) => p.id === parseInt(productId));
+const [fname,fileExt] = productFilename.split(".");
 
-// const baseUrl = useRuntimeConfig().public.baseUrl;
-// const url = baseUrl + "/getOKH/"+ productId;
-// console.log("url",url);
-// const loading = "loading";
-// const success = "success";
-// console.log("url", url);
-// const { data: product, status, error, refresh, clear } = await useFetch(url);
-// console.log("product",product);
+const url = baseUrl + "/getFile/okh/"+fname+"/"+fileExt;
+const loading = "loading";
+const success = "success";
+console.log("url", url);
+const { data, status, error, refresh, clear } = await useFetch(url);
+
+console.log("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
+console.log(data.product);
 </script>
 
 <style scoped>

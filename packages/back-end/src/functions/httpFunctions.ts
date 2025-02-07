@@ -106,13 +106,15 @@ export async function getOKH(
     // duplicate example data so you don't modify it
     const cloned_products = _.cloneDeep(example_products);
     cloned_products[0].medical_products.push(
-      convertToProduct(
+        convertToProduct(
+            "bread.yml",
         itemFromAzure,
         cloned_products[0].medical_products.length + 1
       )
     );
     cloned_products[0].medical_products.push(
-      convertToProduct(
+        convertToProduct(
+             "bread.yml",
         breadData,
         cloned_products[0].medical_products.length + 1
       )
@@ -204,7 +206,7 @@ export async function listOKHsummaries(
         const fname = fnameAtoms.join(".") || "";
         if (fname != "okh-seat-helpful") {
             const fdata = await getOKHByFileName(fname, "okh", extension);
-            const product_summary = convertToProduct(fdata, id_cnt++);
+            const product_summary = convertToProduct(fname+"."+extension,fdata, id_cnt++);
             summaries.push(product_summary);
             console.log("SUMMARY",product_summary);
         }
@@ -226,7 +228,8 @@ export async function getFile(
   }
   const data = await getOKHByFileName(fileName, containerName, fileType);
 
-  return { jsonBody: data };
+  let productObj = { product: data };
+  return { jsonBody: productObj};
 }
 
 // HELPER FUNCTIONS //////////////////////////////////////////////////////////////////////////////////////////
@@ -261,10 +264,11 @@ async function getOKHByFileName(
 }
 
 // will need proper typing once types have been shared with back-end
-function convertToProduct(obj: any, id: number): any | null {
+function convertToProduct(fname:string, obj: any, id: number): any | null {
   if (!obj || typeof obj !== "object") return null;
   return {
-    id,
+      id,
+      fname: fname,
     name: obj["title"] as string,
     image: "https://placecats.com/300/200",
     shortDescription: obj["description"] as string,

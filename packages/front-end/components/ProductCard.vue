@@ -1,6 +1,6 @@
 <!-- components/ProductCard.vue -->
 <template>
-  <NuxtLink :to="`/products/${product.id}`" class="product-card">
+  <NuxtLink :to="`/products/${product.fname}`" class="product-card">
     <img :src="product.image" alt="Product Image" class="product-image" />
     <h3 class="title">{{ product.name }}</h3>
     <p class="author">{{ product.manifestAuthor }}</p>
