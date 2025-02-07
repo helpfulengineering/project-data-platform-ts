@@ -1,20 +1,14 @@
-
-
-
-
 <template>
   <div class="product-detail container center m-10">
     <div class="left">
       <Slider :images="data.product?.image" />
 
-    <div class="specification">Specifications</div>
-    <div class="okh-details">
-      <div>version</div>
-      <div class="value">{{ data.product?.version }}</div>
+      <div class="specification">Specifications</div>
+      <div class="okh-details">
+        <div>version</div>
+        <div class="value">{{ data.product?.version }}</div>
       </div>
-    </div>
-        <div class="center">
-    <div class="okh-details">
+      <div class="okh-details">
         <div>License</div>
         <div class="value">{{ data.product?.license }}</div>
       </div>
@@ -34,8 +28,7 @@
           <div>{{ data.product["manifest-author"].affiliation }}</div>
         </div>
       </div>
-
-     <div class="okh-details">
+      <div class="okh-details">
         <div>manifest language</div>
         <div class="value">{{ data.product["manifest-language"] }}</div>
       </div>
@@ -53,7 +46,7 @@
       </div>
       <div class="okh-details">
         <div>keywords</div>
-        <div class="value">{{ data.product?.keywords?.join(', ') }}</div>
+        <div class="value">{{ data.product?.keywords?.join(", ") }}</div>
       </div>
       <div class="okh-details">
         <div>contact</div>
@@ -71,10 +64,9 @@
         <div>health safety notice</div>
         <div class="value">{{ data.product["health-safety-notice"] }}</div>
       </div>
-
-
-
-    <h1 class="title">{{ data.product?.title }}</h1>
+    </div>
+    <div class="center">
+      <h1 class="title">{{ data.product?.title }}</h1>
 
       <div class="location">Location, Country</div>
       <p>{{ data.product?.description }}</p>
@@ -90,11 +82,9 @@
     </div>
     <!-- <NuxtLink to="/">Back to List</NuxtLink> -->
   </div>
-    </template>
+</template>
 
-
- <script setup lang="ts">
-
+<script setup lang="ts">
 import { useRoute } from "#app";
 import type { OKH_TYPE } from "../../types/OKH.type";
 
@@ -103,15 +93,15 @@ const route = useRoute();
 // changing this to a filename..
 const productFilename = route.params.id as string;
 
-console.log("productFilename",productFilename);
+console.log("productFilename", productFilename);
 
 const productId = route.params.id as string;
 
 const baseUrl = useRuntimeConfig().public.baseUrl;
 
-const [fname,fileExt] = productFilename.split(".");
+const [fname, fileExt] = productFilename.split(".");
 
-const url = baseUrl + "/getFile/okh/"+fname+"/"+fileExt;
+const url = baseUrl + "/getFile/okh/" + fname + "/" + fileExt;
 const loading = "loading";
 const success = "success";
 console.log("url", url);
