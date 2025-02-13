@@ -39,7 +39,8 @@ const routeFunctions: DICT_TYPE = {
   getOKHs,
   getExampleProducts,
   "getFile/{containerName}/{fileName}/{fileType}": getFile, // Example: "getFile/okh/bread/yml"
-  "listFiles/{containerName}": listFilesByContainerName, // Example: http://localhost:7071/api/listFiles/okw OR http://localhost:7071/api/listFiles/okh
+    "listFiles/{containerName}": listFilesByContainerName, // Example: http://localhost:7071/api/listFiles/okw OR http://localhost:7071/api/listFiles/okh
+    listOKHsummaries, // This is specifically meant to provide thumbnails for the frontend
 };
 //create route for each
 for (let key in routeFunctions) {
@@ -105,13 +106,15 @@ export async function getOKH(
     // duplicate example data so you don't modify it
     const cloned_products = _.cloneDeep(example_products);
     cloned_products[0].medical_products.push(
-      convertToProduct(
+        convertToProduct(
+            "bread.yml",
         itemFromAzure,
         cloned_products[0].medical_products.length + 1
       )
     );
     cloned_products[0].medical_products.push(
-      convertToProduct(
+        convertToProduct(
+             "bread.yml",
         breadData,
         cloned_products[0].medical_products.length + 1
       )
@@ -166,9 +169,50 @@ export async function listFilesByContainerName(
     containerName
   );
   if (error) {
-    return { jsonBody: error };
+      return { jsonBody: error };
+
   }
-  return { jsonBody: data };
+    let productsObj = { products: data };
+    console.log("YYYYYYYYYYYYYYYYYYYYY",productsObj);
+  return { jsonBody: productsObj };
+}
+
+export async function listOKHsummaries(
+  request: HttpRequest,
+  context: InvocationContext
+): Promise<HttpResponseInit> {
+    const containerName = "okh";
+  console.log("listFilesByContainerName", serviceName, containerName);
+  const { error, errorMessage, data } = await listFilesInContainer(
+    serviceName,
+    containerName
+  );
+  if (error) {
+      return { jsonBody: error };
+  }
+    // Now we want to add in the things a product card needs.
+    // "data" now contains the files we need, we need to enumerate over it
+    //
+
+    let summaries = [];
+    let id_cnt = 0;
+    for (let index in data) {
+        const longfilename = data[index];
+        // now we need to get the shortname and the extention from the filename
+        // this should use pattenmatching, and may already be written...
+        const shortname = longfilename.split("/").pop() || "";
+        const fnameAtoms = shortname.split(".");
+        const extension = fnameAtoms.pop() || "";
+        const fname = fnameAtoms.join(".") || "";
+        if (fname != "okh-seat-helpful") {
+            const fdata = await getOKHByFileName(fname, "okh", extension);
+            const product_summary = convertToProduct(fname+"."+extension,fdata, id_cnt++);
+            summaries.push(product_summary);
+            console.log("SUMMARY",product_summary);
+        }
+    }
+    let productsObj = { productSummaries: summaries };
+  return { jsonBody: productsObj };
 }
 
 export async function getFile(
@@ -184,7 +228,8 @@ export async function getFile(
   }
   const data = await getOKHByFileName(fileName, containerName, fileType);
 
-  return { jsonBody: data };
+  let productObj = { product: data };
+  return { jsonBody: productObj};
 }
 
 // HELPER FUNCTIONS //////////////////////////////////////////////////////////////////////////////////////////
@@ -219,10 +264,11 @@ async function getOKHByFileName(
 }
 
 // will need proper typing once types have been shared with back-end
-function convertToProduct(obj: any, id: number): any | null {
+function convertToProduct(fname:string, obj: any, id: number): any | null {
   if (!obj || typeof obj !== "object") return null;
   return {
-    id,
+      id,
+      fname: fname,
     name: obj["title"] as string,
     image: "https://placecats.com/300/200",
     shortDescription: obj["description"] as string,
