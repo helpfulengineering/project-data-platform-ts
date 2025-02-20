@@ -229,7 +229,9 @@ export async function getFile(
   const data = await getOKHByFileName(fileName, containerName, fileType);
 
   let productObj = { product: data };
-  return { jsonBody: productObj};
+    return { jsonBody: productObj,
+             headers: { "Access-Control-Allow-Origin" : "*"}
+           };
 }
 
 // HELPER FUNCTIONS //////////////////////////////////////////////////////////////////////////////////////////
