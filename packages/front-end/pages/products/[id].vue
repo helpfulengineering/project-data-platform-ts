@@ -1,7 +1,7 @@
 <template>
   <div class="product-detail container center m-10">
     <div class="left">
-      <Slider :images="data.product?.image" />
+<!--    <Slider :images="data.product?.image" /> -->
 
       <div class="specification">Specifications</div>
       <div class="okh-details">
@@ -74,7 +74,7 @@
         <Reviews />
         <Reviews />
       </div>
-      <RelatedItems />
+ <!--  <RelatedItems /> -->
     </div>
     <div class="right">
       <button class="btn-primary">ORDER</button>
@@ -90,6 +90,11 @@ import type { OKH_TYPE } from "../../types/OKH.type";
 
 const route = useRoute();
 
+// Apparently This is being called with a large number of values which
+// are incorrect. I do not know why. I suppose this might have to
+// do with the idea of "eager fetching". I am going to attempt
+// to at least have this identify this and fail!
+
 // changing this to a filename..
 const productFilename = route.params.id as string;
 
@@ -101,14 +106,23 @@ const baseUrl = useRuntimeConfig().public.baseUrl;
 
 const [fname, fileExt] = productFilename.split(".");
 
-const url = baseUrl + "/getFile/okh/" + fname + "/" + fileExt;
-const loading = "loading";
-const success = "success";
-console.log("url", url);
-const { data, status, error, refresh, clear } = await useFetch(url);
+console.log("fname", fname);
+console.log("fileext", fileExt);
 
-console.log("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
-console.log(data.product);
+//if (!fileExt) {
+//    console.log("no fileExt, we are returning in hopes of avoiding problems. Why this URL is provided, we know not:\n");
+//    console.log(route);
+//} else {
+
+    const url = baseUrl + "/getFile/okh/" + fname + "/" + fileExt;
+    const loading = "loading";
+    const success = "success";
+    console.log("url", url);
+    const { data, status, error, refresh, clear } = await useFetch(url);
+    // const { data, status, error, refresh, clear } = await $fetch(url);
+
+    console.log("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
+//}
 </script>
 
 <style scoped>
