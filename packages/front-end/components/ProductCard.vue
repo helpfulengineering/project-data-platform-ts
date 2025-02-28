@@ -10,6 +10,8 @@
 </template>
 
 <script>
+
+//import {encodeBase64} from '../utils/utils'
 export default {
   props: {
     product: {
@@ -25,7 +27,7 @@ export default {
   border: 1px solid #ddd;
   border-radius: 8px;
   padding: 10px;
-  width: 200px;
+  width: 23%;
   margin-bottom: 15px;
   text-align: center;
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
@@ -56,6 +58,7 @@ export default {
     color: #007bff;
     font-size: 12px;
     font-weight: 500;
+    overflow-wrap: break-word;
     text-decoration: underline;
     text-align: left;
   }
