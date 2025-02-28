@@ -6,5 +6,11 @@
     "Azure_Storage_ServiceName": "https://projectdatablobstorage.blob.core.windows.net",
     "Azure_Storage_OKH_ContainerName": "okh",
     "Azure_Storage_OKW_ContainerName": "okw"
+  },
+  "Host": {
+    "CORS": "*",  // Allow all origins (for development)
+    "CORS_AllowedOrigins": [
+      "http://localhost:3000/"
+    ]
   }
 }

@@ -104,6 +104,11 @@ import type { OKH_TYPE } from "../../types/OKH.type";
 
 const route = useRoute();
 
+// Apparently This is being called with a large number of values which
+// are incorrect. I do not know why. I suppose this might have to
+// do with the idea of "eager fetching". I am going to attempt
+// to at least have this identify this and fail!
+
 // changing this to a filename..
 const productFilename = route.params.id as string;
 
@@ -124,6 +129,7 @@ const { data, status, error } = await useFetch(url);
 
 console.log("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
 console.log(data?.product);
+
 </script>
 
 <style scoped>
