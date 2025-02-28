@@ -1,86 +1,100 @@
 <template>
-  <div class="product-detail container center m-10">
-    <div class="left">
-      <Slider :images="data.product?.image" />
+  <div>
+    <div
+      v-if="status === 'pending'"
+      class="loading skelton-card-group"
+      style="color: red"
+    >
+      loading
+    </div>
+    <div
+      v-else-if="status === 'success'"
+      class="product-detail container center m-10"
+    >
+      <div class="left">
+        <!-- <Slider :images="data.product?.image" /> -->
 
-      <div class="specification">Specifications</div>
-      <div class="okh-details">
-        <div>version</div>
-        <div class="value">{{ data.product?.version }}</div>
-      </div>
-      <div class="okh-details">
-        <div>License</div>
-        <div class="value">{{ data.product?.license }}</div>
-      </div>
-      <div class="okh-details">
-        <div>Licensor</div>
-        <div class="value">
-          <div>{{ data.product?.licensor.name }}</div>
-          <div>{{ data.product?.licensor.email }}</div>
-          <div>{{ data.product?.licensor.affiliation }}</div>
+        <div class="specification">Specifications</div>
+        <div class="okh-details">
+          <div>version</div>
+          <div class="value">{{ data.product?.version }}</div>
+        </div>
+        <div class="okh-details">
+          <div>License</div>
+          <div class="value">{{ data.product?.license }}</div>
+        </div>
+        <div class="okh-details">
+          <div>Licensor</div>
+          <div class="value">
+            <div>{{ data.product?.licensor.name }}</div>
+            <div>{{ data.product?.licensor.email }}</div>
+            <div>{{ data.product?.licensor.affiliation }}</div>
+          </div>
+        </div>
+        <div class="okh-details">
+          <div>manifest author</div>
+          <div class="value">
+            <div>{{ data.product["manifest-author"].name }}</div>
+            <div>{{ data.product["manifest-author"].email }}</div>
+            <div>{{ data.product["manifest-author"].affiliation }}</div>
+          </div>
+        </div>
+        <div class="okh-details">
+          <div>manifest language</div>
+          <div class="value">{{ data.product["manifest-language"] }}</div>
+        </div>
+        <div class="okh-details">
+          <div>okh manifest version</div>
+          <div class="value">{{ data.product["okh-manifest-version"] }}</div>
+        </div>
+        <div class="okh-details">
+          <div>date created</div>
+          <div class="value">{{ data.product["date-created"] }}</div>
+        </div>
+        <div class="okh-details">
+          <div>date updated</div>
+          <div class="value">{{ data.product["date-updated"] }}</div>
+        </div>
+        <div class="okh-details">
+          <div>keywords</div>
+          <div class="value">{{ data.product?.keywords?.join(", ") }}</div>
+        </div>
+        <div class="okh-details">
+          <div>contact</div>
+          <div class="value">
+            <div>{{ data.product.contact.name }}</div>
+            <div>{{ data.product.contact.email }}</div>
+            <div>{{ data.product.contact.affiliation }}</div>
+          </div>
+        </div>
+        <div class="okh-details">
+          <div>development stage</div>
+          <div class="value">{{ data.product["development-stage"] }}</div>
+        </div>
+        <div class="okh-details">
+          <div>health safety notice</div>
+          <div class="value">{{ data.product["health-safety-notice"] }}</div>
         </div>
       </div>
-      <div class="okh-details">
-        <div>manifest author</div>
-        <div class="value">
-          <div>{{ data.product["manifest-author"].name }}</div>
-          <div>{{ data.product["manifest-author"].email }}</div>
-          <div>{{ data.product["manifest-author"].affiliation }}</div>
-        </div>
-      </div>
-      <div class="okh-details">
-        <div>manifest language</div>
-        <div class="value">{{ data.product["manifest-language"] }}</div>
-      </div>
-      <div class="okh-details">
-        <div>okh manifest version</div>
-        <div class="value">{{ data.product["okh-manifest-version"] }}</div>
-      </div>
-      <div class="okh-details">
-        <div>date created</div>
-        <div class="value">{{ data.product["date-created"] }}</div>
-      </div>
-      <div class="okh-details">
-        <div>date updated</div>
-        <div class="value">{{ data.product["date-updated"] }}</div>
-      </div>
-      <div class="okh-details">
-        <div>keywords</div>
-        <div class="value">{{ data.product?.keywords?.join(", ") }}</div>
-      </div>
-      <div class="okh-details">
-        <div>contact</div>
-        <div class="value">
-          <div>{{ data.product.contact.name }}</div>
-          <div>{{ data.product.contact.email }}</div>
-          <div>{{ data.product.contact.affiliation }}</div>
-        </div>
-      </div>
-      <div class="okh-details">
-        <div>development stage</div>
-        <div class="value">{{ data.product["development-stage"] }}</div>
-      </div>
-      <div class="okh-details">
-        <div>health safety notice</div>
-        <div class="value">{{ data.product["health-safety-notice"] }}</div>
-      </div>
-    </div>
-    <div class="center">
-      <h1 class="title">{{ data.product?.title }}</h1>
+      <div class="center">
+        <h1 class="title">{{ data.product?.title }}</h1>
 
-      <div class="location">Location, Country</div>
-      <p>{{ data.product?.description }}</p>
-      <div class="review-wrap">
-        <Reviews />
-        <Reviews />
+        <div class="location">Location, Country</div>
+        <p>{{ data.product?.description }}</p>
+        <div class="review-wrap">
+          <Reviews />
+          <Reviews />
+        </div>
+        <RelatedItems />
       </div>
-      <RelatedItems />
+      <div class="right">
+        <button class="btn-primary">ORDER</button>
+        <button class="btn-secondary">CONTACT SUPPLIER</button>
+      </div>
+      <!-- <NuxtLink to="/">Back to List</NuxtLink> -->
     </div>
-    <div class="right">
-      <button class="btn-primary">ORDER</button>
-      <button class="btn-secondary">CONTACT SUPPLIER</button>
-    </div>
-    <!-- <NuxtLink to="/">Back to List</NuxtLink> -->
+
+    <div v-if="status === 'error'">error : {{ error?.message }}</div>
   </div>
 </template>
 
@@ -102,13 +116,14 @@ const baseUrl = useRuntimeConfig().public.baseUrl;
 const [fname, fileExt] = productFilename.split(".");
 
 const url = baseUrl + "/getFile/okh/" + fname + "/" + fileExt;
-const loading = "loading";
-const success = "success";
+
+// const url = baseUrl + "/getFile/okh/" + productFilename
+//const url = "http://demo4460398.mockable.io/details";
 console.log("url", url);
-const { data, status, error, refresh, clear } = await useFetch(url);
+const { data, status, error } = await useFetch(url);
 
 console.log("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
-console.log(data.product);
+console.log(data?.product);
 </script>
 
 <style scoped>
@@ -193,6 +208,12 @@ console.log(data.product);
     font-size: 24px;
     font-weight: 700;
   }
+}
+
+.loading {
+  font-size: 30px;
+  color: red;
+  background-color: green;
 }
 
 @media only screen and (min-width: 1536px) {

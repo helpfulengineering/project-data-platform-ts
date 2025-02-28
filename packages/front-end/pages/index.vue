@@ -1,12 +1,13 @@
 <script setup lang="ts">
 const baseUrl = useRuntimeConfig().public.baseUrl;
+// const baseUrl = 'http://demo4460398.mockable.io/api';
 
 const url = baseUrl + "/listOKHsummaries";
-const loading = "loading";
-const success = "success";
-console.log("url", url);
-const { data: okhdata, status, error, refresh, clear } = await useFetch(url);
-
+const {
+  data: okhdata,
+  error,
+  status,
+} = await useFetch(url);
 </script>
 
 <template>
@@ -14,23 +15,22 @@ const { data: okhdata, status, error, refresh, clear } = await useFetch(url);
     <h1 class="main-title text-center m-8 text-2xl font-bold">
       HELPFUL TAGLINE / DESCRIPTION
     </h1>
-
+    {{console.log("status", status)}}
+    <div v-if="status === 'error'">error : {{ error?.message }}</div>
     <!-- loading -->
-    <!-- <div v-if="loading" class="loading skelton-card-group">
+    <div v-if="status === 'pending'" class="loading skelton-card-group" style="color: red">
+      loading
+      {{console.log("status loading", status)}}
+      <!-- <SkeletonCard />
       <SkeletonCard />
-      <SkeletonCard />
-      <SkeletonCard />
-    </div> -->
-    <div v-if="success" class="product-categories">
-    {{ console.log("XXXXXXXXXXXXXXXX",okhdata) }}
-     <ProductGroup
-        :products="okhdata.productSummaries"
-        title="Products"
-      />
-
+      <SkeletonCard /> -->
+    </div>
+    <div v-else-if="status === 'success'"  class="product-categories">
+      {{ console.log("XXXXXXXXXXXXXXXX", okhdata) }}
+      <ProductGroup :products="okhdata.productSummaries" title="Products" />
     </div>
 
-    <div v-if="success" class="related-items">
+    <div v-if="status === 'success'" class="related-items">
       <RelatedItems />
     </div>
     <!-- <div v-if="loading" class="loading related-items">
@@ -63,7 +63,7 @@ export default {
   background-color: white;
   padding: 15px;
   margin-bottom: 50px;
-  width: 450px;
+  /* width: 450px; */
 }
 /*
 .product-list.skelton {
@@ -108,5 +108,11 @@ export default {
 
 .skeleton-footer {
   width: 30%;
+}
+
+.loading {
+  font-size: 30px;
+  color: red;
+  background-color: green;
 }
 </style>
