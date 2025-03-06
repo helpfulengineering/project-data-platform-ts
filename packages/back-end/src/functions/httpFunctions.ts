@@ -212,7 +212,9 @@ export async function listOKHsummaries(
         }
     }
     let productsObj = { productSummaries: summaries };
-  return { jsonBody: productsObj };
+  return { jsonBody: productsObj, 
+    headers: { "Access-Control-Allow-Origin" : "*"}
+  };
 }
 
 export async function getFile(
@@ -272,7 +274,7 @@ function convertToProduct(fname:string, obj: any, id: number): any | null {
       id,
       fname: fname,
     name: obj["title"] as string,
-    image: "https://placecats.com/300/200",
+    image:obj.image || "https://placecats.com/300/200",
     shortDescription: obj["description"] as string,
     projectLink: obj["project-link"],
     manifestAuthor: obj["manifest-author"]?.name || "none",
