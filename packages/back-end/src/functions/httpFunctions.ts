@@ -201,6 +201,8 @@ export async function listOKHsummaries(
         // now we need to get the shortname and the extention from the filename
         // this should use pattenmatching, and may already be written...
         const shortname = longfilename.split("/").pop() || "";
+
+
         const fnameAtoms = shortname.split(".");
         const extension = fnameAtoms.pop() || "";
         const fname = fnameAtoms.join(".") || "";
@@ -212,7 +214,7 @@ export async function listOKHsummaries(
         }
     }
     let productsObj = { productSummaries: summaries };
-  return { jsonBody: productsObj, 
+  return { jsonBody: productsObj,
     headers: { "Access-Control-Allow-Origin" : "*"}
   };
 }
@@ -243,7 +245,10 @@ async function getOKHByFileName(
   containerName: string,
   fileType?: string
 ): Promise<any> {
-  const fileExt: string = fileType || name.split(".").pop() || "";
+
+    const fileExt: string = fileType || name.split(".").pop() || "";
+
+    console.log("AADD",name.split("."));
 
   // // Warning!! This function does NOT match the apparent
   // // documentation: https://learn.microsoft.com/en-us/azure/storage/blobs/storage-blob-download-javascript
