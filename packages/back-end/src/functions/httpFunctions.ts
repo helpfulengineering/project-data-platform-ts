@@ -12,6 +12,7 @@ import {
 } from "../lib/azure-storage.js";
 import { DICT_TYPE } from "../types/generalTypes.js";
 import { example_products } from "../dummyData/exampleProducts.js";
+import {getFileNameAndFileType} from '../utils/utils.js';
 import _ from "lodash";
 
 // make sure important environment variables are present
@@ -38,7 +39,8 @@ const routeFunctions: DICT_TYPE = {
   getOKH,
   getOKHs,
   getExampleProducts,
-  "getFile/{containerName}/{fileName}/{fileType}": getFile, // Example: "getFile/okh/bread/yml"
+  // "getFile/{containerName}/{fileName}/{fileType}": getFile, // Example: "getFile/okh/bread/yml"
+  "getFile/{containerName}/{fullFileName}": getFile, // Example: "getFile/okh/bread.yml"
     "listFiles/{containerName}": listFilesByContainerName, // Example: http://localhost:7071/api/listFiles/okw OR http://localhost:7071/api/listFiles/okh
     listOKHsummaries, // This is specifically meant to provide thumbnails for the frontend
 };
@@ -208,7 +210,7 @@ export async function listOKHsummaries(
             const fdata = await getOKHByFileName(fname, "okh", extension);
             const product_summary = convertToProduct(fname+"."+extension,fdata, id_cnt++);
             summaries.push(product_summary);
-            console.log("SUMMARY",product_summary);
+            // console.log("SUMMARY",product_summary);
         }
     }
     let productsObj = { productSummaries: summaries };
@@ -222,9 +224,10 @@ export async function getFile(
   context: any
 ): Promise<HttpResponseInit> {
   context.log("getFile");
-  const { containerName, fileName, fileType } = request.params;
+  // const { containerName, fileName, fileType } = request.params;
+const { containerName, fullFileName } = request.params;
+  const{fileName, fileType} = getFileNameAndFileType(fullFileName);
   context.log(containerName, fileName, fileType);
-
   if (!containerName || !fileName || !fileType) {
     return { jsonBody: "error, no containerName or fileName" };
   }

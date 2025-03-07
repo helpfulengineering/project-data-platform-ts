@@ -10,12 +10,12 @@ const route = useRoute();
 const baseUrl = useRuntimeConfig().public.baseUrl;
 
 const productFilename = route.params.id as string;
-const [fname, fileExt] = productFilename.split(".");
+// const [fname, fileExt] = productFilename.split(".");
 
-const url = baseUrl + "/getFile/okh/" + fname + "/" + fileExt;
+// const url = baseUrl + "/getFile/okh/" + fname + "/" + fileExt;
 
-// const url = baseUrl + "/getFile/okh/" + productFilename
-//const url = "http://demo4460398.mockable.io/details";
+const url = baseUrl + "/getFile/okh/" + productFilename
+
 
 
 const { data, status, error } = await useFetch(url, {
