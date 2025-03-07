@@ -4,7 +4,6 @@ import type { OKH_TYPE } from "../../types/OKH.type";
 import {ref, computed } from 'vue';
 import { formatKeywords, formatImages } from "~/utils/utils";
 
-
 const route = useRoute();
 
 const baseUrl = useRuntimeConfig().public.baseUrl;
@@ -241,7 +240,7 @@ console.log("sliderImages",sliderImages)
     font-weight: 700;
   }
 
-  
+
 }
 
 .loader {
@@ -251,7 +250,7 @@ console.log("sliderImages",sliderImages)
   margin: 300px auto 0 auto;
   border-radius: 50%;
   color: #25b09b;
-  box-shadow: 
+  box-shadow:
     calc(1*var(--d))      calc(0*var(--d))     0 0,
     calc(0.707*var(--d))  calc(0.707*var(--d)) 0 1px,
     calc(0*var(--d))      calc(1*var(--d))     0 2px,
