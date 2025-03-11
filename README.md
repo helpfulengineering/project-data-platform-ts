@@ -28,9 +28,6 @@ We need volunteers. Although we can use a wide variety of skills we need:
 
 TypeScript port of orginal [Project Data Python Code](https://github.com/helpfulengineering/project-data-platform)
 
-# Current Website
-
-The [current website](https://helpfulengineering.github.io/project-data-platform-ts/) is implemented with Github Pages.
 
 # Steps to Start
 
@@ -70,3 +67,7 @@ The [current website](https://helpfulengineering.github.io/project-data-platform
 
 1. In packages/front-end folder, run "npm run dev" to begin the Nuxt server.
 2. Go to localhost:3000 or localhost:3000/homepage
+
+# Older Prototype Website
+
+The [older prototype website](https://helpfulengineering.github.io/project-data-platform-ts/) is implemented with Github Pages.

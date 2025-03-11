@@ -1,15 +1,17 @@
 <!-- components/ProductCard.vue -->
 <template>
-  <NuxtLink :to="`/products/${product.id}`" class="product-card">
+  <NuxtLink :to="`/products/${product.fname}`" class="product-card">
     <img :src="product.image" alt="Product Image" class="product-image" />
     <h3 class="title">{{ product.name }}</h3>
     <p class="author">{{ product.manifestAuthor }}</p>
-    <p class="description">{{ product.shortDescription }}</p>  
+    <p class="description">{{ product.shortDescription }}</p>
     <p class="project-link">{{ product.projectLink }}</p>
   </NuxtLink>
 </template>
 
 <script>
+
+//import {encodeBase64} from '../utils/utils'
 export default {
   props: {
     product: {
@@ -25,7 +27,7 @@ export default {
   border: 1px solid #ddd;
   border-radius: 8px;
   padding: 10px;
-  width: 200px;
+  width: 23%;
   margin-bottom: 15px;
   text-align: center;
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
@@ -56,6 +58,7 @@ export default {
     color: #007bff;
     font-size: 12px;
     font-weight: 500;
+    overflow-wrap: break-word;
     text-decoration: underline;
     text-align: left;
   }

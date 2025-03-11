@@ -1,11 +1,15 @@
 <script setup lang="ts">
 const baseUrl = useRuntimeConfig().public.baseUrl;
-const url = baseUrl + "/getOKH";
-const loading = "loading";
-const success = "success";
-console.log("url", url);
-const { data: products, status, error, refresh, clear } = await useFetch(url);
+//const baseUrl = 'http://demo4460398.mockable.io/api';
 
+const url = baseUrl + "/listOKHsummaries";
+const {
+  data: okhdata,
+  error,
+  status,
+} = await useFetch(url, {
+  lazy: true
+});
 </script>
 
 <template>
@@ -13,29 +17,18 @@ const { data: products, status, error, refresh, clear } = await useFetch(url);
     <h1 class="main-title text-center m-8 text-2xl font-bold">
       HELPFUL TAGLINE / DESCRIPTION
     </h1>
-
+    <div v-if="status === 'error'">error : {{ error?.message }}</div>
     <!-- loading -->
-    <!-- <div v-if="loading" class="loading skelton-card-group">
+    <div v-if="status === 'pending'" class="loader skelton-card-group">
+      <!-- <SkeletonCard />
       <SkeletonCard />
-      <SkeletonCard />
-      <SkeletonCard />
-    </div> -->
-    <div v-if="success" class="product-categories">
-      <ProductGroup
-        :products="products[0].medical_products"
-        title="MEDICAL SUPPLIES"
-      />
-      <ProductGroup
-        :products="products[0].automotive_products"
-        title="AUTOMOTIVE"
-      />
-      <ProductGroup
-        :products="products[0].consumer_products"
-        title="CONSUMER GOODS"
-      />
+      <SkeletonCard /> -->
+    </div>
+    <div v-else-if="status === 'success'"  class="product-categories">
+      <ProductGroup :products="okhdata.productSummaries" title="Products" />
     </div>
 
-    <div v-if="success" class="related-items">
+    <div v-if="status === 'success'" class="related-items">
       <RelatedItems />
     </div>
     <!-- <div v-if="loading" class="loading related-items">
@@ -68,9 +61,9 @@ export default {
   background-color: white;
   padding: 15px;
   margin-bottom: 50px;
-  width: 450px;
+  /* width: 450px; */
 }
-/* 
+/*
 .product-list.skelton {
   margin: 10px 10px 50px 10px;
 } */
@@ -113,5 +106,27 @@ export default {
 
 .skeleton-footer {
   width: 30%;
+}
+
+.loader {
+  --d:22px;
+  width: 4px;
+  height: 4px;
+  margin: 150px auto 0 auto;
+  border-radius: 50%;
+  color: #25b09b;
+  box-shadow: 
+    calc(1*var(--d))      calc(0*var(--d))     0 0,
+    calc(0.707*var(--d))  calc(0.707*var(--d)) 0 1px,
+    calc(0*var(--d))      calc(1*var(--d))     0 2px,
+    calc(-0.707*var(--d)) calc(0.707*var(--d)) 0 3px,
+    calc(-1*var(--d))     calc(0*var(--d))     0 4px,
+    calc(-0.707*var(--d)) calc(-0.707*var(--d))0 5px,
+    calc(0*var(--d))      calc(-1*var(--d))    0 6px;
+  animation: loader 1s infinite steps(8);
+}
+
+@keyframes loader {
+  100% {transform: rotate(1turn)}
 }
 </style>
