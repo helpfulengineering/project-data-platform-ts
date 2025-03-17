@@ -1,6 +1,6 @@
 <script setup lang="ts">
-const baseUrl = useRuntimeConfig().public.baseUrl;
-//const baseUrl = 'http://demo4460398.mockable.io/api';
+//const baseUrl = useRuntimeConfig().public.baseUrl;
+const baseUrl = 'http://demo4460398.mockable.io/api';
 
 const url = baseUrl + "/listOKHsummaries";
 const {
@@ -28,9 +28,10 @@ const {
       <ProductGroup :products="okhdata.productSummaries" title="Products" />
     </div>
 
-    <div v-if="status === 'success'" class="related-items">
+    <!-- <div v-if="status === 'success'" class="related-items">
       <RelatedItems />
-    </div>
+    </div> -->
+    
     <!-- <div v-if="loading" class="loading related-items">
       <SkeletonRelatedItems />
     </div> -->

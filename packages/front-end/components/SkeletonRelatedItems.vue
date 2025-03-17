@@ -13,19 +13,17 @@
   </div>
 </template>
 
-<script>
-export default {
-  props: {
-    products: {
-      type: Array,
-      required: true,
-    },
-    title: {
-      type: String,
-      required: true,
-    },
+<script setup>
+defineProps({
+  products: {
+    type: Array,
+    required: true,
   },
-};
+  title: {
+    type: String,
+    required: true,
+  },
+});
 </script>
 
 <style>

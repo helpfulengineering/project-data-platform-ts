@@ -1,59 +1,57 @@
 <template>
-    <div class="product-list skelton ">
-      <h2 class="skeleton skeleton-card-title">
-        <!-- TRENDING: {{ title }} -->
-      </h2>
-      <div class="skeleton-card-wrap">
-        <div class="skeleton skeleton-card"></div>
-        <div class="skeleton skeleton-card"></div>
-        <div class="skeleton skeleton-card"></div>
-        <div class="skeleton skeleton-card"></div>
-      </div>
+  <div class="product-list skelton">
+    <h2 class="skeleton skeleton-card-title">
+      <!-- TRENDING: {{ title }} -->
+    </h2>
+    <div class="skeleton-card-wrap">
+      <div class="skeleton skeleton-card"></div>
+      <div class="skeleton skeleton-card"></div>
+      <div class="skeleton skeleton-card"></div>
+      <div class="skeleton skeleton-card"></div>
     </div>
-  </template>
-  
-  <script>
-  export default {
-    props: {
-      products: {
-        type: Array,
-        required: true,
-      },
-      title: {
-        type: String,
-        required: true,
-      },
-    },
-  };
-  </script>
-  
-  <style>
-  .card-title {
-    color: #2a3952;
-    font-weight: 700;
-    margin-bottom: 5px;
-  }
+  </div>
+</template>
 
-  .skeleton-card-wrap {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-  }
+<script setup>
+defineProps({
+  products: {
+    type: Array,
+    required: true,
+  },
+  title: {
+    type: String,
+    required: true,
+  },
+});
+</script>
 
-  .skeleton-card {
-    border-radius: 8px;
-    padding-top: 50px;
-    margin-top: 10px;
-    height: 200px;
-    width: 200px;
-  }
-  .skeleton-product-list {
+<style>
+.card-title {
+  color: #2a3952;
+  font-weight: 700;
+  margin-bottom: 5px;
+}
+
+.skeleton-card-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.skeleton-card {
+  border-radius: 8px;
+  padding-top: 50px;
+  margin-top: 10px;
+  height: 200px;
+  width: 200px;
+}
+.skeleton-product-list {
   margin: 0 10px 50px 10px;
 }
-  .skeleton-card-title {
-    height: 20px;
-  }
-  .skeleton {
+.skeleton-card-title {
+  height: 20px;
+}
+.skeleton {
   animation: skeleton-loading 1s linear infinite alternate;
 }
 
@@ -80,5 +78,4 @@
 .skeleton-footer {
   width: 30%;
 }
-  </style>
-  
+</style>
