@@ -4,7 +4,6 @@ import {
   BlobServiceClient,
   ContainerClient,
   SASProtocol,
-
 } from "@azure/storage-blob";
 
 
@@ -13,13 +12,9 @@ import { parse as parseYAML } from "yaml";
 function getBlobServiceClient(serviceName: string) {
   const accountName = "projectdatablobstorage";
   const blobServiceUri = `https://${accountName}.blob.core.windows.net`;
-  // Note, I created this SAS token in the Azure Portal
-  // It provides read only access to the projectdatablobstorage account until March 2026
-  // the info in that account is public, so I don't have an issue including the SAS token in code
-  const sasToken = "sv=2024-11-04&ss=b&srt=sco&sp=rltf&se=2026-03-26T04:44:03Z&st=2025-03-25T20:44:03Z&spr=https&sig=Do47ezJylb1DMPkp%2FA58ez1eBIO1CPoUNuHv2Z1oizE%3D";
 
-  const blobServiceClient = new BlobServiceClient(`${blobServiceUri}?${sasToken}`, null);
-  return blobServiceClient;
+  // blob service allows for anonymous access, so no credentials needed
+  return new BlobServiceClient(`${blobServiceUri}`, null);
 }
 
 async function createContainer(
