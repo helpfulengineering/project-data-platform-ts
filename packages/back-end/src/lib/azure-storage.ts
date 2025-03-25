@@ -4,18 +4,21 @@ import {
   BlobServiceClient,
   ContainerClient,
   SASProtocol,
-  StorageSharedKeyCredential,
+
 } from "@azure/storage-blob";
 
-import { DefaultAzureCredential } from "@azure/identity";
 
 import { parse as parseYAML } from "yaml";
 
 function getBlobServiceClient(serviceName: string) {
-  // Acquire a credential object
-  const tokenCredential = new DefaultAzureCredential();
+  const accountName = "projectdatablobstorage";
+  const blobServiceUri = `https://${accountName}.blob.core.windows.net`;
+  // Note, I created this SAS token in the Azure Portal
+  // It provides read only access to the projectdatablobstorage account until March 2026
+  // the info in that account is public, so I don't have an issue including the SAS token in code
+  const sasToken = "sv=2024-11-04&ss=b&srt=sco&sp=rltf&se=2026-03-26T04:44:03Z&st=2025-03-25T20:44:03Z&spr=https&sig=Do47ezJylb1DMPkp%2FA58ez1eBIO1CPoUNuHv2Z1oizE%3D";
 
-  const blobServiceClient = new BlobServiceClient(serviceName, tokenCredential);
+  const blobServiceClient = new BlobServiceClient(`${blobServiceUri}?${sasToken}`, null);
   return blobServiceClient;
 }
 
@@ -45,7 +48,7 @@ export async function uploadBlob(
     containerName,
     blobServiceClient
   );
-  const blockBlobClient = await containerClient.getBlockBlobClient(fileName);
+  const blockBlobClient = containerClient.getBlockBlobClient(fileName);
   const response = await blockBlobClient.uploadData(blob);
 
   return response.errorCode ? response.errorCode : "Success";
@@ -68,7 +71,7 @@ export const generateSASUrl = async (
     containerName,
     blobServiceClient
   );
-  const blockBlobClient = await containerClient.getBlockBlobClient(fileName);
+  const blockBlobClient = containerClient.getBlockBlobClient(fileName);
 
   // Best practice: create time limits
   const SIXTY_MINUTES = timerange * 60 * 1000;
@@ -130,7 +133,7 @@ export const downloadBlobToJson = async (
 ): Promise<JSON> => {
   const blobServiceClient = getBlobServiceClient(serviceName);
 
-  const containerClient = await blobServiceClient.getContainerClient(
+  const containerClient = blobServiceClient.getContainerClient(
     containerName
   );
 
@@ -141,7 +144,7 @@ export const downloadBlobToJson = async (
   if (!downloadResponse.errorCode && downloadResponse.readableStreamBody) {
     const downloaded = await streamToJson(downloadResponse.readableStreamBody);
     if (downloaded) {
-      console.log("Downloaded blob content:", downloaded);
+      // console.log("Downloaded blob content:", downloaded);
       return downloaded;
     }
   }
@@ -157,7 +160,7 @@ export const downloadBlobYamlToJSON = async (
 ): Promise<JSON> => {
   const blobServiceClient = getBlobServiceClient(serviceName);
 
-  const containerClient = await blobServiceClient.getContainerClient(
+  const containerClient = blobServiceClient.getContainerClient(
     containerName
   );
 
@@ -170,7 +173,7 @@ export const downloadBlobYamlToJSON = async (
       downloadResponse.readableStreamBody
     );
     if (downloaded) {
-      console.log("Downloaded blob content:", downloaded);
+      // console.log("Downloaded blob content:", downloaded);
       return downloaded;
     }
   }

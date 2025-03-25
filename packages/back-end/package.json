@@ -12,15 +12,13 @@
   },
   "dependencies": {
     "@azure/functions": "^4.0.0",
-    "@azure/identity": "^4.4.1",
     "@azure/storage-blob": "^12.25.0",
-    "yaml": "^2.6.0",
-    "lodash": "^4.17.21"
+    "yaml": "^2.6.0"
   },
   "devDependencies": {
-    "@types/lodash": "^4.17.13",
-    "@types/node": "^20.x",
-    "rimraf": "^5.0.10",
+    "@types/node": "^18.x",
+    "azure-functions-core-tools": "^4.x",
+    "rimraf": "^5.0.0",
     "typescript": "^4.0.0"
   },
   "main": "dist/src/{index.js,functions/*.js}"
