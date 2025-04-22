@@ -26,9 +26,20 @@ export function formatKeywords(value : any): string {
     } else {
       return '-'; // Return "-" for null or other types
     }
-  }
+}
 
-  export function formatImages(value: any): Array<string> {
+export function formatKeywordsForQueryParam(value : any): string {
+    if (Array.isArray(value)) {
+      return value.join(','); // Convert array to comma-separated string
+    } else if (typeof value === 'string') {
+      return value; // Return string as is
+    } else {
+      return '-'; // Return "-" for null or other types
+    }
+}
+
+
+export function formatImages(value: any): Array<string> {
     console.log("value",value)
     if (Array.isArray(value)) {
         return value;
@@ -37,4 +48,4 @@ export function formatKeywords(value : any): string {
     } else {
         return [];
     }
-  }
+}
