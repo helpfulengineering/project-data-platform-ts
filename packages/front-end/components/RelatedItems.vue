@@ -8,7 +8,7 @@
   <!-- success -->
     <div v-else-if="status === 'success'" class="related-product-wrap">
       <NuxtLink
-        v-for="productSummary in okhdata.productSummaries"
+        v-for="productSummary in okhdata.relatedOKH"
         :to="`/products/${productSummary.fname}`"
         class="related-okh center mt-6"
         :key="productSummary.fname"
@@ -34,7 +34,7 @@ const props = defineProps({
 });
 console.log("props k", props);
 const baseUrl = useRuntimeConfig().public.baseUrl;
-const url = baseUrl + "/listOKHsummaries";
+const url = baseUrl + "/getRelatedOKH";
 const {
   data: okhdata,
   error,
@@ -48,7 +48,7 @@ const {
 
 watch(okhdata, (newData) => {
   if (newData) {
-    console.log("Fetched Data: ", newData.productSummaries);
+    console.log("Fetched Data: ", newData.relatedOKH);
   }
 });
 

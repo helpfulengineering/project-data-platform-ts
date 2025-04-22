@@ -1,6 +1,6 @@
 <script setup lang="ts">
-//const baseUrl = useRuntimeConfig().public.baseUrl;
-const baseUrl = 'http://demo4460398.mockable.io/api';
+const baseUrl = useRuntimeConfig().public.baseUrl;
+//const baseUrl = 'http://demo4460398.mockable.io/api';
 
 const url = baseUrl + "/listOKHsummaries";
 const {
