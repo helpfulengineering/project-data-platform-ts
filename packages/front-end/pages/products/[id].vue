@@ -13,7 +13,7 @@ const productFilename = route.params.id as string;
 
 // const url = baseUrl + "/getFile/okh/" + fname + "/" + fileExt;
 
-const url = baseUrl + "/getFile/okh/" + productFilename
+const url = baseUrl + "/getFile/okh/" + productFilename;
 
 
 
