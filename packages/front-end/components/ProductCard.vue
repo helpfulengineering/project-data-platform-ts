@@ -9,17 +9,13 @@
   </NuxtLink>
 </template>
 
-<script>
-
-//import {encodeBase64} from '../utils/utils'
-export default {
-  props: {
-    product: {
-      type: Object,
-      required: true,
-    },
-  },
-};
+<script setup>
+defineProps({
+  product: {
+    type: Object,
+    required: true
+  }
+});
 </script>
 
 <style scoped>

@@ -43,6 +43,7 @@ const routeFunctions: DICT_TYPE = {
   "getFile/{containerName}/{fullFileName}": getFile, // Example: "getFile/okh/bread.yml"
     "listFiles/{containerName}": listFilesByContainerName, // Example: http://localhost:7071/api/listFiles/okw OR http://localhost:7071/api/listFiles/okh
     listOKHsummaries, // This is specifically meant to provide thumbnails for the frontend
+    getRelatedOKH,
 };
 //create route for each
 for (let key in routeFunctions) {
@@ -179,6 +180,71 @@ export async function listFilesByContainerName(
   return { jsonBody: productsObj };
 }
 
+function hasOverlapKeywords(arr1: string[], arr2: string[]): boolean {
+  const set1 = new Set(arr1.map(str => str.toLowerCase().trim()));
+  return arr2.some(str => set1.has(str.toLowerCase().trim()));
+}
+
+function normalizeKeywords(keywords: string | string[] | null | undefined): string[] {
+  if (!keywords) {
+      return []; // Return an empty array if null or undefined
+  }
+
+  if (typeof keywords === "string") {
+      return keywords
+          .split(",") // Split by comma
+          .map(keyword => keyword.trim()) // Trim spaces
+          .filter(keyword => keyword.length > 0); // Remove empty strings
+  }
+
+  return keywords.filter(keyword => typeof keyword === "string" && keyword.trim().length > 0);
+}
+
+
+export async function getRelatedOKH(
+  request: HttpRequest,
+  context: InvocationContext
+): Promise<HttpResponseInit> {
+    const containerName = "okh";
+    const keywords: string[] = normalizeKeywords(decodeURIComponent(request.params.keywords))
+
+  const { error, errorMessage, data } = await listFilesInContainer(
+    serviceName,
+    containerName
+  );
+  if (error) {
+      return { jsonBody: error };
+  }
+
+
+    let summaries = [];
+    let id_cnt = 0;
+    for (let index in data) {
+        const longfilename = data[index];
+
+        console.log(longfilename)
+
+        const shortname = longfilename.split("/").pop() || "";
+        const fnameAtoms = shortname.split(".");
+        const extension = fnameAtoms.pop() || "";
+        const fname = fnameAtoms.join(".") || "";
+       
+        const fdata = await getOKHByFileName(fname, "okh", extension);
+        if ( fdata.keywords && hasOverlapKeywords(normalizeKeywords(fdata.keywords),keywords)) {
+          const product_summary = convertToProduct(fname+"."+extension,fdata, id_cnt++);
+          summaries.push(product_summary);
+        }
+       
+      
+        console.log(index)
+   
+    }
+    let productsObj = { relatedOKH: summaries };
+  return { jsonBody: productsObj,
+    headers: { "Access-Control-Allow-Origin" : "*"}
+  };
+}
+
 export async function listOKHsummaries(
   request: HttpRequest,
   context: InvocationContext
@@ -208,12 +274,12 @@ export async function listOKHsummaries(
         const fnameAtoms = shortname.split(".");
         const extension = fnameAtoms.pop() || "";
         const fname = fnameAtoms.join(".") || "";
-        if (fname != "okh-seat-helpful") {
-            const fdata = await getOKHByFileName(fname, "okh", extension);
-            const product_summary = convertToProduct(fname+"."+extension,fdata, id_cnt++);
-            summaries.push(product_summary);
-            // console.log("SUMMARY",product_summary);
-        }
+       
+        const fdata = await getOKHByFileName(fname, "okh", extension);
+        const product_summary = convertToProduct(fname+"."+extension,fdata, id_cnt++);
+        summaries.push(product_summary);
+        console.log("SUMMARY",product_summary);
+
     }
     let productsObj = { productSummaries: summaries };
   return { jsonBody: productsObj,
@@ -243,34 +309,47 @@ const { containerName, fullFileName } = request.params;
 
 // HELPER FUNCTIONS //////////////////////////////////////////////////////////////////////////////////////////
 
+const cache: Map<string, any> = new Map();
+
 async function getOKHByFileName(
   name: string,
   containerName: string,
   fileType?: string
 ): Promise<any> {
+  const fileExt: string = fileType || name.split(".").pop() || "";
 
-    const fileExt: string = fileType || name.split(".").pop() || "";
+//   // Create a cache key based on the name and fileType
+//  const cacheKey = `${name}-${fileExt}`;
 
-  // // Warning!! This function does NOT match the apparent
-  // // documentation: https://learn.microsoft.com/en-us/azure/storage/blobs/storage-blob-download-javascript
-  // // I had to figure it out by guessing. The documentation there
-  // // gives the arguments as "containerClient, blobName, fileNameWithPath"
-  // // I can't explain this discrepancy.
+//   //Check if the result is already cached
+//   if (cache.has(cacheKey)) {
+//     console.log("Returning cached result for:", cacheKey);
+//     return cache.get(cacheKey); // Return the cached result
+//   }
 
+  let result: any = null;
+
+  // Perform the actual request if not cached
   if (fileExt === "json") {
-    return await downloadBlobToJson(
+    result = await downloadBlobToJson(
       process.env?.Azure_Storage_ServiceName as string,
       containerName,
       name + "." + fileExt
     );
   } else if (fileExt === "yml" || fileExt === "yaml") {
-    return await downloadBlobYamlToJSON(
+    result = await downloadBlobYamlToJSON(
       process.env?.Azure_Storage_ServiceName as string,
       containerName,
       name + "." + fileExt
     );
   }
-  return null;
+
+  // // Cache the result if it's not null
+  // if (result !== null) {
+  //   cache.set(cacheKey, result);
+  // }
+
+  return result;
 }
 
 // will need proper typing once types have been shared with back-end

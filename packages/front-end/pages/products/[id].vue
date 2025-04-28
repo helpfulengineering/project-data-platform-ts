@@ -2,7 +2,7 @@
 import { useRoute } from "#app";
 import type { OKH_TYPE } from "../../types/OKH.type";
 import {ref, computed } from 'vue';
-import { formatKeywords, formatImages } from "~/utils/utils";
+import { formatKeywords, formatImages, formatKeywordsForQueryParam } from "~/utils/utils";
 
 const route = useRoute();
 
@@ -123,11 +123,11 @@ console.log("sliderImages",sliderImages)
 
         <div class="location">Location, Country</div>
         <p>{{ product?.description }}</p>
-        <div class="review-wrap">
+        <!-- <div class="review-wrap">
           <Reviews />
           <Reviews />
-        </div>
-        <RelatedItems />
+        </div> -->
+        <RelatedItems :keywords="formatKeywordsForQueryParam(product?.keywords)"/>
       </div>
       <div class="right">
         <button class="btn-primary">ORDER</button>

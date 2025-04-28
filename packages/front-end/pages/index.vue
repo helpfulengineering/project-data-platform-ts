@@ -28,9 +28,10 @@ const {
       <ProductGroup :products="okhdata.productSummaries" title="Products" />
     </div>
 
-    <div v-if="status === 'success'" class="related-items">
+    <!-- <div v-if="status === 'success'" class="related-items">
       <RelatedItems />
-    </div>
+    </div> -->
+    
     <!-- <div v-if="loading" class="loading related-items">
       <SkeletonRelatedItems />
     </div> -->
