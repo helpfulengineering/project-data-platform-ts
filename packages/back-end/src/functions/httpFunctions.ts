@@ -321,7 +321,7 @@ async function getOKHByFileName(
   // Create a cache key based on the name and fileType
   const cacheKey = `${name}-${fileExt}`;
 
-  //Check if the result is already cached
+  // Check if the result is already cached
   if (cache.has(cacheKey)) {
     console.log("Returning cached result for:", cacheKey);
     return cache.get(cacheKey); // Return the cached result
