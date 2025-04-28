@@ -318,14 +318,14 @@ async function getOKHByFileName(
 ): Promise<any> {
   const fileExt: string = fileType || name.split(".").pop() || "";
 
-//   // Create a cache key based on the name and fileType
-//  const cacheKey = `${name}-${fileExt}`;
+  // Create a cache key based on the name and fileType
+  const cacheKey = `${name}-${fileExt}`;
 
-//   //Check if the result is already cached
-//   if (cache.has(cacheKey)) {
-//     console.log("Returning cached result for:", cacheKey);
-//     return cache.get(cacheKey); // Return the cached result
-//   }
+  //Check if the result is already cached
+  if (cache.has(cacheKey)) {
+    console.log("Returning cached result for:", cacheKey);
+    return cache.get(cacheKey); // Return the cached result
+  }
 
   let result: any = null;
 
@@ -344,10 +344,10 @@ async function getOKHByFileName(
     );
   }
 
-  // // Cache the result if it's not null
-  // if (result !== null) {
-  //   cache.set(cacheKey, result);
-  // }
+  // Cache the result if it's not null
+  if (result !== null) {
+    cache.set(cacheKey, result);
+  }
 
   return result;
 }
