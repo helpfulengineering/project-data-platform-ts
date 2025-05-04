@@ -164,7 +164,7 @@ export default {
       searchQuery: '',
       loading: false,
       error: null,
-      apiBaseUrl: 'http://localhost:7074/api' // Updated port to match our latest backend
+      apiBaseUrl: 'http://localhost:7071/api' 
     };
   },
   computed: {

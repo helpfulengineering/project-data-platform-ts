@@ -4,7 +4,7 @@
 // Changing from "localhost" to 127.0.0.1
 // made a huge difference here.
 // This is totally unexplained and complete nonsense, but true.
-const globalBaseUrl = 'http://127.0.0.1:7071/api';
+const globalBaseUrl = 'http://localhost:7071/api';
 
 export default defineNuxtConfig({
     compatibilityDate: '2024-04-03',
