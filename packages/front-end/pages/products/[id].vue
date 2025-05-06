@@ -1,50 +1,169 @@
 <script setup lang="ts">
-import { useRoute } from "#app";
+import { useRoute, useRouter } from "#app";
 import type { OKH_TYPE } from "../../types/OKH.type";
 import {ref, computed } from 'vue';
 import { formatKeywords, formatImages, formatKeywordsForQueryParam } from "~/utils/utils";
 
+
+
 const route = useRoute();
+const router = useRouter();
 
 const baseUrl = useRuntimeConfig().public.baseUrl;
 
 const productFilename = route.params.id as string;
 
-let purename = "";
-let fileExt = ""
-if (productFilename.endsWith(".yml")) {
-    purename = productFilename.slice(0,-4);
-    fileExt = "yml";
-} else if (productFilename.endsWith(".json")) {
-    purename = productFilename.slice(0,-5);
-    fileExt = "json";
-} else {
-    console.log("BAD FILENAME, MUST END IN yml or json:",productFilename);
+// Check if product data is available in route query parameters (from OKH page)
+const product = ref<any>({});
+const sliderImages = ref<string[]>([]);
+const status = ref('pending');
+const error = ref(null);
+
+// Track all available products for navigation
+const allProducts = ref<any[]>([]);
+const currentProductIndex = ref<number>(-1);
+
+// Navigation methods
+const showPreviousProduct = () => {
+  if (currentProductIndex.value > 0) {
+    const prevProduct = allProducts.value[currentProductIndex.value - 1];
+    // Create the filename based on product name
+    const filename = `${prevProduct.name.toLowerCase().replace(/\s+/g, '-')}.json`;
+    navigateToProduct(filename);
+  }
+};
+
+const showNextProduct = () => {
+  if (currentProductIndex.value < allProducts.value.length - 1) {
+    const nextProduct = allProducts.value[currentProductIndex.value + 1];
+    // Create the filename based on product name
+    const filename = `${nextProduct.name.toLowerCase().replace(/\s+/g, '-')}.json`;
+    navigateToProduct(filename);
+  }
+};
+
+const navigateToProduct = (filename: string) => {
+  router.push(`/products/${filename}`);
+};
+
+// Determine if we should fetch data or if we already have data from router
+async function fetchProductData() {
+  try {
+    status.value = 'pending';
+    
+    // First attempt: Try to get product data directly from OKHs endpoint
+    // This ensures we can get data even if the file doesn't exist in storage
+    console.log("Fetching from OKHs endpoint first");
+    const okhResponse = await fetch(`${baseUrl}/getOKHs`);
+    
+    if (okhResponse.ok) {
+      const okhData = await okhResponse.json();
+      
+      // Store all products for navigation between products
+      allProducts.value = [];
+      const productCategories = ['medical_products', 'automotive_products', 'consumer_products'];
+      productCategories.forEach(category => {
+        if (okhData[0]?.[category] && Array.isArray(okhData[0][category])) {
+          allProducts.value = [...allProducts.value, ...okhData[0][category]];
+        }
+      });
+      
+      // Extract purename (without extension) for matching
+      let purename = productFilename;
+      if (productFilename.endsWith(".yml")) {
+        purename = productFilename.slice(0, -4);
+      } else if (productFilename.endsWith(".json")) {
+        purename = productFilename.slice(0, -5);
+      }
+      
+      // Attempt to find a product by name or ID in the OKH data
+      let foundProduct = null;
+      
+      // Check in all product categories
+      for (const category of productCategories) {
+        if (okhData[0]?.[category]) {
+          foundProduct = okhData[0][category].find(p => {
+            // Match by multiple criteria:
+            // 1. Exact filename match
+            // 2. Sanitized name match
+            // 3. ID match
+            const sanitizedName = p.name.toLowerCase().replace(/\s+/g, '-');
+            const nameMatch = sanitizedName === purename || 
+                             `${sanitizedName}.json` === productFilename ||
+                             `${sanitizedName}.yml` === productFilename;
+            const idMatch = p.id.toString() === purename || p.id.toString() === productFilename;
+            
+            return nameMatch || idMatch;
+          });
+          if (foundProduct) break;
+        }
+      }
+      
+      if (foundProduct) {
+        console.log("Product found in OKHs data:", foundProduct.name);
+        // Find the index of the current product for navigation
+        currentProductIndex.value = allProducts.value.findIndex(p => p.id === foundProduct.id);
+        
+        // Format the product data to match the expected format for display
+        status.value = 'success';
+        product.value = {
+          ...foundProduct,
+          title: foundProduct.name,
+          description: foundProduct.shortDescription,
+          version: "1.0",
+          license: "Open Source",
+          keywords: [foundProduct.name.split(' ')[0], "OKH", foundProduct.name.split(' ').slice(-1)[0]], // Create keywords from the name
+          "manifest-author": { name: foundProduct.manifestAuthor || 'Unknown' },
+          "manifest-language": "en",
+          "okh-manifest-version": "1.0",
+          "date-created": new Date().toISOString().split('T')[0],
+          "date-updated": new Date().toISOString().split('T')[0],
+          "development-stage": "prototype",
+          "health-safety-notice": "Standard safety practices apply"
+        };
+        sliderImages.value = foundProduct.image ? [foundProduct.image] : [];
+        return;
+      }
+    }
+    
+    // Second attempt: If product wasn't found in OKHs, try the getFile endpoint
+    // Parse the filename to extract parts
+    let purename = "";
+    let fileExt = "";
+    if (productFilename.endsWith(".yml")) {
+      purename = productFilename.slice(0,-4);
+      fileExt = "yml";
+    } else if (productFilename.endsWith(".json")) {
+      purename = productFilename.slice(0,-5);
+      fileExt = "json";
+    } else {
+      // Default to treating it as a JSON file
+      purename = productFilename;
+      fileExt = "json";
+    }
+    
+    // If we reach here, proceed with normal file fetching
+    const url = baseUrl + "/getFile/okh/" + purename + "/" + fileExt;
+    console.log("Fetching product from URL:", url);
+    
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`Product not found. Please check the URL or return to the products page.`);
+    }
+    
+    const data = await response.json();
+    product.value = data.product;
+    sliderImages.value = formatImages(data.product?.image);
+    status.value = 'success';
+  } catch (err) {
+    console.error('Error fetching product:', err);
+    error.value = err;
+    status.value = 'error';
+  }
 }
 
-console.log("purename", purename);
-
-const url = baseUrl + "/getFile/okh/" + purename + "/" + fileExt;
-
-// const url = baseUrl + "/getFile/okh/" + productFilename
-//const url = "http://demo4460398.mockable.io/details";
-
-
-const { data, status, error } = await useFetch(url, {
-  lazy: true,
-});
-
-const sliderImages = ref<string[]>([]);
-const product = ref<any>({});
-
-watchEffect(() => {
-  product.value = data.value?.product;
-  sliderImages.value = formatImages(data.value?.product?.image);
-});
-console.log("sliderImages",sliderImages)
-// const { data, status, error, refresh   } = useAsyncData(url, () =>
-//   $fetch(url)
-// );
+// Fetch product data on component mount
+fetchProductData();
 </script>
 
 <template>
@@ -66,7 +185,23 @@ console.log("sliderImages",sliderImages)
       class="product-detail container center m-10"
     >
       <div class="left">
-        <Slider v-if="sliderImages.length > 0" :images="sliderImages"/>
+        <!-- Custom Slider with Navigation -->  
+        <div class="slider-container">
+          <button class="prev-button" @click="showPreviousProduct" :disabled="currentProductIndex <= 0">
+            ‹
+          </button>
+          
+          <!-- Slider images -->
+          <div class="slider">
+            <div class="slide" v-for="(image, index) in sliderImages" :key="index">
+              <img :src="image" alt="Product Image" />
+            </div>
+          </div>
+
+          <button class="next-button" @click="showNextProduct" :disabled="currentProductIndex >= allProducts.length - 1">
+            ›
+          </button>
+        </div>
 
         <div class="specification">Specifications</div>
         <div class="okh-details">
@@ -134,13 +269,16 @@ console.log("sliderImages",sliderImages)
       <div class="center">
         <h1 class="title">{{ product?.title }}</h1>
 
-        <div class="location">Location, Country</div>
+        <div class="location">Available for use during crisis response</div>
         <p>{{ product?.description }}</p>
         <!-- <div class="review-wrap">
           <Reviews />
           <Reviews />
         </div> -->
-        <RelatedItems :keywords="formatKeywordsForQueryParam(product?.keywords)"/>
+        <div class="related-section">
+          <h2 class="related-title">RELATED ITEMS</h2>
+          <RelatedItems :keywords="formatKeywordsForQueryParam(product?.keywords)"/>
+        </div>
       </div>
       <div class="right">
         <button class="btn-primary">ORDER</button>
@@ -284,5 +422,85 @@ console.log("sliderImages",sliderImages)
       max-width: 1400px;
     }
   }
+}
+/* Slider container styles */
+.slider-container {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  overflow: hidden;
+}
+
+.prev-button, .next-button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: #FFFFFF;
+  border-radius: 100%;
+  color: #333333;
+  border: none;
+  font-weight: 700;
+  font-size: 28px;
+  cursor: pointer;
+  line-height: 12px;
+  padding-bottom: 4px;
+  z-index: 10;
+  outline: none; 
+  height: 40px;
+  width: 40px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.next-button {
+  right: 10px;
+}
+
+.prev-button {
+  left: 10px;
+}
+
+.prev-button:hover, .next-button:hover {
+  background-color: #f0f0f0;
+}
+
+.prev-button:disabled, .next-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.slider {
+  display: flex;
+  transition: transform 0.5s ease-in-out;
+}
+
+.slide {
+  min-width: 100%;
+  box-sizing: border-box;
+}
+
+.slide img {
+  width: 100%;
+  display: block;
+  border-radius: 4px;
+}
+
+.related-section {
+  width: 100%;
+  margin-top: 40px;
+  border-top: 1px solid #e5e5e5;
+  padding-top: 20px;
+}
+
+.related-title {
+  color: #2a3952;
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0 0 20px 0;
+  text-transform: uppercase;
+  font-family: Arial, sans-serif;
 }
 </style>

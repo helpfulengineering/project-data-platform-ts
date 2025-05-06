@@ -1,6 +1,5 @@
 <template>
   <div class="related-products">
-    <h1 class="title">Related to items you’ve viewed</h1>
     <!-- error -->
     <div v-if="status === 'error'">error : {{ error?.message }}</div>
     <!-- loading -->
@@ -10,17 +9,25 @@
       <NuxtLink
         v-for="productSummary in okhdata.relatedOKH"
         :to="`/products/${productSummary.fname}`"
-        class="related-okh center mt-6"
+        class="related-okh"
         :key="productSummary.fname"
-        :product="productSummary"
       >
         <img
           :src="productSummary.image"
           alt="Product Image"
           class="img-product"
         />
-        <h1 class="name">{{ productSummary.name }}</h1>
+        <div class="name">{{ productSummary.name }}</div>
       </NuxtLink>
+      
+      <!-- Display placeholder items if there are fewer than 5 related items -->
+      <template v-if="okhdata.relatedOKH && okhdata.relatedOKH.length < 5">
+        <div 
+          v-for="index in 5 - okhdata.relatedOKH.length" 
+          :key="'empty-'+index"
+          class="related-okh empty">
+        </div>
+      </template>
     </div>
   </div>
 </template>
@@ -99,30 +106,41 @@ watch(okhdata, (newData) => {
 .related-products {
   background-color: white;
   margin-bottom: 40px;
+  width: 100%;
 
   .name {
     color: #2a3952;
-    font-size: 16px;
+    font-size: 14px;
+    font-weight: 600;
+    margin-top: 10px;
+    text-align: center;
   }
 
   .related-okh {
-    margin: 20px 5px;
-    width: 15%;
+    margin: 10px;
+    width: 18%;
+    text-decoration: none;
+    transition: transform 0.2s ease;
+    display: block;
+    
+    &:hover {
+      transform: translateY(-3px);
+    }
   }
 
-  .title {
-    color: #2a3952;
-    font-size: 24px;
-    font-weight: 700;
-    padding: 20px 0 0 10px;
-    text-align: center;
-    text-transform: uppercase;
+  .img-product {
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   }
 
   .related-product-wrap {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
     flex-wrap: wrap;
+    margin-top: 20px;
   }
 }
 .loader {
