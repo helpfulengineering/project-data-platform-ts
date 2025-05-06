@@ -373,10 +373,95 @@ export async function getRelatedOKH(
   context: InvocationContext
 ): Promise<HttpResponseInit> {
   context.log(`Http function processed request for url "${request.url}"`);
-  return { 
-    jsonBody: { message: "Related OKH endpoint" },
-    headers: { "Access-Control-Allow-Origin": "*" }
-  };
+  
+  // Get keywords from query params (if any)
+  const keywords = request.query.get('keywords') || '';
+  context.log(`Looking for products related to keywords: ${keywords}`);
+  
+  try {
+    // Get the example products data
+    const products = _.cloneDeep(example_products);
+    
+    // Extract all products from different categories
+    const allProducts = [];
+    
+    // Add medical products
+    if (products[0]?.medical_products) {
+      allProducts.push(...products[0].medical_products);
+    }
+    
+    // Add automotive products
+    if (products[0]?.automotive_products) {
+      allProducts.push(...products[0].automotive_products);
+    }
+    
+    // Add consumer products
+    if (products[0]?.consumer_products) {
+      allProducts.push(...products[0].consumer_products);
+    }
+    
+    // Function to format product for frontend
+    const formatProductForFrontend = (product: any) => ({
+      id: product.id,
+      name: product.name,
+      image: product.image,
+      description: product.shortDescription,
+      // Create a filename from the product name
+      fname: `${product.name.toLowerCase().replace(/\s+/g, '-')}.json`
+    });
+    
+    // If no keywords are provided, return a few random products
+    let relatedProducts = [];
+    if (!keywords || keywords === '') {
+      // Return up to 5 random products
+      relatedProducts = _.sampleSize(allProducts, 5).map(formatProductForFrontend);
+    } else {
+      // Parse the keywords from the URL-encoded comma-separated string
+      const keywordArray = decodeURIComponent(keywords).split(',');
+      
+      // Filter products that might be related to these keywords
+      // This is a simple implementation - in a real app, you might use more sophisticated matching
+      relatedProducts = allProducts
+        .filter(product => {
+          // Skip if we're on the same product page (match by ID)
+          if (product.id.toString() === request.query.get('id')) {
+            return false;
+          }
+          
+          // Check if any keyword appears in the product name or description
+          return keywordArray.some(keyword => {
+            const lowerKeyword = keyword.toLowerCase().trim();
+            return product.name.toLowerCase().includes(lowerKeyword) || 
+                   (product.shortDescription && product.shortDescription.toLowerCase().includes(lowerKeyword));
+          });
+        })
+        .map(formatProductForFrontend);
+    }
+    
+    // If we don't have at least 3 related products, add more random ones
+    if (relatedProducts.length < 3) {
+      const additionalProducts = _.sampleSize(
+        allProducts.filter(p => !relatedProducts.find(rp => rp.id === p.id)),
+        5 - relatedProducts.length
+      );
+      relatedProducts.push(...additionalProducts.map(formatProductForFrontend));
+    }
+    
+    // Limit to max 5 products
+    relatedProducts = relatedProducts.slice(0, 5);
+    
+    return { 
+      jsonBody: { relatedOKH: relatedProducts },
+      headers: { "Access-Control-Allow-Origin": "*" }
+    };
+  } catch (error) {
+    context.log(`Error providing related OKH data: ${error}`);
+    return {
+      status: 500,
+      jsonBody: { error: "Failed to provide related OKH data", message: error },
+      headers: { "Access-Control-Allow-Origin": "*" }
+    };
+  }
 }
 
 app.http('getRelatedOKH', {
