@@ -11,7 +11,7 @@ import {
   listFilesInContainer,
 } from "../lib/azure-storage.js";
 import { DICT_TYPE } from "../types/generalTypes.js";
-import { example_products } from "../dummyData/exampleProducts.js";
+// import { example_products } from "../dummyData/exampleProducts.js";
 import _ from "lodash";
 
 // make sure important environment variables are present
@@ -35,12 +35,13 @@ if (!OKWcontainerName) {
 const routeFunctions: DICT_TYPE = {
   test,
   listRoutes,
-  getOKH,
-  getOKHs,
-  getExampleProducts,
+//  getOKH,
+//  getOKHs,
+//  getExampleProducts,
   "getFile/{containerName}/{fileName}/{fileType}": getFile, // Example: "getFile/okh/bread/yml"
     "listFiles/{containerName}": listFilesByContainerName, // Example: http://localhost:7071/api/listFiles/okw OR http://localhost:7071/api/listFiles/okh
     listOKHsummaries, // This is specifically meant to provide thumbnails for the frontend
+    listOKWsummaries, // This is specifically meant to provide thumbnails for the frontend
     getRelatedOKH,
 };
 //create route for each
@@ -81,74 +82,74 @@ export async function listRoutes(
 }
 
 // This route is currently meant for the front-end to provide dummy data (with some real data sprinkled in)
-export async function getOKH(
-  request: HttpRequest,
-  context: InvocationContext
-): Promise<HttpResponseInit> {
-  context.log(`Http function processed request for url "${request.url}"`);
+// export async function getOKH(
+//   request: HttpRequest,
+//   context: InvocationContext
+// ): Promise<HttpResponseInit> {
+//   context.log(`Http function processed request for url "${request.url}"`);
 
-  // item from azure
-  // const jsonFileName =
-  // request.query.get("name")
-  // || (await request.text())
+//   // item from azure
+//   // const jsonFileName =
+//   // request.query.get("name")
+//   // || (await request.text())
 
-  try {
-    // Note okh is of type JSON. Decoding into a type correct
-    // object requires a lot of complexity as explained in this issue:
-    // https://stackoverflow.com/questions/22885995/how-do-i-initialize-a-typescript-object-with-a-json-object
-    const itemFromAzure = await getOKHByFileName(
-      "okh-ventilator",
-      "okh",
-      "json"
-    );
+//   try {
+//     // Note okh is of type JSON. Decoding into a type correct
+//     // object requires a lot of complexity as explained in this issue:
+//     // https://stackoverflow.com/questions/22885995/how-do-i-initialize-a-typescript-object-with-a-json-object
+//     const itemFromAzure = await getOKHByFileName(
+//       "okh-ventilator",
+//       "okh",
+//       "json"
+//     );
 
-    const breadData = await getOKHByFileName("bread", "okh", "yml");
+//     const breadData = await getOKHByFileName("bread", "okh", "yml");
 
-    // duplicate example data so you don't modify it
-    const cloned_products = _.cloneDeep(example_products);
-    cloned_products[0].medical_products.push(
-        convertToProduct(
-            "bread.yml",
-        itemFromAzure,
-        cloned_products[0].medical_products.length + 1
-      )
-    );
-    cloned_products[0].medical_products.push(
-        convertToProduct(
-             "bread.yml",
-        breadData,
-        cloned_products[0].medical_products.length + 1
-      )
-    );
+//     // duplicate example data so you don't modify it
+//     const cloned_products = _.cloneDeep(example_products);
+//     cloned_products[0].medical_products.push(
+//         convertToProduct(
+//             "bread.yml",
+//         itemFromAzure,
+//         cloned_products[0].medical_products.length + 1
+//       )
+//     );
+//     cloned_products[0].medical_products.push(
+//         convertToProduct(
+//              "bread.yml",
+//         breadData,
+//         cloned_products[0].medical_products.length + 1
+//       )
+//     );
 
-    return {
-      jsonBody: cloned_products,
-    };
-  } catch (error) {
-    return {
-      status: 500,
-      jsonBody: error,
-    };
-  }
-}
+//     return {
+//       jsonBody: cloned_products,
+//     };
+//   } catch (error) {
+//     return {
+//       status: 500,
+//       jsonBody: error,
+//     };
+//   }
+// }
 
-export async function getExampleProducts(
-  request: HttpRequest,
-  context: InvocationContext
-): Promise<HttpResponseInit> {
-  context.log(`Http function processed request for url "${request.url}"`);
+// export async function getExampleProducts(
+//   request: HttpRequest,
+//   context: InvocationContext
+// ): Promise<HttpResponseInit> {
+//   context.log(`Http function processed request for url "${request.url}"`);
 
-  return { jsonBody: example_products };
-}
+//   return { jsonBody: example_products };
+// }
 
-export async function getOKHs(
-  request: HttpRequest,
-  context: InvocationContext
-): Promise<HttpResponseInit> {
-  context.log(`Http function processed request for url "${request.url}"`);
+// export async function getOKHs(
+//   request: HttpRequest,
+//   context: InvocationContext
+// ): Promise<HttpResponseInit> {
+//   context.log(`Http function processed request for url "${request.url}"`);
 
-  return { jsonBody: example_products };
-}
+//   return { jsonBody: example_products };
+// }
 
 export async function test(
   request: HttpRequest,
@@ -226,16 +227,16 @@ export async function getRelatedOKH(
         const fnameAtoms = shortname.split(".");
         const extension = fnameAtoms.pop() || "";
         const fname = fnameAtoms.join(".") || "";
-       
+
         const fdata = await getOKHByFileName(fname, "okh", extension);
         if ( fdata.keywords && hasOverlapKeywords(normalizeKeywords(fdata.keywords),keywords)) {
           const product_summary = convertToProduct(fname+"."+extension,fdata, id_cnt++);
           summaries.push(product_summary);
         }
-       
-      
+
+
         console.log(index)
-   
+
     }
     let productsObj = { relatedOKH: summaries };
   return { jsonBody: productsObj,
@@ -243,11 +244,24 @@ export async function getRelatedOKH(
   };
 }
 
+export async function listOKWsummaries(
+  request: HttpRequest,
+  context: InvocationContext
+): Promise<HttpResponseInit> {
+    return listSummaries(request,context,"okw");
+}
+
 export async function listOKHsummaries(
   request: HttpRequest,
   context: InvocationContext
 ): Promise<HttpResponseInit> {
-    const containerName = "okh";
+    return listSummaries(request,context,"okh");
+}
+async function listSummaries(
+    request: HttpRequest,
+    context: InvocationContext,
+    containerName: string
+): Promise<HttpResponseInit> {
   console.log("listFilesByContainerName", serviceName, containerName);
   const { error, errorMessage, data } = await listFilesInContainer(
     serviceName,
@@ -256,6 +270,8 @@ export async function listOKHsummaries(
   if (error) {
       return { jsonBody: error };
   }
+    console.log("dataReturned", data);
+
     // Now we want to add in the things a product card needs.
     // "data" now contains the files we need, we need to enumerate over it
     //
@@ -272,15 +288,15 @@ export async function listOKHsummaries(
         const fnameAtoms = shortname.split(".");
         const extension = fnameAtoms.pop() || "";
         const fname = fnameAtoms.join(".") || "";
-       
-        const fdata = await getOKHByFileName(fname, "okh", extension);
-        const product_summary = convertToProduct(fname+"."+extension,fdata, id_cnt++);
-        summaries.push(product_summary);
-        console.log("SUMMARY",product_summary);
+
+        const fdata = await getOKHByFileName(fname, containerName, extension);
+        const summary = convertToProduct(fname+"."+extension,fdata, id_cnt++);
+        summaries.push(summary);
+        console.log("SUMMARY",summary);
 
     }
-    let productsObj = { productSummaries: summaries };
-  return { jsonBody: productsObj,
+    let productsOrOKWsObj = { summaries: summaries };
+  return { jsonBody: productsOrOKWsObj,
     headers: { "Access-Control-Allow-Origin" : "*"}
   };
 }
