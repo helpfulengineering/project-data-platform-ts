@@ -11,7 +11,9 @@ import {
   listFilesInContainer,
 } from "../lib/azure-storage.js";
 import { DICT_TYPE } from "../types/generalTypes.js";
+
 // import { example_products } from "../dummyData/exampleProducts.js";
+import {getFileNameAndFileType} from '../utils/utils.js';
 import _ from "lodash";
 
 // make sure important environment variables are present
@@ -165,11 +167,29 @@ export async function listFilesByContainerName(
 ): Promise<HttpResponseInit> {
   const { containerName } = request.params;
 
-  console.log("listFilesByContainerName", serviceName, containerName);
+    console.log("listFilesByContainerName GGGGGGGGG", serviceName, containerName);
+    {
   const { error, errorMessage, data } = await listFilesInContainer(
+    serviceName,
+    "okh"
+  );
+        console.log("XXXX okh",data);
+    }
+    {
+  const { error, errorMessage, data } = await listFilesInContainer(
+    serviceName,
+    "okw"
+  );
+        console.log("XXXX okw",data);
+    }
+
+
+    const { error, errorMessage, data } = await listFilesInContainer(
     serviceName,
     containerName
   );
+    console.log("XXXX");
+    console.log("error",error);
   if (error) {
       return { jsonBody: error };
 
@@ -262,15 +282,35 @@ async function listSummaries(
     context: InvocationContext,
     containerName: string
 ): Promise<HttpResponseInit> {
-  console.log("listFilesByContainerName", serviceName, containerName);
-  const { error, errorMessage, data } = await listFilesInContainer(
-    serviceName,
-    containerName
-  );
-  if (error) {
-      return { jsonBody: error };
-  }
-    console.log("dataReturned", data);
+    console.log("list Summaries", serviceName, containerName);
+
+    // {
+    //     const { error, errorMessage, data } = await listFilesInContainer(
+    //         serviceName,
+    //         "okz"
+    //     );
+    //     console.log("Returning OKH Summaries",data);
+    //     if (error) {
+    //         return { jsonBody: error };
+    //     }
+    //     console.log("dataReturned", data);
+    // }
+    console.log("ZZZ About to call listFilesInContainer ");
+
+    const { error, errorMessage, data } = await listFilesInContainer(
+        serviceName,
+        //        "okh"
+        "okw"
+    );
+    console.log("ZZZZZZZZZZZZZZZ",error);
+
+    if (error) {
+        return { jsonBody: error };
+    }
+    console.log("Returning OKW Summaries",data);
+
+
+
 
     // Now we want to add in the things a product card needs.
     // "data" now contains the files we need, we need to enumerate over it
@@ -296,8 +336,8 @@ async function listSummaries(
 
     }
     let productsOrOKWsObj = { summaries: summaries };
-  return { jsonBody: productsOrOKWsObj,
-    headers: { "Access-Control-Allow-Origin" : "*"}
+    return { jsonBody: productsOrOKWsObj,
+             headers: { "Access-Control-Allow-Origin" : "*"}
   };
 }
 
@@ -306,9 +346,10 @@ export async function getFile(
   context: any
 ): Promise<HttpResponseInit> {
   context.log("getFile");
-  const { containerName, fileName, fileType } = request.params;
+  // const { containerName, fileName, fileType } = request.params;
+const { containerName, fullFileName } = request.params;
+  const{fileName, fileType} = getFileNameAndFileType(fullFileName);
   context.log(containerName, fileName, fileType);
-
   if (!containerName || !fileName || !fileType) {
     return { jsonBody: "error, no containerName or fileName" };
   }
