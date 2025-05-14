@@ -60,7 +60,7 @@ async function getOKHByFileName(
         containerName,
         name
       ) as unknown as AzureStorageResult;
-      
+
       if (result.error) {
         throw new Error(result.errorMessage);
       }
@@ -71,7 +71,7 @@ async function getOKHByFileName(
         containerName,
         name
       ) as unknown as AzureStorageResult;
-      
+
       if (result.error) {
         throw new Error(result.errorMessage);
       }
@@ -155,7 +155,7 @@ export async function listRoutes(
     `${request.url.split("/api/")[0]}/api/listOKHsummaries`,
     `${request.url.split("/api/")[0]}/api/getRelatedOKH`
   ];
-  
+
   return { jsonBody: routes };
 }
 
@@ -258,7 +258,7 @@ export async function getFile(
 ): Promise<HttpResponseInit> {
   const { containerName, fileName, fileType } = request.params;
   context.log(`Getting file: ${fileName}.${fileType} from container ${containerName}`);
-  
+
   try {
     const data = await getOKHByFileName(fileName, containerName, fileType);
     return { jsonBody: { product: data } };
@@ -289,7 +289,7 @@ export async function listFilesByContainerName(
     serviceName,
     containerName
   ) as unknown as AzureStorageResult;
-  
+
   if (result.error) {
     return { jsonBody: result.error };
   }
@@ -311,14 +311,14 @@ export async function listOKHsummaries(
   context: InvocationContext
 ): Promise<HttpResponseInit> {
   context.log(`Listing OKH summaries for critical supplies`);
-  
+
   try {
     // Get the example products data
     const products = _.cloneDeep(example_products);
-    
+
     // Extract medical products as our critical supplies
     const medicalProducts = products[0]?.medical_products || [];
-    
+
     // Format them for the frontend
     const productSummaries = medicalProducts.map(product => ({
       id: product.id,
@@ -330,7 +330,7 @@ export async function listOKHsummaries(
       whereToFind: 'Check local relief organizations', // Default location
       keywords: []
     }));
-    
+
     // Add example automotive products as well
     const automotiveProducts = products[0]?.automotive_products || [];
     automotiveProducts.forEach(product => {
@@ -345,8 +345,8 @@ export async function listOKHsummaries(
         keywords: []
       });
     });
-    
-    return { 
+
+    return {
       jsonBody: { productSummaries },
       headers: { "Access-Control-Allow-Origin": "*" }
     };
@@ -373,33 +373,33 @@ export async function getRelatedOKH(
   context: InvocationContext
 ): Promise<HttpResponseInit> {
   context.log(`Http function processed request for url "${request.url}"`);
-  
+
   // Get keywords from query params (if any)
   const keywords = request.query.get('keywords') || '';
   context.log(`Looking for products related to keywords: ${keywords}`);
-  
+
   try {
     // Get the example products data
     const products = _.cloneDeep(example_products);
-    
+
     // Extract all products from different categories
     const allProducts = [];
-    
+
     // Add medical products
     if (products[0]?.medical_products) {
       allProducts.push(...products[0].medical_products);
     }
-    
+
     // Add automotive products
     if (products[0]?.automotive_products) {
       allProducts.push(...products[0].automotive_products);
     }
-    
+
     // Add consumer products
     if (products[0]?.consumer_products) {
       allProducts.push(...products[0].consumer_products);
     }
-    
+
     // Function to format product for frontend
     const formatProductForFrontend = (product: any) => ({
       id: product.id,
@@ -409,16 +409,19 @@ export async function getRelatedOKH(
       // Create a filename from the product name
       fname: `${product.name.toLowerCase().replace(/\s+/g, '-')}.json`
     });
-    
+
     // If no keywords are provided, return a few random products
-    let relatedProducts = [];
+      //  let relatedProducts = [];
+      // Note: Rob weakening this typing to "any" to get it to compile.
+      // I will talk to Abner Onchana about this.
+      let relatedProducts: any[];
     if (!keywords || keywords === '') {
       // Return up to 5 random products
       relatedProducts = _.sampleSize(allProducts, 5).map(formatProductForFrontend);
     } else {
       // Parse the keywords from the URL-encoded comma-separated string
       const keywordArray = decodeURIComponent(keywords).split(',');
-      
+
       // Filter products that might be related to these keywords
       // This is a simple implementation - in a real app, you might use more sophisticated matching
       relatedProducts = allProducts
@@ -427,17 +430,17 @@ export async function getRelatedOKH(
           if (product.id.toString() === request.query.get('id')) {
             return false;
           }
-          
+
           // Check if any keyword appears in the product name or description
           return keywordArray.some(keyword => {
             const lowerKeyword = keyword.toLowerCase().trim();
-            return product.name.toLowerCase().includes(lowerKeyword) || 
+            return product.name.toLowerCase().includes(lowerKeyword) ||
                    (product.shortDescription && product.shortDescription.toLowerCase().includes(lowerKeyword));
           });
         })
         .map(formatProductForFrontend);
     }
-    
+
     // If we don't have at least 3 related products, add more random ones
     if (relatedProducts.length < 3) {
       const additionalProducts = _.sampleSize(
@@ -446,11 +449,11 @@ export async function getRelatedOKH(
       );
       relatedProducts.push(...additionalProducts.map(formatProductForFrontend));
     }
-    
+
     // Limit to max 5 products
     relatedProducts = relatedProducts.slice(0, 5);
-    
-    return { 
+
+    return {
       jsonBody: { relatedOKH: relatedProducts },
       headers: { "Access-Control-Allow-Origin": "*" }
     };
