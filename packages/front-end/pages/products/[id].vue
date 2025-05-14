@@ -9,13 +9,13 @@ const route = useRoute();
 const baseUrl = useRuntimeConfig().public.baseUrl;
 
 const productFilename = route.params.id as string;
-const [fname, fileExt] = productFilename.split(".");
+
+const f = getFileNameAndFileType(productFilename);
+
+const fname = f.fileName;
+const fileExt = f.fileType;
 
 const url = baseUrl + "/getFile/okh/" + fname + "/" + fileExt;
-
-// const url = baseUrl + "/getFile/okh/" + productFilename;
-
-
 
 const { data, status, error } = await useFetch(url, {
   lazy: true,

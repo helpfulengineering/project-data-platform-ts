@@ -244,6 +244,7 @@ export async function getFile(
   if (!containerName || !fileName || !fileType) {
     return { jsonBody: "error, no containerName or fileName" };
   }
+    context.log("AAA",containerName,fileName,fileType);
   const data = await getOKHByFileName(fileName, containerName, fileType);
 
   let productObj = { product: data };
