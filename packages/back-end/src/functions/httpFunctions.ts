@@ -12,7 +12,6 @@ import {
 } from "../lib/azure-storage.js";
 import { DICT_TYPE } from "../types/generalTypes.js";
 
-// import { example_products } from "../dummyData/exampleProducts.js";
 import {getFileNameAndFileType} from '../utils/utils.js';
 import _ from "lodash";
 
