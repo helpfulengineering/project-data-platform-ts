@@ -1,4 +1,3 @@
-// Used to get read-only SAS token URL
 import {
   BlobSASPermissions,
   BlobServiceClient,
@@ -13,37 +12,37 @@ function getBlobServiceClient(serviceName: string) {
   return blobServiceClient;
 }
 
-async function createContainer(
-  containerName: string,
-  blobServiceClient: BlobServiceClient
-): Promise<ContainerClient> {
-  const containerClient = blobServiceClient.getContainerClient(containerName);
-  await containerClient.createIfNotExists();
+// async function createContainer(
+//   containerName: string,
+//   blobServiceClient: BlobServiceClient
+// ): Promise<ContainerClient> {
+//   const containerClient = blobServiceClient.getContainerClient(containerName);
+//   await containerClient.createIfNotExists();
 
-  return containerClient;
-}
+//   return containerClient;
+// }
 
-export async function uploadBlob(
-  serviceName: string,
-  fileName: string,
-  containerName: string,
-  blob: Buffer
-): Promise<string> {
-  if (!serviceName || !fileName || !containerName || !blob) {
-    return "Upload function missing parameters";
-  }
+// export async function uploadBlob(
+//   serviceName: string,
+//   fileName: string,
+//   containerName: string,
+//   blob: Buffer
+// ): Promise<string> {
+//   if (!serviceName || !fileName || !containerName || !blob) {
+//     return "Upload function missing parameters";
+//   }
 
-  const blobServiceClient = getBlobServiceClient(serviceName);
+//   const blobServiceClient = getBlobServiceClient(serviceName);
 
-  const containerClient = await createContainer(
-    containerName,
-    blobServiceClient
-  );
-  const blockBlobClient = await containerClient.getBlockBlobClient(fileName);
-  const response = await blockBlobClient.uploadData(blob);
+//   const containerClient = await createContainer(
+//     containerName,
+//     blobServiceClient
+//   );
+//   const blockBlobClient = await containerClient.getBlockBlobClient(fileName);
+//   const response = await blockBlobClient.uploadData(blob);
 
-  return response.errorCode ? response.errorCode : "Success";
-}
+//   return response.errorCode ? response.errorCode : "Success";
+// }
 
 type ListFilesInContainerResponse = {
   error: boolean;
@@ -101,7 +100,6 @@ export const downloadBlobToJson = async (
   if (!downloadResponse.errorCode && downloadResponse.readableStreamBody) {
     const downloaded = await streamToJson(downloadResponse.readableStreamBody);
     if (downloaded) {
-      console.log("Downloaded blob content:", downloaded);
       return downloaded;
     }
   }
@@ -130,7 +128,6 @@ export const downloadBlobYamlToJSON = async (
       downloadResponse.readableStreamBody
     );
     if (downloaded) {
-      console.log("Downloaded blob content:", downloaded);
       return downloaded;
     }
   }

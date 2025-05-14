@@ -82,76 +82,6 @@ export async function listRoutes(
   return { jsonBody: routes };
 }
 
-// This route is currently meant for the front-end to provide dummy data (with some real data sprinkled in)
-// export async function getOKH(
-//   request: HttpRequest,
-//   context: InvocationContext
-// ): Promise<HttpResponseInit> {
-//   context.log(`Http function processed request for url "${request.url}"`);
-
-//   // item from azure
-//   // const jsonFileName =
-//   // request.query.get("name")
-//   // || (await request.text())
-
-//   try {
-//     // Note okh is of type JSON. Decoding into a type correct
-//     // object requires a lot of complexity as explained in this issue:
-//     // https://stackoverflow.com/questions/22885995/how-do-i-initialize-a-typescript-object-with-a-json-object
-//     const itemFromAzure = await getOKHByFileName(
-//       "okh-ventilator",
-//       "okh",
-//       "json"
-//     );
-
-//     const breadData = await getOKHByFileName("bread", "okh", "yml");
-
-//     // duplicate example data so you don't modify it
-//     const cloned_products = _.cloneDeep(example_products);
-//     cloned_products[0].medical_products.push(
-//         convertToProduct(
-//             "bread.yml",
-//         itemFromAzure,
-//         cloned_products[0].medical_products.length + 1
-//       )
-//     );
-//     cloned_products[0].medical_products.push(
-//         convertToProduct(
-//              "bread.yml",
-//         breadData,
-//         cloned_products[0].medical_products.length + 1
-//       )
-//     );
-
-//     return {
-//       jsonBody: cloned_products,
-//     };
-//   } catch (error) {
-//     return {
-//       status: 500,
-//       jsonBody: error,
-//     };
-//   }
-// }
-
-// export async function getExampleProducts(
-//   request: HttpRequest,
-//   context: InvocationContext
-// ): Promise<HttpResponseInit> {
-//   context.log(`Http function processed request for url "${request.url}"`);
-
-//   return { jsonBody: example_products };
-// }
-
-// export async function getOKHs(
-//   request: HttpRequest,
-//   context: InvocationContext
-// ): Promise<HttpResponseInit> {
-//   context.log(`Http function processed request for url "${request.url}"`);
-
-//   return { jsonBody: example_products };
-// }
-
 export async function test(
   request: HttpRequest,
   context: InvocationContext
@@ -166,20 +96,11 @@ export async function listFilesByContainerName(
 ): Promise<HttpResponseInit> {
   const { containerName } = request.params;
 
-    console.log("listFilesByContainerName GGGGGGGGG", serviceName, containerName);
     {
-  const { error, errorMessage, data } = await listFilesInContainer(
-    serviceName,
-    "okh"
-  );
-        console.log("XXXX okh",data);
-    }
-    {
-  const { error, errorMessage, data } = await listFilesInContainer(
-    serviceName,
-    "okw"
-  );
-        console.log("XXXX okw",data);
+        const { error, errorMessage, data } = await listFilesInContainer(
+            serviceName,
+            containerName
+        );
     }
 
 
@@ -187,14 +108,12 @@ export async function listFilesByContainerName(
     serviceName,
     containerName
   );
-    console.log("XXXX");
     console.log("error",error);
   if (error) {
       return { jsonBody: error };
 
   }
     let productsObj = { products: data };
-    console.log("YYYYYYYYYYYYYYYYYYYYY",productsObj);
   return { jsonBody: productsObj };
 }
 
@@ -281,34 +200,14 @@ async function listSummaries(
     context: InvocationContext,
     containerName: string
 ): Promise<HttpResponseInit> {
-    console.log("list Summaries", serviceName, containerName);
-
-    // {
-    //     const { error, errorMessage, data } = await listFilesInContainer(
-    //         serviceName,
-    //         "okz"
-    //     );
-    //     console.log("Returning OKH Summaries",data);
-    //     if (error) {
-    //         return { jsonBody: error };
-    //     }
-    //     console.log("dataReturned", data);
-    // }
-    console.log("ZZZ About to call listFilesInContainer ");
-
     const { error, errorMessage, data } = await listFilesInContainer(
         serviceName,
         containerName,
     );
-    console.log("ZZZZZZZZZZZZZZZ",error);
 
     if (error) {
         return { jsonBody: error };
     }
-    console.log("Returning OKW Summaries",data);
-
-
-
 
     // Now we want to add in the things a product card needs.
     // "data" now contains the files we need, we need to enumerate over it
@@ -330,8 +229,6 @@ async function listSummaries(
         const fdata = await getOKHByFileName(fname, containerName, extension);
         const summary = convertToProduct(fname+"."+extension,fdata, id_cnt++);
         summaries.push(summary);
-        console.log("SUMMARY",summary);
-
     }
     let productsOrOKWsObj = { summaries: summaries };
     return { jsonBody: productsOrOKWsObj,
@@ -343,11 +240,7 @@ export async function getFile(
   request: HttpRequest,
   context: any
 ): Promise<HttpResponseInit> {
-  context.log("getFile");
-  // const { containerName, fileName, fileType } = request.params;
-const { containerName, fullFileName } = request.params;
-  const{fileName, fileType} = getFileNameAndFileType(fullFileName);
-  context.log(containerName, fileName, fileType);
+    const { containerName, fileName, fileType } = request.params;
   if (!containerName || !fileName || !fileType) {
     return { jsonBody: "error, no containerName or fileName" };
   }
