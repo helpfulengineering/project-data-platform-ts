@@ -33,7 +33,8 @@ const selectedOkh = ref<any>(null);
 
 // API configuration
 const apiBaseUrl = ref(process.env.VITE_API_BASE_URL || 'http://localhost:7071/api');
-const supplyGraphApiUrl = ref(process.env.VITE_SUPPLY_GRAPH_AI_URL || 'http://localhost:8000');
+// TODO: make this configurable, and understand if it will always be 8001.
+const supplyGraphApiUrl = ref(process.env.VITE_SUPPLY_GRAPH_AI_URL || 'http://localhost:8001');
 const supplyGraphApiEndpoint = ref('/v1/supply-tree/create'); // Path to the versioned supply tree creation endpoint
 
 // Example OKH data
@@ -152,7 +153,7 @@ const sendToSupplyGraphAI = async (okhItem) => {
     // Prepare the request payload for supply-graph-ai
     // Using the model from the supply-graph-ai API
     const payload = {
-      okh_reference: okhItem.id?.toString() || okhItem.name,
+      okh_reference: okhItem.id?.toString() || okhItem.fname,
       required_quantity: 1,
       deadline: null,
       metadata: {
@@ -313,7 +314,7 @@ onMounted(async () => {
     console.warn('Supply Graph AI API is not available. Will use mock data as fallback.');
   }
 
-  fetchData();
+//  fetchData();
   fetchOkhData();
 });
 </script>
