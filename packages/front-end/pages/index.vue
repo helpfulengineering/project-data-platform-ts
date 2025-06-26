@@ -25,12 +25,13 @@ const {
       <SkeletonCard /> -->
     </div>
     <div v-else-if="status === 'success'"  class="product-categories">
-      <ProductGroup :products="okhdata.productSummaries" title="Products" />
+      <ProductGroup :products="okhdata.summaries" title="Products" />
     </div>
 
-    <div v-if="status === 'success'" class="related-items">
+    <!-- <div v-if="status === 'success'" class="related-items">
       <RelatedItems />
-    </div>
+    </div> -->
+
     <!-- <div v-if="loading" class="loading related-items">
       <SkeletonRelatedItems />
     </div> -->
@@ -115,7 +116,7 @@ export default {
   margin: 150px auto 0 auto;
   border-radius: 50%;
   color: #25b09b;
-  box-shadow: 
+  box-shadow:
     calc(1*var(--d))      calc(0*var(--d))     0 0,
     calc(0.707*var(--d))  calc(0.707*var(--d)) 0 1px,
     calc(0*var(--d))      calc(1*var(--d))     0 2px,

@@ -2,7 +2,7 @@
 import { useRoute } from "#app";
 import type { OKH_TYPE } from "../../types/OKH.type";
 import {ref, computed } from 'vue';
-import { formatKeywords, formatImages } from "~/utils/utils";
+import { formatKeywords, formatImages, formatKeywordsForQueryParam } from "~/utils/utils";
 
 const route = useRoute();
 
@@ -10,25 +10,12 @@ const baseUrl = useRuntimeConfig().public.baseUrl;
 
 const productFilename = route.params.id as string;
 
-let purename = "";
-let fileExt = ""
-if (productFilename.endsWith(".yml")) {
-    purename = productFilename.slice(0,-4);
-    fileExt = "yml";
-} else if (productFilename.endsWith(".json")) {
-    purename = productFilename.slice(0,-5);
-    fileExt = "json";
-} else {
-    console.log("BAD FILENAME, MUST END IN yml or json:",productFilename);
-}
+const f = getFileNameAndFileType(productFilename);
 
-console.log("purename", purename);
+const fname = f.fileName;
+const fileExt = f.fileType;
 
-const url = baseUrl + "/getFile/okh/" + purename + "/" + fileExt;
-
-// const url = baseUrl + "/getFile/okh/" + productFilename
-//const url = "http://demo4460398.mockable.io/details";
-
+const url = baseUrl + "/getFile/okh/" + fname + "/" + fileExt;
 
 const { data, status, error } = await useFetch(url, {
   lazy: true,
@@ -136,11 +123,11 @@ console.log("sliderImages",sliderImages)
 
         <div class="location">Location, Country</div>
         <p>{{ product?.description }}</p>
-        <div class="review-wrap">
+        <!-- <div class="review-wrap">
           <Reviews />
           <Reviews />
-        </div>
-        <RelatedItems />
+        </div> -->
+        <RelatedItems :keywords="formatKeywordsForQueryParam(product?.keywords)"/>
       </div>
       <div class="right">
         <button class="btn-primary">ORDER</button>
