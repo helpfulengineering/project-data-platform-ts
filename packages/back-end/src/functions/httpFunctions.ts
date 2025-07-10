@@ -15,6 +15,8 @@ import { DICT_TYPE } from "../types/generalTypes.js";
 import {getFileNameAndFileType} from '../utils/utils.js';
 import _ from "lodash";
 
+import pool from "../db";
+
 // make sure important environment variables are present
 const serviceName: string = process.env?.Azure_Storage_ServiceName || "";
 const OKHcontainerName: string =
@@ -44,6 +46,7 @@ const routeFunctions: DICT_TYPE = {
     listOKHsummaries, // This is specifically meant to provide thumbnails for the frontend
     listOKWsummaries, // This is specifically meant to provide thumbnails for the frontend
     getRelatedOKH,
+    "incidents":getIncidents,
 };
 //create route for each
 for (let key in routeFunctions) {
@@ -249,6 +252,16 @@ export async function getFile(
 
   let productObj = { product: data };
     return { jsonBody: productObj,
+             headers: { "Access-Control-Allow-Origin" : "*"}
+           };
+}
+
+//get incidents//
+export async function getIncidents(request: HttpRequest,
+  context: any): Promise<HttpResponseInit> {
+
+    const result = await pool.query('SELECT * FROM project_data.incident');
+    return { jsonBody: result.rows,
              headers: { "Access-Control-Allow-Origin" : "*"}
            };
 }
