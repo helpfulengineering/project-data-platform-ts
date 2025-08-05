@@ -17,6 +17,9 @@ import _ from "lodash";
 
 import pool from "../db";
 
+import * as dotenv from 'dotenv';
+dotenv.config({ path: '../.env' });
+
 // make sure important environment variables are present
 const serviceName: string = process.env?.Azure_Storage_ServiceName || "";
 const OKHcontainerName: string =
@@ -212,9 +215,6 @@ async function listSummaries(
         return { jsonBody: error };
     }
 
-    // Now we want to add in the things a product card needs.
-    // "data" now contains the files we need, we need to enumerate over it
-    //
 
     let summaries = [];
     let id_cnt = 0;
@@ -235,7 +235,11 @@ async function listSummaries(
     }
     let productsOrOKWsObj = { summaries: summaries };
     return { jsonBody: productsOrOKWsObj,
-             headers: { "Access-Control-Allow-Origin" : "*"}
+             headers: { 
+               "Access-Control-Allow-Origin": "*",
+               "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+               "Access-Control-Allow-Headers": "Content-Type, Authorization"
+             }
   };
 }
 
@@ -262,7 +266,11 @@ export async function getIncidents(request: HttpRequest,
 
     const result = await pool.query('SELECT * FROM project_data.incident');
     return { jsonBody: result.rows,
-             headers: { "Access-Control-Allow-Origin" : "*"}
+             headers: { 
+               "Access-Control-Allow-Origin": "*",
+               "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+               "Access-Control-Allow-Headers": "Content-Type, Authorization"
+             }
            };
 }
 
