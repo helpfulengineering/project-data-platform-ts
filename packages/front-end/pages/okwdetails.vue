@@ -113,5 +113,165 @@
 </template>
 
 <style scoped>
+.okw-detail-page.container {
+  display: flex;
+  margin: 150px auto 0 auto;
 
+  .sidebar {
+    width: 200px;
+    background-color: #e9ecef;
+    padding: 10px;
+    margin-right: 20px;
+    flex: 1 1 35%;
+  }
+
+  .sidebar h3 {
+    font-size: 16px;
+    margin-bottom: 10px;
+  }
+
+  .sidebar ul {
+    list-style: none;
+  }
+
+  .sidebar ul li {
+    margin-bottom: 5px;
+  }
+
+  .sidebar ul li a {
+    color: #003087;
+    text-decoration: none;
+  }
+
+  .okw-section {
+    background-color: #fff;
+    padding: 20px;
+    border: 1px solid #ddd;
+    margin-bottom: 20px;
+  }
+
+  .okw-section h2 {
+    font-size: 20px;
+    margin-bottom: 10px;
+  }
+
+  .okw-section p {
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .okw-section .btn-wrap {
+    display: flex;
+    align-items: center;
+  }
+
+  .okw-section .order-btn {
+    background-color: #a6f671;
+    color: black;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 10px;
+  }
+
+  .okw-section .contact-btn {
+    background-color: transparent;
+    border: 2px solid#D9D9D9;
+    color: black;
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  .contact-info {
+    padding: 0 20px;
+  }
+  .tabs {
+    display: flex;
+    margin-bottom: 10px;
+  }
+
+  .tabs a {
+    color: #333;
+    text-decoration: none;
+    padding: 10px;
+    border-bottom: 2px solid transparent;
+  }
+
+  .tabs a.active {
+    border-bottom-color: #007bff;
+  }
+
+  .business-section {
+    background-color: #fff;
+    padding: 20px;
+    border: 1px solid #ddd;
+  }
+
+  .business-section h2 {
+    font-size: 18px;
+    margin-bottom: 10px;
+  }
+
+  .business-section p {
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-top: 10px;
+  }
+
+  .details div {
+    background-color: #f8f9fa;
+    padding: 10px;
+  }
+
+  .details div h3 {
+    font-size: 14px;
+    margin-bottom: 5px;
+  }
+
+  .details div p {
+    font-size: 12px;
+  }
+
+  .reviews {
+    background-color: #f8f9fa;
+    padding: 10px;
+    margin-top: 10px;
+  }
+
+  .reviews h3 {
+    font-size: 14px;
+    margin-bottom: 5px;
+  }
+
+  .reviews p {
+    font-size: 12px;
+  }
+
+  .verified {
+    display: flex;
+    align-items: center;
+    margin-top: 20px;
+  }
+
+  .verified img {
+    height: 40px;
+    margin-right: 10px;
+  }
+
+  .verified p {
+    font-size: 12px;
+  }
+
+  .main-title {
+    color: #2a3952;
+  }
+}
 </style>
