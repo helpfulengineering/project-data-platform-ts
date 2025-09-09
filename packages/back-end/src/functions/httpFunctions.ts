@@ -276,6 +276,9 @@ export async function getIncidents(request: HttpRequest,
 
 // HELPER FUNCTIONS //////////////////////////////////////////////////////////////////////////////////////////
 
+/* Cache is a temporary implementation used to speed up response time during local development.
+* Make sure to remove this in the final implementation. */
+
 const cache: Map<string, any> = new Map();
 
 async function getOKHByFileName(
@@ -311,7 +314,7 @@ async function getOKHByFileName(
     );
   }
 
-  // Cache the result if it's not null
+  // Cache the result if it's not null 
   if (result !== null) {
     cache.set(cacheKey, result);
   }
