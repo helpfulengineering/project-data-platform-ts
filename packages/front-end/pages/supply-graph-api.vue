@@ -12,7 +12,7 @@ const selectedOkh = ref<any>(null);
 // API configuration
 const apiBaseUrl = ref(import.meta.env.VITE_API_BASE_URL || 'http://localhost:7071/api');
 // Updated to use port 8081 as requested
-const supplyGraphApiUrl = ref(import.meta.env.VITE_SUPPLY_GRAPH_AI_URL || 'http://localhost:8081');
+const supplyGraphApiUrl = ref(import.meta.env.VITE_SUPPLY_GRAPH_AI_URL || 'http://localhost:8001');
 const supplyGraphApiEndpoint = ref('/v1/supply-tree/create'); // Path to the versioned supply tree creation endpoint
 
 // Example OKH data
@@ -83,7 +83,7 @@ const fetchOkhData = async () => {
 
   try {
     console.log('Fetching OKH data from project-data-platform backend...');
-    
+
     // Enhanced API call to fetch OKH data from project data platform
     // Try multiple endpoints to ensure compatibility
     const endpoints = [
@@ -130,7 +130,7 @@ const fetchOkhData = async () => {
 
     // Enhanced data processing to handle various response formats
     let processedData = [];
-    
+
     if (data && Array.isArray(data.summaries)) {
       // Format: { summaries: [...] }
       processedData = data.summaries;
@@ -174,7 +174,7 @@ const fetchOkhData = async () => {
       ...item,
       originalData: item // Keep original for consistency
     }));
-    
+
     // Clear error after fallback to allow continued usage
     setTimeout(() => {
       if (error.value && error.value.includes('Failed to load OKH data')) {
@@ -199,7 +199,7 @@ const sendToSupplyGraphAI = async (okhItem) => {
   try {
     console.log('Processing OKH item for Supply Graph AI:', okhItem);
     const originalData = okhItem.originalData || okhItem;
-    
+
     const payload = {
       okh_reference: okhItem.id?.toString() || originalData.fname || originalData.id || 'unknown',
       required_quantity: 1,
@@ -247,7 +247,7 @@ const sendToSupplyGraphAI = async (okhItem) => {
         // Response might not be JSON
         console.warn('Could not parse error response as JSON');
       }
-      
+
       throw new Error(
         `Supply Graph AI API error: ${response.status} ${response.statusText}` +
         (errorData ? ` - ${JSON.stringify(errorData)}` : '')
@@ -404,7 +404,7 @@ onMounted(async () => {
         </div>
       </div>
       <div class="mt-2 text-xs">
-        <span class="font-medium">Integration Flow:</span> 
+        <span class="font-medium">Integration Flow:</span>
         Fetch OKHs from project-data-platform → Send to supply-graph-ai → Display supply tree
       </div>
     </div>
@@ -445,7 +445,7 @@ onMounted(async () => {
 
       <!-- Analysis Method Badge -->
       <div class="mb-4">
-        <span 
+        <span
           class="inline-block px-3 py-1 text-xs font-medium rounded-full"
           :class="supplyTreeData.analysisMethod.includes('supply-graph-ai') ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'"
         >
@@ -463,8 +463,8 @@ onMounted(async () => {
                 <h3 class="font-bold text-lg text-blue-900">{{ supplyTreeData.rootItem.name }}</h3>
                 <p class="text-sm text-blue-700 mt-1">{{ supplyTreeData.rootItem.shortDescription }}</p>
                 <div class="mt-2 flex flex-wrap gap-1">
-                  <span 
-                    v-for="keyword in (supplyTreeData.rootItem.keywords || [])" 
+                  <span
+                    v-for="keyword in (supplyTreeData.rootItem.keywords || [])"
                     :key="keyword"
                     class="px-2 py-1 bg-blue-200 text-blue-800 text-xs rounded"
                   >
@@ -543,7 +543,7 @@ onMounted(async () => {
       </details>
     </div>
     <div class="mt-8 pt-6 border-t">
-      
+
     </div>
   </section>
 </template>
