@@ -13,6 +13,8 @@ export default defineNuxtConfig({
      runtimeConfig: {
         public: {
             baseUrl: process.env.BACKEND_URL ? process.env.BACKEND_URL : globalBaseUrl,
+            // Supply Graph AI configuration
+            supplyGraphAiUrl: process.env.SUPPLY_GRAPH_AI_URL || 'http://localhost:8081'
 //            apiBase: '/api'
         }
     },

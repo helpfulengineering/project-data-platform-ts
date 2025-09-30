@@ -1,8 +1,7 @@
 <script setup lang="ts">
     import { onMounted, ref, computed } from 'vue';
 
-const data1 = ref<any>(null);
-const data2 = ref<any>(null);
+// Removed data1 and data2 - no mock data needed
 const okhData = ref<any>([]);
 const supplyTreeData = ref<any>(null);
 const loading = ref<boolean>(false);
@@ -15,176 +14,71 @@ const apiBaseUrl = ref(import.meta.env.VITE_API_BASE_URL || 'http://localhost:70
 const supplyGraphApiUrl = ref(import.meta.env.VITE_SUPPLY_GRAPH_AI_URL || 'http://localhost:8081');
 const supplyGraphApiEndpoint = ref('/v1/supply-tree/create'); // Path to the versioned supply tree creation endpoint
 
-// Example OKH data
-const mockOKHData = [
-  {
-    id: 1,
-    name: "N95 Respirator",
-    shortDescription: "Medical-grade respiratory protection against airborne particles",
-    image: "https://example.com/n95.jpg",
-    keywords: ["mask", "medical", "protection", "respirator"],
-    maker: "3M Healthcare",
-    whereToFind: "Medical supply distributors"
-  },
-  {
-    id: 2,
-    name: "Ventilator",
-    shortDescription: "Medical device for assisting or replacing breathing function",
-    image: "https://example.com/ventilator.jpg",
-    keywords: ["medical", "breathing", "emergency", "hospital"],
-    maker: "Philips Respironics",
-    whereToFind: "Hospital equipment suppliers"
-  },
-  {
-    id: 3,
-    name: "Pulse Oximeter",
-    shortDescription: "Non-invasive device measuring oxygen saturation in the blood",
-    image: "https://example.com/oximeter.jpg",
-    keywords: ["medical", "oxygen", "monitoring"],
-    maker: "Nonin Medical",
-    whereToFind: "Medical retailers"
-  },
-  {
-    id: 4,
-    name: "Face Shield",
-    shortDescription: "Protective equipment covering the entire face from splashes and sprays",
-    image: "https://example.com/faceshield.jpg",
-    keywords: ["protection", "face", "medical", "PPE"],
-    maker: "Various manufacturers",
-    whereToFind: "Medical supply stores"
-  },
-  {
-    id: 5,
-    name: "Hand Sanitizer",
-    shortDescription: "Alcohol-based hand rub for disinfection",
-    image: "https://example.com/sanitizer.jpg",
-    keywords: ["hygiene", "disinfectant", "cleaning"],
-    maker: "Various manufacturers",
-    whereToFind: "Pharmacies, grocery stores"
-  }
-];
-
-const fetchData = async () => {
-  try {
-    // Use mock data examples to simulate API responses
-    data1.value = { message: "Mock OKH data response" };
-    data2.value = { message: "Mock OKW creation response", status: "success" };
-
-    console.log('Mock Data1:', data1.value);
-    console.log('Mock Data2:', data2.value);
-  } catch (error) {
-    console.error('Error with mock data:', error);
-  }
-};
+// Removed fetchData function - no mock data needed
 
 const fetchOkhData = async () => {
   loading.value = true;
   error.value = null;
 
   try {
-    console.log('Fetching OKH data from project-data-platform backend...');
+    console.log('Fetching OKH data ONLY from Azure Blob Storage via backend...');
+    console.log('Using OKH endpoint: listOKHsummaries');
     
-    // Enhanced API call to fetch OKH data from project data platform
-    // Try multiple endpoints to ensure compatibility
-    const endpoints = [
-      `${apiBaseUrl.value}/listOKHsummaries`,
-      `${apiBaseUrl.value}/getOKHs`,
-      `${apiBaseUrl.value}/okh/list`
-    ];
-
-    let response = null;
-    let lastError = null;
-
-    // Try each endpoint until one works
-    for (const endpoint of endpoints) {
-      try {
-        console.log(`Trying endpoint: ${endpoint}`);
-        response = await fetch(endpoint, {
-          method: 'GET',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-          }
-        });
-
-        if (response.ok) {
-          console.log(`Successfully connected to: ${endpoint}`);
-          break;
-        } else {
-          console.warn(`Endpoint ${endpoint} returned ${response.status}: ${response.statusText}`);
-          lastError = new Error(`${response.status}: ${response.statusText}`);
-        }
-      } catch (err) {
-        console.warn(`Failed to connect to ${endpoint}:`, err.message);
-        lastError = err;
-        response = null;
+    // Use ONLY the OKH endpoint - pulls from "okh" container in Azure Storage
+    const endpoint = `${apiBaseUrl.value}/listOKHsummaries`;
+    
+    console.log(`Calling OKH backend endpoint: ${endpoint}`);
+    const response = await fetch(endpoint, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
       }
-    }
+    });
 
-    if (!response || !response.ok) {
-      throw lastError || new Error('All API endpoints failed');
+    if (!response.ok) {
+      throw new Error(`OKH Backend API error: ${response.status} ${response.statusText}`);
     }
 
     const data = await response.json();
-    console.log('Raw API response:', data);
+    console.log('OKH Backend API response:', data);
 
-    // Enhanced data processing to handle various response formats
-    let processedData = [];
-    
-    if (data && Array.isArray(data.summaries)) {
-      // Format: { summaries: [...] }
-      processedData = data.summaries;
-    } else if (data && data.items && Array.isArray(data.items)) {
-      // Format: { items: [...] }
-      processedData = data.items;
-    } else if (data && Array.isArray(data)) {
-      // Format: [...]
-      processedData = data;
-    } else if (data && data.data && Array.isArray(data.data)) {
-      // Format: { data: [...] }
-      processedData = data.data;
-    } else {
-      console.warn('API response format unexpected:', data);
-      throw new Error('Unexpected API response format');
+    // Process the summaries array from the OKH backend response
+    if (!data || !data.summaries || !Array.isArray(data.summaries)) {
+      throw new Error('Invalid OKH response format: expected { summaries: [...] }');
     }
 
     // Normalize the OKH data structure for consistent usage
-    okhData.value = processedData.map(item => ({
-      id: item.id || item.fname || item.name || Math.random().toString(36).substr(2, 9),
-      name: item.name || item.title || 'Unknown Item',
-      shortDescription: item.shortDescription || item.description || item.summary || 'No description available',
-      image: item.image || item.imageUrl || item.thumbnail || null,
-      keywords: item.keywords || item.tags || [],
-      maker: item.maker || item.author || item.creator || 'Unknown',
-      whereToFind: item.whereToFind || item.source || 'Unknown source',
-      // Keep original data for API calls
+    okhData.value = data.summaries.map((item: any) => ({
+      id: item.id || item.fname || `okh-${item.id || Math.random().toString(36).substr(2, 9)}`,
+      name: item.name || item.title || 'Unknown OKH Item',
+      shortDescription: item.shortDescription || item.description || 'No description available',
+      image: item.image || 'https://placecats.com/300/200',
+      keywords: item.keywords || [],
+      maker: item.manifestAuthor || item.maker || 'Unknown',
+      whereToFind: 'Azure Blob Storage (OKH Container)',
+      projectLink: item.projectLink,
+      fname: item.fname,
+      dataSource: 'okh_azure_storage',
+      // Keep original OKH data for Supply Graph AI calls
       originalData: item
     }));
 
-    console.log(`Successfully loaded ${okhData.value.length} OKH items from project data platform`);
+    console.log(`Successfully loaded ${okhData.value.length} OKH items ONLY from Azure Blob Storage`);
     console.log('Processed OKH Data:', okhData.value);
 
-  } catch (err) {
-    console.error('Error fetching OKH data from project data platform:', err);
+  } catch (err: any) {
+    console.error('Error fetching OKH data from Azure Blob Storage:', err);
     error.value = `Failed to load OKH data: ${err.message}`;
-
-    // Enhanced fallback to mock data with better error handling
-    console.warn('Using mock data due to API error. This is expected in development.');
-    okhData.value = mockOKHData.map(item => ({
-      ...item,
-      originalData: item // Keep original for consistency
-    }));
     
-    // Clear error after fallback to allow continued usage
-    setTimeout(() => {
-      if (error.value && error.value.includes('Failed to load OKH data')) {
-        error.value = null;
-      }
-    }, 3000);
+    // No fallback - only use OKH from Azure storage
+    okhData.value = [];
   } finally {
     loading.value = false;
   }
 };
+
+// Removed duplicate code - function already completed above
 
 const sendToSupplyGraphAI = async (okhItem) => {
   if (!okhItem) {
@@ -269,57 +163,7 @@ const sendToSupplyGraphAI = async (okhItem) => {
       requestPayload: payload // Keep request for debugging
     };
 
-    // Fallback to mock data if API returns empty response
-    if (!supplyTreeResponse || Object.keys(supplyTreeResponse).length === 0) {
-      console.warn('Empty response from Supply Graph AI API, generating mock data');
-
-      // Generate mock related components based on the selected item's keywords
-      const relatedComponents = mockOKHData
-        .filter(item => item.id !== okhItem.id) // Don't include the current item
-        .filter(item => {
-          // Simple keyword matching logic
-          if (!okhItem.keywords || !item.keywords) return false;
-
-          return okhItem.keywords.some(keyword =>
-            item.keywords.includes(keyword));
-        })
-        .map(item => ({
-          id: item.id,
-          name: item.name,
-          shortDescription: item.shortDescription,
-          image: item.image,
-          maker: item.maker,
-          supplyRelation: Math.random() > 0.5 ? "component" : "accessory"
-        }));
-
-      // Add fallback components if needed
-      if (relatedComponents.length < 2) {
-        const randomItems = mockOKHData
-          .filter(item =>
-            item.id !== okhItem.id &&
-            !relatedComponents.find(rc => rc.id === item.id))
-          .slice(0, 2)
-          .map(item => ({
-            id: item.id,
-            name: item.name,
-            shortDescription: item.shortDescription,
-            image: item.image,
-            maker: item.maker,
-            supplyRelation: "alternative"
-          }));
-
-        relatedComponents.push(...randomItems);
-      }
-      // Create mock supply tree response
-      supplyTreeData.value = {
-        rootItem: selectedOkh.value,
-        relatedComponents,
-        supplyChainDepth: Math.floor(Math.random() * 3) + 1,
-        analysisTimestamp: new Date().toISOString(),
-        analysisMethod: "fallback-mock-data"
-      };
-    }
-
+    
     console.log('Final Supply Tree Data:', supplyTreeData.value);
   } catch (err) {
     console.error('Error generating supply tree:', err);
@@ -370,10 +214,10 @@ onMounted(async () => {
   // Check if supply graph API is available
   const isSupplyGraphApiAvailable = await checkSupplyGraphApiAvailability();
   if (!isSupplyGraphApiAvailable) {
-    console.warn('Supply Graph AI API is not available. Will use mock data as fallback.');
+    console.warn('Supply Graph AI API is not available.');
   }
 
-//  fetchData();
+// Removed fetchData() call - no mock data needed
   fetchOkhData();
 });
 </script>
