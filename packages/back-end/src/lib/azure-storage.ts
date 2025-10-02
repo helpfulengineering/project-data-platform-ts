@@ -8,8 +8,16 @@ import {
 import { parse as parseYAML } from "yaml";
 
 function getBlobServiceClient(serviceName: string) {
-  const blobServiceClient = new BlobServiceClient(serviceName);
-  return blobServiceClient;
+  // Check if serviceName is a connection string or URL
+  if (serviceName.includes('AccountName=')) {
+    // It's a connection string
+    const blobServiceClient = BlobServiceClient.fromConnectionString(serviceName);
+    return blobServiceClient;
+  } else {
+    // It's a URL
+    const blobServiceClient = new BlobServiceClient(serviceName);
+    return blobServiceClient;
+  }
 }
 
 // async function createContainer(
