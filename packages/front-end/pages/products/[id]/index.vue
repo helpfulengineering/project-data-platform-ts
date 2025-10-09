@@ -30,7 +30,11 @@ watchEffect(() => {
   sliderImages.value = formatImages(data.value?.product?.image);
 });
 
+
+const okh = useState('okh', () => null)
+
 function goToSupplyTree () {
+  okh.value = product.value
   router.push({
     name: 'products-id-supplyTree',   // ⚠️ this exact name
     params: { id: productFilename }  // reuse current product id
