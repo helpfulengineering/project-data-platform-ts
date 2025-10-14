@@ -20,7 +20,7 @@ const selectedOkh = ref<any>(null);
 const apiBaseUrl = ref(
   import.meta.env.VITE_API_BASE_URL || "http://localhost:7071/api"
 );
-// Updated to use port 8081 as requested
+// Updated to use port 8001 as requested
 const supplyGraphApiUrl = ref(
   import.meta.env.VITE_SUPPLY_GRAPH_AI_URL || "http://localhost:8001"
 );
@@ -87,11 +87,11 @@ const sendToSupplyGraphAI = async (o: any) => {
       },
     };
 
-    console.log("Enhanced payload for Supply Graph AI (port 8081):", payload);
+    console.log("Enhanced payload for Supply Graph AI (port 8001):", payload);
     console.log(
       `Sending request to: ${supplyGraphApiUrl.value}${supplyGraphApiEndpoint.value}`
     );
-    // Enhanced request to supply-graph-ai endpoint at port 8081
+    // Enhanced request to supply-graph-ai endpoint at port 8001
     const response = await fetch(
       `${supplyGraphApiUrl.value}${supplyGraphApiEndpoint.value}`,
       {
@@ -150,7 +150,7 @@ const sendToSupplyGraphAI = async (o: any) => {
         supplyTreeResponse.creation_time ||
         supplyTreeResponse.timestamp ||
         new Date().toISOString(),
-      analysisMethod: "supply-graph-ai-port-8081",
+      analysisMethod: "supply-graph-ai-port-8001",
       apiResponse: supplyTreeResponse, // Keep full response for debugging
       requestPayload: payload, // Keep request for debugging
     };
