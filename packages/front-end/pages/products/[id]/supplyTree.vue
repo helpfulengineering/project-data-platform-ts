@@ -60,31 +60,31 @@ const sendToSupplyGraphAI = async (o: any) => {
         originalData.fname ||
         originalData.id ||
         "unknown",
-      required_quantity: 1,
+      // required_quantity: 1,
       deadline: null,
-      metadata: {
-        name: okhItem.name || originalData.name || originalData.title,
-        shortDescription:
-          okhItem.shortDescription ||
-          originalData.description ||
-          originalData.summary,
-        keywords:
-          okhItem.keywords || originalData.keywords || originalData.tags || [],
-        maker:
-          okhItem.maker ||
-          originalData.maker ||
-          originalData.author ||
-          originalData.creator,
-        whereToFind:
-          okhItem.whereToFind ||
-          originalData.whereToFind ||
-          originalData.source,
-        source: "project-data-platform-ts",
-        image: okhItem.image || originalData.image || originalData.imageUrl,
-        originalId: originalData.id || originalData.fname,
-        dataSource: originalData.dataSource || "project-data-platform",
-        ...originalData,
-      },
+      // metadata: {
+      //   name: okhItem.name || originalData.name || originalData.title,
+      //   shortDescription:
+      //     okhItem.shortDescription ||
+      //     originalData.description ||
+      //     originalData.summary,
+      //   keywords:
+      //     okhItem.keywords || originalData.keywords || originalData.tags || [],
+      //   maker:
+      //     okhItem.maker ||
+      //     originalData.maker ||
+      //     originalData.author ||
+      //     originalData.creator,
+      //   whereToFind:
+      //     okhItem.whereToFind ||
+      //     originalData.whereToFind ||
+      //     originalData.source,
+      //   source: "project-data-platform-ts",
+      //   image: okhItem.image || originalData.image || originalData.imageUrl,
+      //   originalId: originalData.id || originalData.fname,
+      //   dataSource: originalData.dataSource || "project-data-platform",
+      //   ...originalData,
+      // },
     };
 
     console.log("Enhanced payload for Supply Graph AI (port 8001):", payload);
