@@ -10,9 +10,9 @@ const selectedOkh = ref<any>(null);
 
 // API configuration
 const apiBaseUrl = ref(import.meta.env.VITE_API_BASE_URL || 'http://localhost:7071/api');
-// Updated to use port 8081 as requested
+// Updated to use port 8001 as requested
 const supplyGraphApiUrl = ref(import.meta.env.VITE_SUPPLY_GRAPH_AI_URL || 'http://localhost:8001');
-const supplyGraphApiEndpoint = ref('/v1/supply-tree/create'); // Path to the versioned supply tree creation endpoint
+const supplyGraphApiEndpoint = ref('/v1/match'); // Path to the versioned match endpoint
 
 // Removed fetchData function - no mock data needed
 
@@ -23,10 +23,10 @@ const fetchOkhData = async () => {
   try {
     console.log('Fetching OKH data ONLY from Azure Blob Storage via backend...');
     console.log('Using OKH endpoint: listOKHsummaries');
-    
+
     // Use ONLY the OKH endpoint - pulls from "okh" container in Azure Storage
     const endpoint = `${apiBaseUrl.value}/listOKHsummaries`;
-    
+
     console.log(`Calling OKH backend endpoint: ${endpoint}`);
     const response = await fetch(endpoint, {
       method: 'GET',
@@ -70,7 +70,7 @@ const fetchOkhData = async () => {
   } catch (err: any) {
     console.error('Error fetching OKH data from Azure Blob Storage:', err);
     error.value = `Failed to load OKH data: ${err.message}`;
-    
+
     // No fallback - only use OKH from Azure storage
     okhData.value = [];
   } finally {
@@ -112,10 +112,10 @@ const sendToSupplyGraphAI = async (okhItem) => {
       }
     };
 
-    console.log('Enhanced payload for Supply Graph AI (port 8081):', payload);
+    console.log('Enhanced payload for Supply Graph AI (port 8001):', payload);
     console.log(`Sending request to: ${supplyGraphApiUrl.value}${supplyGraphApiEndpoint.value}`);
 
-    // Enhanced request to supply-graph-ai endpoint at port 8081
+    // Enhanced request to supply-graph-ai endpoint at port 8001
     const response = await fetch(`${supplyGraphApiUrl.value}${supplyGraphApiEndpoint.value}`, {
       method: 'POST',
       headers: {
@@ -158,12 +158,12 @@ const sendToSupplyGraphAI = async (okhItem) => {
       relatedComponents: supplyTreeResponse.components || supplyTreeResponse.related_items || supplyTreeResponse.dependencies || [],
       supplyChainDepth: supplyTreeResponse.depth || supplyTreeResponse.chain_depth || 1,
       analysisTimestamp: supplyTreeResponse.creation_time || supplyTreeResponse.timestamp || new Date().toISOString(),
-      analysisMethod: "supply-graph-ai-port-8081",
+      analysisMethod: "supply-graph-ai-port-8001",
       apiResponse: supplyTreeResponse, // Keep full response for debugging
       requestPayload: payload // Keep request for debugging
     };
 
-    
+
     console.log('Final Supply Tree Data:', supplyTreeData.value);
   } catch (err) {
     console.error('Error generating supply tree:', err);
@@ -243,7 +243,7 @@ onMounted(async () => {
           <code class="bg-blue-100 px-1 rounded">{{ apiBaseUrl }}</code>
         </div>
         <div>
-          <span class="font-medium">Supply Graph AI (Port 8081):</span><br>
+          <span class="font-medium">Supply Graph AI (Port 8001):</span><br>
           <code class="bg-blue-100 px-1 rounded">{{ supplyGraphApiUrl }}{{ supplyGraphApiEndpoint }}</code>
         </div>
       </div>
