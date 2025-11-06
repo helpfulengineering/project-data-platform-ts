@@ -8,6 +8,26 @@ they can make.
 This matching of demand to supply is a fundamental human problem that could allow lives to be saved and
 distress relieved during the serial natuarl disaster that we face.
 
+# Our OKH and OKW libraries
+
+Our OKH and OKW libraries are implemented as publicly accessible Azure blob containers:
+```
+    "Azure_Storage_ServiceName": "https://projdatablobstorage.blob.core.windows.net",
+    "Azure_Storage_OKH_ContainerName": "okh",
+    "Azure_Storage_OKW_ContainerName": "okw"
+```
+These OKHs and OKWs are taken from our repo: [https://github.com/helpfulengineering/library](https://github.com/helpfulengineering/library).
+
+Helpful created its own OKW template, and added an extenstion to OKH, both of which are defined here:
+[https://github.com/helpfulengineering/OKF-Schema](https://github.com/helpfulengineering/OKF-Schema)
+
+We are currently working with the Internet of Production Alliance (IoPA) to unify these extensions with their official schemas.
+
+
+
+
+
+
 # Technology
 
 At present, we are using Microsoft Azure to build a basic website.
