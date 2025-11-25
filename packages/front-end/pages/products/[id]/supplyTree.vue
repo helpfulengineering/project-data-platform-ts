@@ -24,7 +24,7 @@ const apiBaseUrl = ref(
 const supplyGraphApiUrl = ref(
   import.meta.env.VITE_SUPPLY_GRAPH_AI_URL || "http://localhost:8001"
 );
-const supplyGraphApiEndpoint = ref("/v1/supply-tree/create"); // Path to the versioned supply tree creation endpoint
+const supplyGraphApiEndpoint = ref("/v1/match"); // Path to the versioned supply tree creation endpoint
 
 const sendToSupplyGraphAI = async (o: any) => {
   if (!o) {
