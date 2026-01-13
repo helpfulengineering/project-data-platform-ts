@@ -22,9 +22,10 @@ const apiBaseUrl = ref(
 );
 // Updated to use port 8001 as requested
 const supplyGraphApiUrl = ref(
-  import.meta.env.VITE_SUPPLY_GRAPH_AI_URL || "http://localhost:8001"
+  import.meta.env.VITE_SUPPLY_GRAPH_AI_URL || "http://localhost:8000"
 );
-const supplyGraphApiEndpoint = ref("/v1/match"); // Path to the versioned supply tree creation endpoint
+const supplyGraphApiEndpoint = ref("/v1/api/match"); // Path to the versioned supply tree creation endpoint
+
 
 const sendToSupplyGraphAI = async (o: any) => {
   if (!o) {
@@ -54,37 +55,10 @@ const sendToSupplyGraphAI = async (o: any) => {
   try {
     const originalData = okhItem.originalData || okhItem;
 
+    console.log("Preparing to send OKH item to Supply Graph AI:", okhItem);
+
     const payload = {
-      okh_reference:
-        okhItem.id?.toString() ||
-        originalData.fname ||
-        originalData.id ||
-        "unknown",
-      required_quantity: 1,
-      deadline: null,
-      metadata: {
-        name: okhItem.name || originalData.name || originalData.title,
-        shortDescription:
-          okhItem.shortDescription ||
-          originalData.description ||
-          originalData.summary,
-        keywords:
-          okhItem.keywords || originalData.keywords || originalData.tags || [],
-        maker:
-          okhItem.maker ||
-          originalData.maker ||
-          originalData.author ||
-          originalData.creator,
-        whereToFind:
-          okhItem.whereToFind ||
-          originalData.whereToFind ||
-          originalData.source,
-        source: "project-data-platform-ts",
-        image: okhItem.image || originalData.image || originalData.imageUrl,
-        originalId: originalData.id || originalData.fname,
-        dataSource: originalData.dataSource || "project-data-platform",
-        ...originalData,
-      },
+      recipe_id: "8f14e3c4-09f2-4a5e-8bd9-4b5bb5d0a9cd",
     };
 
     console.log("Enhanced payload for Supply Graph AI (port 8001):", payload);
@@ -134,87 +108,57 @@ const sendToSupplyGraphAI = async (o: any) => {
 
     // Parse the response from supply graph AI
     const supplyTreeResponse = await response.json();
-    console.log("Supply Graph AI Response:", supplyTreeResponse);
 
-    // Enhanced response processing to handle various response formats
-    supplyTreeData.value = {
-      rootItem: selectedOkh.value,
-      relatedComponents:
-        supplyTreeResponse.components ||
-        supplyTreeResponse.related_items ||
-        supplyTreeResponse.dependencies ||
-        [],
-      supplyChainDepth:
-        supplyTreeResponse.depth || supplyTreeResponse.chain_depth || 1,
-      analysisTimestamp:
-        supplyTreeResponse.creation_time ||
-        supplyTreeResponse.timestamp ||
-        new Date().toISOString(),
-      analysisMethod: "supply-graph-ai-port-8001",
-      apiResponse: supplyTreeResponse, // Keep full response for debugging
-      requestPayload: payload, // Keep request for debugging
+
+    console.log("Supply Graph AI Response2:", supplyTreeResponse);
+
+    // Clear previous solutions
+    const formattedSolutions: any[] = [];
+
+    supplyTreeResponse.data.solutions.forEach((solution: any) => {
+
+      const children = solution.tree.capabilities_used.map((capability: string) => ({
+        name: capability,
+        image: "/OKP_icon.png",
+      }));
+
+
+      const formattedSolution = {
+        name: solution.facility_name,
+        image: "/okw_maker.png",
+        class: "test",
+        children: children,
+      };
+
+      formattedSolutions.push(formattedSolution);
+    });
+
+    console.log("formattedSolutions:", formattedSolutions);
+
+    // Update treeData.value to trigger re-render in D3Tree component
+    treeData.value = {
+      name: selectedOkh.value?.name || "Supply Tree",
+      children: [
+        {
+          image: "/okh.png",
+          children: formattedSolutions,
+        },
+      ],
     };
-
-    console.log("Final Supply Tree Data:", supplyTreeData.value);
   } catch (err) {
     console.error("Error generating supply tree:", err);
-    error.value = `Failed to generate supply tree: ${err.message}`;
+    error.value = `Failed to generate supply tree: ${err instanceof Error ? err.message : String(err)}`;
   } finally {
     loading.value = false;
   }
 };
 
-const treeData = reactive({
-  name: "Oatmeal raisin cookie",
-
+const treeData = ref<any>({
+  name: "Chocolate Chip Cookies",
   children: [
     {
-      // name: "OKW",
-      image: "/okw.png",
-      children: [
-        {
-          name: "cinnamon",
-          class: "test",
-          children: [
-            {
-              image: "/okw.png",
-              children: [
-                {
-                  name: "testA",
-                  children: [
-                    {
-                      image: "/okw.png",
-                      children: [
-                        {
-                          name: "test1",
-                        },
-                      ],
-                    },
-                    { image: "/okw.png" },
-                    { image: "/okw.png" },
-                    { image: "/okw.png" },
-                  ],
-                },
-              ],
-            },
-            { image: "/okw.png", children: [{ name: "testB" }] },
-            { image: "/okw.png" },
-            { image: "/okw.png" },
-          ],
-        },
-        { name: "vanilla extract", children: [{ image: "/okw.png" }] },
-        { name: "white sugar", children: [{ image: "/okw.png" }] },
-        { name: "raisin", children: [{ image: "/okw.png" }] },
-        { name: "egg", children: [{ image: "/okw.png" }] },
-        { name: "shipping supply", children: [{ image: "/okw.png" }] },
-        { name: "butter", children: [{ image: "/okw.png" }] },
-        { name: "oats", children: [{ image: "/okw.png" }] },
-        {
-          name: "all purpose flour",
-          children: [{ image: "/okw.png" }],
-        },
-        { name: "brown sugar", children: [{ image: "/okw.png" }] },
-      ],
+      image: "/okh.png",
+      children: [],
     },
   ],
 });

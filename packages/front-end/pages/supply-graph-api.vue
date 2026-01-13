@@ -11,7 +11,7 @@ const selectedOkh = ref<any>(null);
 // API configuration
 const apiBaseUrl = ref(import.meta.env.VITE_API_BASE_URL || 'http://localhost:7071/api');
 // Updated to use port 8001 as requested
-const supplyGraphApiUrl = ref(import.meta.env.VITE_SUPPLY_GRAPH_AI_URL || 'http://localhost:8001');
+const supplyGraphApiUrl = ref(import.meta.env.VITE_SUPPLY_GRAPH_AI_URL || 'http://localhost:8000');
 const supplyGraphApiEndpoint = ref('/v1/match'); // Path to the versioned match endpoint
 
 // Removed fetchData function - no mock data needed
@@ -94,23 +94,27 @@ const sendToSupplyGraphAI = async (okhItem) => {
     console.log('Processing OKH item for Supply Graph AI:', okhItem);
     const originalData = okhItem.originalData || okhItem;
 
-    const payload = {
-      okh_reference: okhItem.id?.toString() || originalData.fname || originalData.id || 'unknown',
-      required_quantity: 1,
-      deadline: null,
-      metadata: {
-        name: okhItem.name || originalData.name || originalData.title,
-        shortDescription: okhItem.shortDescription || originalData.description || originalData.summary,
-        keywords: okhItem.keywords || originalData.keywords || originalData.tags || [],
-        maker: okhItem.maker || originalData.maker || originalData.author || originalData.creator,
-        whereToFind: okhItem.whereToFind || originalData.whereToFind || originalData.source,
-        source: "project-data-platform-ts",
-        image: okhItem.image || originalData.image || originalData.imageUrl,
-        originalId: originalData.id || originalData.fname,
-        dataSource: originalData.dataSource || 'project-data-platform',
-        ...originalData
-      }
-    };
+    // const payload = {
+    //   okh_reference: okhItem.id?.toString() || originalData.fname || originalData.id || 'unknown',
+    //   required_quantity: 1,
+    //   deadline: null,
+    //   metadata: {
+    //     name: okhItem.name || originalData.name || originalData.title,
+    //     shortDescription: okhItem.shortDescription || originalData.description || originalData.summary,
+    //     keywords: okhItem.keywords || originalData.keywords || originalData.tags || [],
+    //     maker: okhItem.maker || originalData.maker || originalData.author || originalData.creator,
+    //     whereToFind: okhItem.whereToFind || originalData.whereToFind || originalData.source,
+    //     source: "project-data-platform-ts",
+    //     image: okhItem.image || originalData.image || originalData.imageUrl,
+    //     originalId: originalData.id || originalData.fname,
+    //     dataSource: originalData.dataSource || 'project-data-platform',
+    //     ...originalData
+    //   }
+    // };
+
+  const payload =  {
+  "recipe_id": "8f14e3c4-09f2-4a5e-8bd9-4b5bb5d0a9cd"
+}
 
     console.log('Enhanced payload for Supply Graph AI (port 8001):', payload);
     console.log(`Sending request to: ${supplyGraphApiUrl.value}${supplyGraphApiEndpoint.value}`);

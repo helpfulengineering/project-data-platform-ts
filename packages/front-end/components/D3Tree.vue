@@ -25,6 +25,14 @@ export default {
       default: 40, // Default size of the image node
     },
   },
+  watch: {
+    data: {
+      handler() {
+        this.drawTree();
+      },
+      deep: true, // Watch nested properties for changes
+    },
+  },
   mounted() {
     this.drawTree();
   },
