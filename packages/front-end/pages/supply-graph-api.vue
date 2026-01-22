@@ -11,7 +11,7 @@ const selectedOkh = ref<any>(null);
 // API configuration
 const apiBaseUrl = ref(import.meta.env.VITE_API_BASE_URL || 'http://localhost:7071/api');
 // Updated to use port 8001 as requested
-const supplyGraphApiUrl = ref(import.meta.env.VITE_SUPPLY_GRAPH_AI_URL || 'http://localhost:8000');
+const supplyGraphApiUrl = ref(import.meta.env.VITE_SUPPLY_GRAPH_AI_URL || 'http://localhost:8001');
 const supplyGraphApiEndpoint = ref('/v1/match'); // Path to the versioned match endpoint
 
 // Removed fetchData function - no mock data needed

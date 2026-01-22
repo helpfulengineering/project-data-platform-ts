@@ -22,7 +22,7 @@ const apiBaseUrl = ref(
 );
 // Updated to use port 8001 as requested
 const supplyGraphApiUrl = ref(
-  import.meta.env.VITE_SUPPLY_GRAPH_AI_URL || "http://localhost:8000"
+  import.meta.env.VITE_SUPPLY_GRAPH_AI_URL || "http://localhost:8001"
 );
 const supplyGraphApiEndpoint = ref("/v1/api/match"); // Path to the versioned supply tree creation endpoint
 
