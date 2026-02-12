@@ -57,6 +57,7 @@ const sendToSupplyGraphAI = async (o: any) => {
 
     console.log("Preparing to send OKH item to Supply Graph AI:", okhItem);
 
+      // WARNING! TODO: This is hard coding a recipe. We instatn want this to be the OKH!
     const payload = {
       recipe_id: "8f14e3c4-09f2-4a5e-8bd9-4b5bb5d0a9cd",
     };
