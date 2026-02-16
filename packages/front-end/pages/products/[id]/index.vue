@@ -91,12 +91,14 @@ console.log("sliderImages",sliderImages)
         <div class="okh-details">
           <div>manifest author</div>
           <div class="value">
-    <div>{{ product["manifest-author"]?.name ??
-            product?.metadata?.original?.manifest_author?.name }}</div>
-    <div>{{ product["manifest-author"]?.email ??
-            product?.metadata?.original?.manifest_author?.email }}</div>
-    <div>{{ product["manifest-author"]?.affiliation ??
-          product?.metadata?.original?.manifest_author?.affiliation }}</div>
+    <div>{{ product?.metadata?.original?.manifest_author?.name ??
+            product["manifest-author"]?.name
+             }}</div>
+    <div>{{ product?.metadata?.original?.manifest_author?.email ??
+            product["manifest-author"]?.email }}</div>
+    <div>{{ product?.metadata?.original?.manifest_author?.affiliation ??
+            product["manifest-author"]?.affiliation
+           }}</div>
           </div>
         </div>
         <div class="okh-details">
