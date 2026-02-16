@@ -64,27 +64,30 @@ const sendToSupplyGraphAI = async (o: any) => {
       console.log("HOPING FILENAME",okhItem.fname);
 
       // WARNING! TODO: This is hard coding a recipe. We instatn want this to be the OKH!
-    // const payload = {
-    //   recipe_id: "8f14e3c4-09f2-4a5e-8bd9-4b5bb5d0a9cd",
-    // };
-      //
-
-  //                json={
-  //               "okh_url": "https://raw.githubusercontent.com/example/okh.yaml"
-  //           }
-      // )
-
-
- //     recipe_id: "8f14e3c4-09f2-4a5e-8bd9-4b5bb5d0a9cd"
-      //      const okh_blobstorage_file_name = "https://projdatablobstorage.blob.core.windows.net/newformats/okh/manifests/";
-//      const oatmeal_cookie_file_name = "okh-quaker-oats-oatmeal-recipe.json";
-
-
       // TODO: See if we can use our own backend for this....
-      const okh_blobstorage_file_name = "https://projdatablobstorage.blob.core.windows.net/okh/";
-      const payload = {
-          "okh_url": `${okh_blobstorage_file_name}${productFilename}`
+      const okh_blobstorage_file_name = "https://projdatablobstorage.blob.core.windows.net/okh";
+
+
+    const parts = productFilename.split('.');
+
+
+    const payload = {
+          "okh_url": `${okh_blobstorage_file_name}/${productFilename}`
     };
+
+      // We would like to get this data from our backend, instead from
+      // azure, because we have already read this data.
+      // However, I don't think that will work because that system
+      // runs in docker, which does not have access to a local
+      // machine.
+      //
+      // const backend_url = "http://localhost:7071/api/getFile";
+      // const fileType = "okh";
+      // const payload = {
+      //     "okh_url": `${backend_url}/okh/${parts[0]}/${parts[1]}`
+      // };
+
+
 
     console.log("Enhanced payload for Supply Graph AI (port 8001):", payload);
     console.log(

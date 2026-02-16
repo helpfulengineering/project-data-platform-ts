@@ -75,7 +75,10 @@ console.log("sliderImages",sliderImages)
         </div>
         <div class="okh-details">
           <div>License</div>
-          <div class="value">{{product?.license }}</div>
+    <div class="value">{{ product?.license?.software
+                         ?? (product?.license?.hardware
+                             ?? product?.license)
+                        }}</div>
         </div>
         <div class="okh-details">
           <div>Licensor</div>
@@ -88,26 +91,29 @@ console.log("sliderImages",sliderImages)
         <div class="okh-details">
           <div>manifest author</div>
           <div class="value">
-            <div>{{ product["manifest-author"]?.name }}</div>
-            <div>{{ product["manifest-author"]?.email }}</div>
-            <div>{{ product["manifest-author"]?.affiliation }}</div>
+    <div>{{ product["manifest-author"]?.name ??
+            product?.metadata?.original?.manifest_author?.name }}</div>
+    <div>{{ product["manifest-author"]?.email ??
+            product?.metadata?.original?.manifest_author?.email }}</div>
+    <div>{{ product["manifest-author"]?.affiliation ??
+          product?.metadata?.original?.manifest_author?.affiliation }}</div>
           </div>
         </div>
         <div class="okh-details">
           <div>manifest language</div>
-          <div class="value">{{ product["manifest-language"] }}</div>
+          <div class="value">{{ product?.documentation_language ?? product["document_language"] }}</div>
         </div>
         <div class="okh-details">
           <div>okh manifest version</div>
-          <div class="value">{{ product["okh-manifest-version"] }}</div>
+          <div class="value">{{ product?.metadata?.original?.okh_manifest_version ?? product["okh-manifest-version"] }}</div>
         </div>
         <div class="okh-details">
           <div>date created</div>
-          <div class="value">{{ product["date-created"] }}</div>
+          <div class="value">{{ product?.metadata?.original?.date_created ?? product["date-created"] }}</div>
         </div>
         <div class="okh-details">
           <div>date updated</div>
-          <div class="value">{{ product["date-updated"] }}</div>
+          <div class="value">{{ product?.metadata?.original?.date_updated ?? product["date-updated"] }}</div>
         </div>
         <div class="okh-details">
           <div>keywords</div>
@@ -124,7 +130,7 @@ console.log("sliderImages",sliderImages)
         </div>
         <div class="okh-details">
           <div>development stage</div>
-          <div class="value">{{ product["development-stage"] }}</div>
+          <div class="value">{{ product["development_stage"] ?? product["development-stage"] }}</div>
         </div>
         <div class="okh-details">
           <div>health safety notice</div>
