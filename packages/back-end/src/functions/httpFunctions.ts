@@ -235,7 +235,7 @@ async function listSummaries(
     }
     let productsOrOKWsObj = { summaries: summaries };
     return { jsonBody: productsOrOKWsObj,
-             headers: { 
+             headers: {
                "Access-Control-Allow-Origin": "*",
                "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
                "Access-Control-Allow-Headers": "Content-Type, Authorization"
@@ -266,7 +266,7 @@ export async function getIncidents(request: HttpRequest,
 
     const result = await pool.query('SELECT * FROM project_data.incident');
     return { jsonBody: result.rows,
-             headers: { 
+             headers: {
                "Access-Control-Allow-Origin": "*",
                "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
                "Access-Control-Allow-Headers": "Content-Type, Authorization"
@@ -314,7 +314,7 @@ async function getOKHByFileName(
     );
   }
 
-  // Cache the result if it's not null 
+  // Cache the result if it's not null
   if (result !== null) {
     cache.set(cacheKey, result);
   }
@@ -332,6 +332,8 @@ function convertToProduct(fname:string, obj: any, id: number): any | null {
     image:obj.image || "https://placecats.com/300/200",
     shortDescription: obj["description"] as string,
     projectLink: obj["project-link"],
-    manifestAuthor: obj["manifest-author"]?.name || "none",
+      manifestAuthor:
+      (obj?.metadata?.original?.manifest_author?.name ??
+       obj["manifest-author"]?.name) || "none",
   };
 }
