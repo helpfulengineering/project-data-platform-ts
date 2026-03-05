@@ -9,10 +9,6 @@ can try to use it is:
 
 > npm run start
 
-However, you will probably also need to sign into Azure using:
-
-> az login
-
 This also means that as a developer, you need to contact us and
 have an Azure account which has been given permission on our blob storage.
 
