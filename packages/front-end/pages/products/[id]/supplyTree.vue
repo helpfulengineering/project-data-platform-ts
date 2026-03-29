@@ -1,7 +1,12 @@
 <script setup lang="ts">
-import { useRouter, useRoute } from "#app";
-import { ref, reactive, computed, onMounted } from "vue";
+import { useRoute } from "#app";
+import { ref, onMounted } from "vue";
 import D3SupplyTree from "../../../components/D3Tree.vue";
+import {
+  buildManufacturingMatchPayload,
+  parseOhmMatchBody,
+  postOhmMatch,
+} from "~/utils/ohmMatch";
 
 const route = useRoute();
 
@@ -9,28 +14,13 @@ const okh = useState("okh");
 
 console.log("Shared product:", okh.value);
 
-
-
 const productFilename = route.params.id as string;
 
 console.log("productFilename", productFilename);
 
-// now you have  route.params.id   → same product id
-const okhData = ref<any>([]);
-const supplyTreeData = ref<any>(null);
 const loading = ref<boolean>(false);
 const error = ref<string | null>(null);
 const selectedOkh = ref<any>(null);
-// API configuration
-const apiBaseUrl = ref(
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:7071/api"
-);
-// Updated to use port 8001 as requested
-const supplyGraphApiUrl = ref(
-  import.meta.env.VITE_SUPPLY_GRAPH_AI_URL || "http://localhost:8001"
-);
-const supplyGraphApiEndpoint = ref("/v1/api/match"); // Path to the versioned supply tree creation endpoint
-
 
 const sendToSupplyGraphAI = async (o: any) => {
   if (!o) {
@@ -58,112 +48,55 @@ const sendToSupplyGraphAI = async (o: any) => {
   error.value = null;
   selectedOkh.value = okhItem;
   try {
-    const originalData = okhItem.originalData || okhItem;
+    const payload = buildManufacturingMatchPayload(productFilename);
 
-      console.log("Preparing to send OKH item to Supply Graph AI:", okhItem);
-      console.log("HOPING FILENAME",okhItem.fname);
-
-      // WARNING! TODO: This is hard coding a recipe. We instatn want this to be the OKH!
-      // TODO: See if we can use our own backend for this....
-      const okh_blobstorage_file_name = "https://projdatablobstorage.blob.core.windows.net/okh";
-
-
-    const parts = productFilename.split('.');
-
-
-    const payload = {
-          "okh_url": `${okh_blobstorage_file_name}/${productFilename}`
-    };
-
-      // We would like to get this data from our backend, instead from
-      // azure, because we have already read this data.
-      // However, I don't think that will work because that system
-      // runs in docker, which does not have access to a local
-      // machine.
-      //
-      // const backend_url = "http://localhost:7071/api/getFile";
-      // const fileType = "okh";
-      // const payload = {
-      //     "okh_url": `${backend_url}/okh/${parts[0]}/${parts[1]}`
-      // };
-
-
-
-    console.log("Enhanced payload for Supply Graph AI (port 8001):", payload);
-    console.log(
-      `Sending request to: ${supplyGraphApiUrl.value}${supplyGraphApiEndpoint.value}`
-    );
-    // Enhanced request to supply-graph-ai endpoint at port 8001
-    const response = await fetch(
-      `${supplyGraphApiUrl.value}${supplyGraphApiEndpoint.value}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-          // Enhanced headers for better compatibility
-          "User-Agent": "project-data-platform-ts/1.0",
-          "X-Requested-With": "XMLHttpRequest",
-          // Add CORS headers if needed for local development
-          Origin:
-            typeof window !== "undefined"
-              ? window.location.origin
-              : "http://localhost:3000",
-        },
-        mode: "cors", // Explicitly request CORS mode
-        body: JSON.stringify(payload),
-      }
-    );
-
-    console.log(
-      `Supply Graph AI response status: ${response.status} ${response.statusText}`
-    );
+    console.log("OHM match payload:", payload);
+    const response = await postOhmMatch(payload as Record<string, unknown>);
 
     if (!response.ok) {
-      let errorData = null;
+      let errorData: unknown = null;
       try {
         errorData = await response.json();
-      } catch (e) {
-        // Response might not be JSON
+      } catch {
         console.warn("Could not parse error response as JSON");
       }
-
       throw new Error(
-        `Supply Graph AI API error: ${response.status} ${response.statusText}` +
-          (errorData ? ` - ${JSON.stringify(errorData)}` : "")
+        `OHM match error: ${response.status} ${response.statusText}` +
+          (errorData ? ` — ${JSON.stringify(errorData)}` : "")
       );
     }
 
-    // Parse the response from supply graph AI
     const supplyTreeResponse = await response.json();
+    const { solutions } = parseOhmMatchBody(supplyTreeResponse);
 
+    if (!solutions.length) {
+      // HTTP 200 with empty solutions is valid; not a client/transport error.
+      error.value = null;
+      treeData.value = {
+        name: selectedOkh.value?.name || "Supply Tree",
+        children: [{ image: "/okh.png", children: [] }],
+      };
+      return;
+    }
 
-    console.log("Supply Graph AI Response2:", supplyTreeResponse);
-
-    // Clear previous solutions
     const formattedSolutions: any[] = [];
-
-    supplyTreeResponse.data.solutions.forEach((solution: any) => {
-
-      const children = solution.tree.capabilities_used.map((capability: string) => ({
-        name: capability,
+    for (const solution of solutions) {
+      const tree = (solution.tree as Record<string, unknown> | undefined) || {};
+      const capRaw = tree.capabilities_used;
+      const caps = Array.isArray(capRaw) ? capRaw : [];
+      const children = caps.map((capability: unknown) => ({
+        name: String(capability),
         image: "/OKP_icon.png",
       }));
 
-
-      const formattedSolution = {
-        name: solution.facility_name,
+      formattedSolutions.push({
+        name: String(solution.facility_name ?? "Facility"),
         image: "/okw_maker.png",
         class: "test",
-        children: children,
-      };
+        children,
+      });
+    }
 
-      formattedSolutions.push(formattedSolution);
-    });
-
-    console.log("formattedSolutions:", formattedSolutions);
-
-    // Update treeData.value to trigger re-render in D3Tree component
     treeData.value = {
       name: selectedOkh.value?.name || "Supply Tree",
       children: [
