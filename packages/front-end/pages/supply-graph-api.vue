@@ -1,5 +1,12 @@
 <script setup lang="ts">
-    import { onMounted, ref, computed } from 'vue';
+import { onMounted, ref } from 'vue';
+import {
+  buildManufacturingMatchPayload,
+  getOhmBaseUrl,
+  OHM_MATCH_PATH,
+  parseOhmMatchBody,
+  postOhmMatch,
+} from '~/utils/ohmMatch';
 
 // Removed data1 and data2 - no mock data needed
 const okhData = ref<any>([]);
@@ -10,9 +17,8 @@ const selectedOkh = ref<any>(null);
 
 // API configuration
 const apiBaseUrl = ref(import.meta.env.VITE_API_BASE_URL || 'http://localhost:7071/api');
-// Updated to use port 8001 as requested
-const supplyGraphApiUrl = ref(import.meta.env.VITE_SUPPLY_GRAPH_AI_URL || 'http://localhost:8001');
-const supplyGraphApiEndpoint = ref('/v1/match'); // Path to the versioned match endpoint
+const supplyGraphApiUrl = ref(getOhmBaseUrl());
+const supplyGraphApiEndpoint = ref(OHM_MATCH_PATH);
 
 // Removed fetchData function - no mock data needed
 
@@ -80,9 +86,30 @@ const fetchOkhData = async () => {
 
 // Removed duplicate code - function already completed above
 
-const sendToSupplyGraphAI = async (okhItem) => {
+function solutionsToRelatedComponents(solutions: Record<string, unknown>[]) {
+  return solutions.map((sol, i) => {
+    const tree = (sol.tree as Record<string, unknown> | undefined) || {};
+    const caps = tree.capabilities_used;
+    const capList = Array.isArray(caps)
+      ? caps.map(String)
+      : [];
+    const conf = typeof sol.confidence === 'number' ? sol.confidence : Number(sol.confidence);
+    return {
+      name: String(sol.facility_name ?? `Facility ${i + 1}`),
+      shortDescription: capList.length
+        ? capList.slice(0, 8).join(', ')
+        : `Match type: ${String(sol.match_type ?? 'unknown')}`,
+      supplyRelation:
+        Number.isFinite(conf) && conf > 0
+          ? `confidence ${conf.toFixed(2)}`
+          : undefined,
+    };
+  });
+}
+
+const sendToSupplyGraphAI = async (okhItem: any) => {
   if (!okhItem) {
-    error.value = "No OKH item selected";
+    error.value = 'No OKH item selected';
     return;
   }
 
@@ -91,87 +118,41 @@ const sendToSupplyGraphAI = async (okhItem) => {
   selectedOkh.value = okhItem;
 
   try {
-    console.log('Processing OKH item for Supply Graph AI:', okhItem);
     const originalData = okhItem.originalData || okhItem;
+    const fname = originalData.fname || okhItem.fname;
+    const payload = buildManufacturingMatchPayload(String(fname || ''));
 
-    // const payload = {
-    //   okh_reference: okhItem.id?.toString() || originalData.fname || originalData.id || 'unknown',
-    //   required_quantity: 1,
-    //   deadline: null,
-    //   metadata: {
-    //     name: okhItem.name || originalData.name || originalData.title,
-    //     shortDescription: okhItem.shortDescription || originalData.description || originalData.summary,
-    //     keywords: okhItem.keywords || originalData.keywords || originalData.tags || [],
-    //     maker: okhItem.maker || originalData.maker || originalData.author || originalData.creator,
-    //     whereToFind: okhItem.whereToFind || originalData.whereToFind || originalData.source,
-    //     source: "project-data-platform-ts",
-    //     image: okhItem.image || originalData.image || originalData.imageUrl,
-    //     originalId: originalData.id || originalData.fname,
-    //     dataSource: originalData.dataSource || 'project-data-platform',
-    //     ...originalData
-    //   }
-    // };
-
-  const payload =  {
-  "recipe_id": "8f14e3c4-09f2-4a5e-8bd9-4b5bb5d0a9cd"
-}
-
-    console.log('Enhanced payload for Supply Graph AI (port 8001):', payload);
-    console.log(`Sending request to: ${supplyGraphApiUrl.value}${supplyGraphApiEndpoint.value}`);
-
-    // Enhanced request to supply-graph-ai endpoint at port 8001
-    const response = await fetch(`${supplyGraphApiUrl.value}${supplyGraphApiEndpoint.value}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        // Enhanced headers for better compatibility
-        'User-Agent': 'project-data-platform-ts/1.0',
-        'X-Requested-With': 'XMLHttpRequest',
-        // Add CORS headers if needed for local development
-        'Origin': typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000',
-      },
-      mode: 'cors', // Explicitly request CORS mode
-      body: JSON.stringify(payload),
-    });
-
-    console.log(`Supply Graph AI response status: ${response.status} ${response.statusText}`);
+    console.log('OHM match payload:', payload);
+    const response = await postOhmMatch(payload as Record<string, unknown>);
 
     if (!response.ok) {
-      let errorData = null;
+      let errorData: unknown = null;
       try {
         errorData = await response.json();
-      } catch (e) {
-        // Response might not be JSON
+      } catch {
         console.warn('Could not parse error response as JSON');
       }
-
       throw new Error(
-        `Supply Graph AI API error: ${response.status} ${response.statusText}` +
-        (errorData ? ` - ${JSON.stringify(errorData)}` : '')
+        `OHM match error: ${response.status} ${response.statusText}` +
+          (errorData ? ` — ${JSON.stringify(errorData)}` : '')
       );
     }
 
-    // Parse the response from supply graph AI
     const supplyTreeResponse = await response.json();
-    console.log('Supply Graph AI Response:', supplyTreeResponse);
+    const { solutions } = parseOhmMatchBody(supplyTreeResponse);
 
-    // Enhanced response processing to handle various response formats
     supplyTreeData.value = {
       rootItem: selectedOkh.value,
-      relatedComponents: supplyTreeResponse.components || supplyTreeResponse.related_items || supplyTreeResponse.dependencies || [],
-      supplyChainDepth: supplyTreeResponse.depth || supplyTreeResponse.chain_depth || 1,
-      analysisTimestamp: supplyTreeResponse.creation_time || supplyTreeResponse.timestamp || new Date().toISOString(),
-      analysisMethod: "supply-graph-ai-port-8001",
-      apiResponse: supplyTreeResponse, // Keep full response for debugging
-      requestPayload: payload // Keep request for debugging
+      relatedComponents: solutionsToRelatedComponents(solutions),
+      supplyChainDepth: solutions.length ? Math.max(1, solutions.length) : 0,
+      analysisTimestamp: new Date().toISOString(),
+      analysisMethod: 'open-hardware-manager /v1/api/match',
+      apiResponse: supplyTreeResponse,
+      requestPayload: payload,
     };
-
-
-    console.log('Final Supply Tree Data:', supplyTreeData.value);
-  } catch (err) {
+  } catch (err: unknown) {
     console.error('Error generating supply tree:', err);
-    error.value = `Failed to generate supply tree: ${err.message}`;
+    error.value = `Failed to generate supply tree: ${err instanceof Error ? err.message : String(err)}`;
   } finally {
     loading.value = false;
   }
@@ -193,15 +174,15 @@ const checkSupplyGraphApiAvailability = async () => {
     for (const endpoint of endpoints) {
       try {
         const response = await fetch(`${supplyGraphApiUrl.value}${endpoint}`, {
-          method: 'HEAD',
-          timeout: 1000 // Short timeout for quick check
+          method: 'GET',
+          signal: AbortSignal.timeout(3000),
         });
         if (response.ok) {
           console.log(`Supply Graph AI API is available at endpoint: ${endpoint}`);
           return true;
         }
-      } catch (e) {
-        // Ignore individual endpoint errors and try next
+      } catch {
+        // try next
       }
     }
 
