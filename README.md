@@ -53,7 +53,7 @@ This repository is a **monorepo of separate npm packages** (no root `package.jso
 |-----------|-----------|-------------|---------|
 | Azure Functions API | `packages/back-end` | `http://127.0.0.1:7071/api` | OKH/OKW listing, blob-backed product data, incidents (Postgres), etc. |
 | Nuxt front end | `packages/front-end` | `http://localhost:3000` | Vue UI |
-| Open Hardware Manager (supply-graph-ai) | *separate clone* | `http://localhost:8001` | Matching / supply-tree API (`POST /v1/api/match`, docs at `/docs`) |
+| Open Hardware Manager (supply-graph-ai) | *separate clone* (often **Docker Compose**) | `http://localhost:8001` | FastAPI matching / supply-tree API (`POST /v1/api/match`, docs at `/docs`) |
 | Mock match API (optional) | `packages/mock-api` | `http://localhost:8001` | Tiny Express stub; **same port as OHM** — use one or the other, not both |
 
 ## Prerequisites
@@ -62,7 +62,7 @@ This repository is a **monorepo of separate npm packages** (no root `package.jso
 - **Azure Functions Core Tools v4** (installed with `packages/back-end` via npm; ensure `func` is on your `PATH` after `npm install`)
 - **Azure CLI** (`az`) — install from [Microsoft’s docs](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli). You need subscription access and permissions for team resources (blob storage, etc.) as appropriate.
 - **PostgreSQL** — only if you use endpoints that query the database (e.g. `/api/incidents`). Configure via `packages/back-end/.env` (see [packages/back-end/README.md](packages/back-end/README.md)).
-- **supply-graph-ai** — Python 3.12, Conda (recommended), and dependencies per that repo’s README ([local dev](https://github.com/helpfulengineering/supply-graph-ai/blob/main/README.md#option-2-local-development-for-active-development) or Docker Compose).
+- **supply-graph-ai** — easiest path is **Docker Desktop** and **`docker compose`** in that repo (service **`ohm-api`** maps **host port 8001**). Alternative: local Python 3.12 / Conda per [supply-graph-ai README](https://github.com/helpfulengineering/supply-graph-ai/blob/main/README.md).
 
 ## 1. Back end (`packages/back-end`)
 
@@ -121,7 +121,28 @@ The front end uses two different configuration mechanisms:
 
 ## 3. Open Hardware Manager — **supply-graph-ai** (matching API)
 
-Clone and run [supply-graph-ai](https://github.com/helpfulengineering/supply-graph-ai) **outside** this repo (for example next to it: `../supply-graph-ai`). Typical local startup from that project:
+Clone [supply-graph-ai](https://github.com/helpfulengineering/supply-graph-ai) **outside** this repo (for example next to it: `../supply-graph-ai`).
+
+### Docker Desktop (typical setup)
+
+With **Docker Desktop** running, from the **supply-graph-ai** repository root:
+
+```bash
+cd /path/to/supply-graph-ai
+cp env.template .env   # if you have not already; edit for storage/API keys as needed
+docker compose up ohm-api
+```
+
+The Compose file publishes the FastAPI app on **host `localhost:8001`** (container service **`ohm-api`**, port mapping `8001:8001`). Confirm it is up:
+
+- **http://localhost:8001/health**
+- **http://localhost:8001/docs**
+
+You can use `docker compose up` instead of `docker compose up ohm-api` if you intend to start the full stack defined in that repo’s `docker-compose.yml`.
+
+### Local Python (no Docker)
+
+For active development inside supply-graph-ai with hot reload:
 
 ```bash
 cd /path/to/supply-graph-ai
@@ -129,11 +150,11 @@ conda create -n supply-graph-ai python=3.12
 conda activate supply-graph-ai
 pip install -r requirements.txt
 pip install -e .
-cp env.template .env   # edit if your team requires storage or API keys
+cp env.template .env
 python run.py
 ```
 
-The HTTP API listens on **`http://localhost:8001`** by default (`API_PORT` in that project’s settings). Interactive docs: **http://localhost:8001/docs**.
+Same default URL: **`http://localhost:8001`** (`API_PORT` in that project’s settings).
 
 ### Wiring project-data-platform-ts ↔ supply-graph-ai
 
@@ -141,9 +162,13 @@ The HTTP API listens on **`http://localhost:8001`** by default (`API_PORT` in th
 |-----------|-------------------|
 | Browser → **Azure Functions** | `BACKEND_URL` / default `baseUrl` → `http://127.0.0.1:7071/api` (or your deployed API URL). |
 | Browser → **OHM** | `VITE_SUPPLY_GRAPH_AI_URL` → base URL only, **no path** (e.g. `http://localhost:8001`). The front end appends **`/v1/api/match`** for match requests. |
+| OKH file URL for match | Optional **`VITE_PUBLIC_OKH_BLOB_BASE`** (default: `https://projdatablobstorage.blob.core.windows.net/okh`). The UI sends **`okh_url`** = `{base}/{fname}` so OHM can fetch the manifest over HTTPS. |
 | OHM → **Azure Blob** | Configure OHM’s `.env` / storage settings per [supply-graph-ai documentation](https://github.com/helpfulengineering/supply-graph-ai) so it can load OKW/OKH data as needed for matching. |
+| **OKH vs OKW in a match call** | This repo sends **OKH** as **`okh_url`**. **OKW** (capability) files are **not** attached by the browser; OHM’s **`OKWService`** loads them from **OHM-configured storage** and matches against the fetched OKH. See **[docs/match-endpoint-integration.md](docs/match-endpoint-integration.md)** (section *OKH + OKW workflow*). |
 
 **Match endpoint:** **`POST {VITE_SUPPLY_GRAPH_AI_URL}/v1/api/match`** — this is the route the Open Hardware Manager exposes; it is **not** the same as the stub in `packages/mock-api` (`POST /v1/match`).
+
+**End-to-end match testing:** Follow **[docs/match-endpoint-integration.md](docs/match-endpoint-integration.md)** for the ordered verification steps (OHM health, blob URL reachability from Docker, Azure Functions, CORS, and curl). Shared client helpers live in **`packages/front-end/utils/ohmMatch.ts`**. To assert the **same JSON body and headers** as the UI against a running OHM, run **`OKH_FNAME=… node scripts/verify-ohm-match.mjs`** from the repo root (see doc §6).
 
 **CORS:** In development, supply-graph-ai typically allows browser calls; if you change origins or run production-like settings, set **`CORS_ORIGINS`** in OHM’s environment so **`http://localhost:3000`** (and/or `http://127.0.0.1:3000`) is allowed.
 
