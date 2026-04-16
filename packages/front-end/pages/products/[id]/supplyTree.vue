@@ -2,6 +2,7 @@
 import { useRoute } from "#app";
 import { ref, onMounted } from "vue";
 import D3SupplyTree from "../../../components/D3Tree.vue";
+import SupplyTreeGroup from "../../../components/SupplyTreeGroup.vue";
 import {
   buildManufacturingMatchPayload,
   parseOhmMatchBody,
@@ -21,6 +22,9 @@ console.log("productFilename", productFilename);
 const loading = ref<boolean>(false);
 const error = ref<string | null>(null);
 const selectedOkh = ref<any>(null);
+
+// TODO: This should be typed as an Array of some kind.
+// const solutions = ref<any>(null);
 
 const sendToSupplyGraphAI = async (o: any) => {
   if (!o) {
@@ -66,8 +70,11 @@ const sendToSupplyGraphAI = async (o: any) => {
       );
     }
 
-    const supplyTreeResponse = await response.json();
-    const { solutions } = parseOhmMatchBody(supplyTreeResponse);
+      const supplyTreeResponse = await response.json();
+
+      const { solutions } = parseOhmMatchBody(supplyTreeResponse);
+ //     solutionDataHolder.solutions = solutions;
+ //     console.log("solutions:",solutionDataHolder.solutions);
 
     if (!solutions.length) {
       // HTTP 200 with empty solutions is valid; not a client/transport error.
@@ -115,7 +122,7 @@ const sendToSupplyGraphAI = async (o: any) => {
 };
 
 const treeData = ref<any>({
-  name: "Chocolate Chip Cookies",
+  name: "Default Name",
   children: [
     {
       image: "/okh.png",
@@ -123,6 +130,11 @@ const treeData = ref<any>({
     },
   ],
 });
+
+const solutionDataHolder = ref<any>({
+  solutions: [],
+});
+
 
 onMounted(() => {
   // auto-load on mount; remove if you only want manual load via button
@@ -133,10 +145,19 @@ onMounted(() => {
 <template>
   <section>
     <div class="supply-tree-page">
-      <div class="section">
+    <div class="section">
+
+
         <h1>Cookie Supply Tree 1</h1>
 
-        <div class="content">
+
+    <div class="content">
+
+    <!--        <SupplyTreeGroup>
+    :solutions="solutionDataHolder"
+</SupplyTreeGroup>
+    -->
+
           <D3SupplyTree
             :data="treeData"
             :width="800"
@@ -175,7 +196,9 @@ onMounted(() => {
       </div>
     </div>
     <!-- <SupplyTree :product-id="route.params.id" /> -->
-  </section>
+    </section>
+
+
 </template>
 
 <style>
