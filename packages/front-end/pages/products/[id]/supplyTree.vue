@@ -73,8 +73,9 @@ const sendToSupplyGraphAI = async (o: any) => {
       const supplyTreeResponse = await response.json();
 
       const { solutions } = parseOhmMatchBody(supplyTreeResponse);
- //     solutionDataHolder.solutions = solutions;
- //     console.log("solutions:",solutionDataHolder.solutions);
+      solutionDataHolder.solutions = solutions;
+      solutionDataHolder.fake = "abc";
+     console.log("solutions:",solutionDataHolder.solutions);
 
     if (!solutions.length) {
       // HTTP 200 with empty solutions is valid; not a client/transport error.
@@ -113,6 +114,12 @@ const sendToSupplyGraphAI = async (o: any) => {
         },
       ],
     };
+      // I think this triggers the "watch" method
+      // in the component
+    solutionDataHolder.value = {
+          fake: "spud",
+        solutions: solutions,
+      };
   } catch (err) {
     console.error("Error generating supply tree:", err);
     error.value = `Failed to generate supply tree: ${err instanceof Error ? err.message : String(err)}`;
@@ -132,6 +139,9 @@ const treeData = ref<any>({
 });
 
 const solutionDataHolder = ref<any>({
+    name: "Solution Data Holder",
+    fake: "abc",
+    width: "300",
   solutions: [],
 });
 
@@ -153,14 +163,15 @@ onMounted(() => {
 
     <div class="content">
 
-    <!--        <SupplyTreeGroup>
-    :solutions="solutionDataHolder"
-</SupplyTreeGroup>
-    -->
+    <p>
+    <SupplyTreeGroup
+    :data="solutionDataHolder"
+    />
+    </p>
 
           <D3SupplyTree
-            :data="treeData"
-            :width="800"
+:data="treeData"
+            :width="801"
             :height="600"
             class="supply-tree"
           />

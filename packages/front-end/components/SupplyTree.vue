@@ -1,4 +1,4 @@
-<!-- components/ProductCard.vue -->
+<!-- components/SupplyTree.vue -->
 <template>
     This is a Supply Tree:
 <!--     {{ solution.capabilities_used }} -->

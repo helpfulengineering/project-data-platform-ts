@@ -34,6 +34,8 @@ export default {
     },
   },
   mounted() {
+    console.log("D3Tree mounted fake",this.fake);
+    console.log("mounted supply tree width",this.width);
     this.drawTree();
   },
   methods: {
