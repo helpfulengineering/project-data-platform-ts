@@ -1,14 +1,13 @@
 <!-- components/SupplyTree.vue -->
 <template>
     This is a Supply Tree:
-<!--     {{ solution.capabilities_used }} -->
+     |{{ name }}|
 </template>
 
 <script setup>
+// Define props to receive data from the parent
 defineProps({
-  solution: {
-    type: Object,
-    required: true
-  }
-});
+  name: String,
+  role: String
+})
 </script>

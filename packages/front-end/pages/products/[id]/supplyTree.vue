@@ -171,10 +171,10 @@ onMounted(() => {
 
           <D3SupplyTree
 :data="treeData"
-            :width="801"
+            :width="808"
             :height="600"
             class="supply-tree"
-          />
+    />
 
           <div class="right">
             <button class="btn-primary">ORDER</button>
@@ -206,7 +206,6 @@ onMounted(() => {
         </div>
       </div>
     </div>
-    <!-- <SupplyTree :product-id="route.params.id" /> -->
     </section>
 
 

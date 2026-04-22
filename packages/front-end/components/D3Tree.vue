@@ -1,4 +1,5 @@
 <template>
+    <h1>D3 Tree</h1>
   <div ref="tree" style="border: 1px solid #ccc; overflow: hidden"></div>
 </template>
 

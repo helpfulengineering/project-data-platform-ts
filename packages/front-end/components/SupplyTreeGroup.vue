@@ -4,13 +4,14 @@
     SUPPLY TREE GROUP
     </h2>
     <div class="flex flex-wrap justify-between">
-    <!-- Number of solutions: {{ solutions.length() }} -->
-    Single Value:
-   | {{ data }}|
-<!--      <SupplyTree>
-        v-for="solution in solutions"
-      </SupplyTree>
-    -->
+    Number of solutions: {{ data.solutions.length }}
+          <D3SupplyTree
+    v-for="solution in data.solutions"
+:data="treeData"
+            :width="808"
+            :height="600"
+            class="supply-tree"
+          />
     </div>
   </div>
 </template>
@@ -48,10 +49,6 @@
     },
   },
   mounted() {
-    console.log("mounted supply tree solutions", this.solutions);
-   console.log("mounted supply tree fake",this.data.fake);
-   console.log("mounted supply tree solution",this.data.solutions);
-   console.log("mounted supply tree width",this.width);
   },
     }
 </script>
