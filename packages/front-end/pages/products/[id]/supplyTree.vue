@@ -2,6 +2,7 @@
 import { useRoute } from "#app";
 import { ref, onMounted } from "vue";
 import D3SupplyTree from "../../../components/D3Tree.vue";
+import SupplyTree from "../../../components/SupplyTree.vue";
 import SupplyTreeGroup from "../../../components/SupplyTreeGroup.vue";
 import {
   buildManufacturingMatchPayload,
@@ -105,7 +106,8 @@ const sendToSupplyGraphAI = async (o: any) => {
       });
     }
 
-    treeData.value = {
+      treeData.push({
+          key: 0,
       name: selectedOkh.value?.name || "Supply Tree",
       children: [
         {
@@ -113,12 +115,25 @@ const sendToSupplyGraphAI = async (o: any) => {
           children: formattedSolutions,
         },
       ],
-    };
+      });
+
+      treeData.push( {
+          key: 1,
+      name: selectedOkh.value?.name || "Supply Tree",
+      children: [
+        {
+          image: "/okh.png",
+          children: formattedSolutions,
+        },
+      ],
+      });
+      console.log("TreeData",treeData);
       // I think this triggers the "watch" method
       // in the component
     solutionDataHolder.value = {
-          fake: "spud",
-        solutions: solutions,
+        fake: "spud",
+        image:  "/okh.png",
+        solutions: [treeData[0],treeData[1]],
       };
   } catch (err) {
     console.error("Error generating supply tree:", err);
@@ -128,21 +143,25 @@ const sendToSupplyGraphAI = async (o: any) => {
   }
 };
 
-const treeData = ref<any>({
-  name: "Default Name",
-  children: [
-    {
-      image: "/okh.png",
-      children: [],
-    },
-  ],
-});
+let treeData : ref<any>[] = [];
+
+// const treeData[] = ref<any>({
+//     key: 0,
+//   name: "Default Name",
+//   children: [
+//     {
+//       image: "/okh.png",
+//       children: [],
+//     },
+//   ],
+// });
+
 
 const solutionDataHolder = ref<any>({
     name: "Solution Data Holder",
     fake: "abc",
     width: "300",
-  solutions: [],
+    solutions: [],
 });
 
 
@@ -156,26 +175,33 @@ onMounted(() => {
   <section>
     <div class="supply-tree-page">
     <div class="section">
-
-
         <h1>Cookie Supply Tree 1</h1>
-
-
     <div class="content">
 
     <p>
+    <!--
     <SupplyTreeGroup
     :data="solutionDataHolder"
     />
+    -->
     </p>
-
-          <D3SupplyTree
-:data="treeData"
+    <div>
+    <!-- In the code below, why can't I use
+solution instead of treeData? -->
+<div  v-for="(solution,index) in solutionDataHolder.solutions">
+<p>index {{ index }}</p>
+<p>solution {{solution}}</p>
+<p>treeData {{treeData[0]}}</p>
+</div>
+<D3SupplyTree
+ v-for="(solution,index) in solutionDataHolder.solutions"
+:data="solution"
+:key="solution.key"
             :width="808"
             :height="600"
             class="supply-tree"
-    />
-
+/>
+    </div>
           <div class="right">
             <button class="btn-primary">ORDER</button>
             <button class="btn-secondary">EDIT SUPPLY TREE</button>

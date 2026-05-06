@@ -5,6 +5,19 @@
     </h2>
     <div class="flex flex-wrap justify-between">
     Number of solutions: {{ data.solutions.length }}
+    <div>
+    {{ data.solutions[0] }}
+    </div>
+<!--
+         <SupplyTree
+    v-for="solution in data.solutions"
+:data="data.solutions[0]"
+            :width="808"
+            :height="600"
+            class="supply-tree"
+          />
+    -->
+    <!--
           <D3SupplyTree
     v-for="solution in data.solutions"
 :data="treeData"
@@ -12,6 +25,7 @@
             :height="600"
             class="supply-tree"
           />
+    -->
     </div>
   </div>
 </template>
