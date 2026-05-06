@@ -112,7 +112,7 @@ const sendToSupplyGraphAI = async (o: any) => {
       children: [
         {
           image: "/okh.png",
-          children: formattedSolutions,
+          children: [formattedSolutions[0]],
         },
       ],
       });
@@ -123,7 +123,7 @@ const sendToSupplyGraphAI = async (o: any) => {
       children: [
         {
           image: "/okh.png",
-          children: formattedSolutions,
+          children: [formattedSolutions[1]],
         },
       ],
       });
