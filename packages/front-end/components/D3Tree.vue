@@ -1,6 +1,9 @@
 <template>
-    <h1>D3 Tree</h1>
-    <h2> {{ data.name}} </h2>
+    <div class="right">
+            <button class="btn-primary">ORDER</button>
+    <button class="btn-secondary">EDIT SUPPLY TREE</button>
+    <h1>{{ data.name}}</h1>
+    </div>
   <div ref="tree" style="border: 1px solid #ccc; overflow: hidden"></div>
 </template>
 

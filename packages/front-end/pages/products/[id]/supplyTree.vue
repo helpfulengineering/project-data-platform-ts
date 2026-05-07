@@ -23,8 +23,7 @@ const loading = ref<boolean>(false);
 const error = ref<string | null>(null);
 const selectedOkh = ref<any>(null);
 
-// TODO: This should be typed as an Array of some kind.
-// const solutions = ref<any>(null);
+var selectedOKHname : string;
 
 const sendToSupplyGraphAI = async (o: any) => {
     if (!o) {
@@ -51,6 +50,8 @@ const sendToSupplyGraphAI = async (o: any) => {
     loading.value = true;
     error.value = null;
     selectedOkh.value = okhItem;
+    selectedOKHname = selectedOkh.value.name;
+
     try {
         const payload = buildManufacturingMatchPayload(productFilename);
 
@@ -95,16 +96,18 @@ const sendToSupplyGraphAI = async (o: any) => {
                 image: "/OKP_icon.png",
             }));
 
-
             formattedSolutions.push({
                 name: String(solution.facility_name ?? "Facility"),
                 image: "/okw_maker.png",
                 class: "test",
                 children,
             });
+
+
+
             treeData.push({
                 key: key_num++,
-                name: selectedOkh.value?.name || "Supply Tree",
+                name: formattedSolutions[key_num-1].name || "Supply Tree",
                 children: [
                     {
                         image: "/okh.png",
@@ -112,6 +115,7 @@ const sendToSupplyGraphAI = async (o: any) => {
                     },
                 ],
             });
+            console.log("OKW name",formattedSolutions[key_num-1].name);
         }
 
         // I think this triggers the "watch" method
@@ -121,7 +125,6 @@ const sendToSupplyGraphAI = async (o: any) => {
             image:  "/okh.png",
             treeDataObjects: treeData,
         };
-        console.log("solutionDataHolder.solutions",solutionDataHolder.value.treeDataObjects);
     } catch (err) {
         console.error("Error generating supply tree:", err);
         error.value = `Failed to generate supply tree: ${err instanceof Error ? err.message : String(err)}`;
@@ -151,7 +154,7 @@ onMounted(() => {
   <section>
     <div class="supply-tree-page">
     <div class="section">
-        <h1>Cookie Supply Tree 1</h1>
+    <h1>{{ selectedOKHname }}</h1>
     <div class="content">
 
     <p>
@@ -174,10 +177,12 @@ v-for="(treeDataObject,index) in solutionDataHolder.treeDataObjects"
             class="supply-tree"
 />
     </div>
-          <div class="right">
+<!--
+<div class="right">
             <button class="btn-primary">ORDER</button>
             <button class="btn-secondary">EDIT SUPPLY TREE</button>
-          </div>
+</div>
+-->
         </div>
         <div class="details">
           <div class="overview">
