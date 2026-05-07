@@ -1,10 +1,12 @@
-<template>
+    <template>
+    <div class="d3-supply-tree-container">
     <div class="right">
             <button class="btn-primary">ORDER</button>
     <button class="btn-secondary">EDIT SUPPLY TREE</button>
     <h1>{{ data.name}}</h1>
     </div>
-  <div ref="tree" style="border: 1px solid #ccc; overflow: hidden"></div>
+    <div ref="tree" style="border: 1px solid #ccc; overflow: hidden"></div>
+    </div>
 </template>
 
 <script>
