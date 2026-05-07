@@ -1,5 +1,6 @@
 <template>
     <h1>D3 Tree</h1>
+    <h2> {{ data.name}} </h2>
   <div ref="tree" style="border: 1px solid #ccc; overflow: hidden"></div>
 </template>
 

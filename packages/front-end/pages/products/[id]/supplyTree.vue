@@ -2,8 +2,7 @@
 import { useRoute } from "#app";
 import { ref, onMounted } from "vue";
 import D3SupplyTree from "../../../components/D3Tree.vue";
-import SupplyTree from "../../../components/SupplyTree.vue";
-import SupplyTreeGroup from "../../../components/SupplyTreeGroup.vue";
+
 import {
   buildManufacturingMatchPayload,
   parseOhmMatchBody,
@@ -74,9 +73,6 @@ const sendToSupplyGraphAI = async (o: any) => {
       const supplyTreeResponse = await response.json();
 
       const { solutions } = parseOhmMatchBody(supplyTreeResponse);
-      solutionDataHolder.solutions = solutions;
-      solutionDataHolder.fake = "abc";
-     console.log("solutions:",solutionDataHolder.solutions);
 
     if (!solutions.length) {
       // HTTP 200 with empty solutions is valid; not a client/transport error.
@@ -128,13 +124,15 @@ const sendToSupplyGraphAI = async (o: any) => {
       ],
       });
       console.log("TreeData",treeData);
+      console.log("TreeData as a composed",[treeData[0],treeData[1]]);
       // I think this triggers the "watch" method
       // in the component
     solutionDataHolder.value = {
         fake: "spud",
         image:  "/okh.png",
-        solutions: [treeData[0],treeData[1]],
-      };
+        treeDataObjects: [treeData[0],treeData[1]],
+    };
+    console.log("solutionDataHolder.solutions",solutionDataHolder.solutions);
   } catch (err) {
     console.error("Error generating supply tree:", err);
     error.value = `Failed to generate supply tree: ${err instanceof Error ? err.message : String(err)}`;
@@ -145,23 +143,15 @@ const sendToSupplyGraphAI = async (o: any) => {
 
 let treeData : ref<any>[] = [];
 
-// const treeData[] = ref<any>({
-//     key: 0,
-//   name: "Default Name",
-//   children: [
-//     {
-//       image: "/okh.png",
-//       children: [],
-//     },
-//   ],
-// });
 
-
+// This class should not be needed, but due to Vue's reactive nature,
+// we have to have an object that we can set the ".value" of.
+// We actually are setting "treeData" into this object.
 const solutionDataHolder = ref<any>({
     name: "Solution Data Holder",
     fake: "abc",
     width: "300",
-    solutions: [],
+    treeDataObjects: [],
 });
 
 
@@ -179,24 +169,20 @@ onMounted(() => {
     <div class="content">
 
     <p>
-    <!--
-    <SupplyTreeGroup
-    :data="solutionDataHolder"
-    />
-    -->
     </p>
     <div>
     <!-- In the code below, why can't I use
-solution instead of treeData? -->
-<div  v-for="(solution,index) in solutionDataHolder.solutions">
+solution instead of treeData?
+<div  v-for="(solution,index) in treeData">
 <p>index {{ index }}</p>
 <p>solution {{solution}}</p>
-<p>treeData {{treeData[0]}}</p>
+<p>treeData {{solution}}</p>
 </div>
+ -->
 <D3SupplyTree
- v-for="(solution,index) in solutionDataHolder.solutions"
-:data="solution"
-:key="solution.key"
+v-for="(treeDataObject,index) in solutionDataHolder.treeDataObjects"
+:data="treeDataObject"
+:key="treeDataObject.key"
             :width="808"
             :height="600"
             class="supply-tree"
