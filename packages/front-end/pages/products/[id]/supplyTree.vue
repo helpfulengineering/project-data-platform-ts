@@ -2,6 +2,7 @@
 import { useRoute } from "#app";
 import { ref, onMounted } from "vue";
 import D3SupplyTree from "../../../components/D3Tree.vue";
+
 import {
   buildManufacturingMatchPayload,
   parseOhmMatchBody,
@@ -22,107 +23,128 @@ const loading = ref<boolean>(false);
 const error = ref<string | null>(null);
 const selectedOkh = ref<any>(null);
 
+var selectedOKHname : string;
+
 const sendToSupplyGraphAI = async (o: any) => {
-  if (!o) {
-    error.value = "No OKH item selected";
-    return;
-  }
-
-  const okhItem = {
-    id: o.id || o.fname || o.name || Math.random().toString(36).substr(2, 9),
-    name: o.name || o.title || "Unknown Item",
-    shortDescription:
-      o.shortDescription ||
-      o.description ||
-      o.summary ||
-      "No description available",
-    image: o.image || o.imageUrl || o.thumbnail || null,
-    keywords: o.keywords || o.tags || [],
-    maker: o.maker || o.author || o.creator || "Unknown",
-    whereToFind: o.whereToFind || o.source || "Unknown source",
-    // Keep original data for API calls
-    originalData: o,
-  };
-
-  loading.value = true;
-  error.value = null;
-  selectedOkh.value = okhItem;
-  try {
-    const payload = buildManufacturingMatchPayload(productFilename);
-
-    console.log("OHM match payload:", payload);
-    const response = await postOhmMatch(payload as Record<string, unknown>);
-
-    if (!response.ok) {
-      let errorData: unknown = null;
-      try {
-        errorData = await response.json();
-      } catch {
-        console.warn("Could not parse error response as JSON");
-      }
-      throw new Error(
-        `OHM match error: ${response.status} ${response.statusText}` +
-          (errorData ? ` — ${JSON.stringify(errorData)}` : "")
-      );
+    if (!o) {
+        error.value = "No OKH item selected";
+        return;
     }
 
-    const supplyTreeResponse = await response.json();
-    const { solutions } = parseOhmMatchBody(supplyTreeResponse);
-
-    if (!solutions.length) {
-      // HTTP 200 with empty solutions is valid; not a client/transport error.
-      error.value = null;
-      treeData.value = {
-        name: selectedOkh.value?.name || "Supply Tree",
-        children: [{ image: "/okh.png", children: [] }],
-      };
-      return;
-    }
-
-    const formattedSolutions: any[] = [];
-    for (const solution of solutions) {
-      const tree = (solution.tree as Record<string, unknown> | undefined) || {};
-      const capRaw = tree.capabilities_used;
-      const caps = Array.isArray(capRaw) ? capRaw : [];
-      const children = caps.map((capability: unknown) => ({
-        name: String(capability),
-        image: "/OKP_icon.png",
-      }));
-
-      formattedSolutions.push({
-        name: String(solution.facility_name ?? "Facility"),
-        image: "/okw_maker.png",
-        class: "test",
-        children,
-      });
-    }
-
-    treeData.value = {
-      name: selectedOkh.value?.name || "Supply Tree",
-      children: [
-        {
-          image: "/okh.png",
-          children: formattedSolutions,
-        },
-      ],
+    const okhItem = {
+        id: o.id || o.fname || o.name || Math.random().toString(36).substr(2, 9),
+        name: o.name || o.title || "Unknown Item",
+        shortDescription:
+        o.shortDescription ||
+            o.description ||
+            o.summary ||
+            "No description available",
+        image: o.image || o.imageUrl || o.thumbnail || null,
+        keywords: o.keywords || o.tags || [],
+        maker: o.maker || o.author || o.creator || "Unknown",
+        whereToFind: o.whereToFind || o.source || "Unknown source",
+        // Keep original data for API calls
+        originalData: o,
     };
-  } catch (err) {
-    console.error("Error generating supply tree:", err);
-    error.value = `Failed to generate supply tree: ${err instanceof Error ? err.message : String(err)}`;
-  } finally {
-    loading.value = false;
-  }
+
+    loading.value = true;
+    error.value = null;
+    selectedOkh.value = okhItem;
+    selectedOKHname = selectedOkh.value.name;
+
+    try {
+        const payload = buildManufacturingMatchPayload(productFilename);
+
+        console.log("OHM match payload:", payload);
+        const response = await postOhmMatch(payload as Record<string, unknown>);
+
+        if (!response.ok) {
+            let errorData: unknown = null;
+            try {
+                errorData = await response.json();
+            } catch {
+                console.warn("Could not parse error response as JSON");
+            }
+            throw new Error(
+                `OHM match error: ${response.status} ${response.statusText}` +
+                    (errorData ? ` — ${JSON.stringify(errorData)}` : "")
+            );
+        }
+
+        const supplyTreeResponse = await response.json();
+
+        const { solutions } = parseOhmMatchBody(supplyTreeResponse);
+
+        if (!solutions.length) {
+            // HTTP 200 with empty solutions is valid; not a client/transport error.
+            error.value = null;
+            treeData.value = {
+                name: selectedOkh.value?.name || "Supply Tree",
+                children: [{ image: "/okh.png", children: [] }],
+            };
+            return;
+        }
+
+        const formattedSolutions: any[] = [];
+        var key_num = 0;
+        for (const solution of solutions) {
+            const tree = (solution.tree as Record<string, unknown> | undefined) || {};
+            const capRaw = tree.capabilities_used;
+            const caps = Array.isArray(capRaw) ? capRaw : [];
+            const children = caps.map((capability: unknown) => ({
+                name: String(capability),
+                image: "/OKP_icon.png",
+            }));
+
+            formattedSolutions.push({
+                name: String(solution.facility_name ?? "Facility"),
+                confidence: solution.confidence,
+                image: "/okw_maker.png",
+                class: "test",
+                children,
+            });
+
+
+
+            treeData.push({
+                key: key_num++,
+                name: formattedSolutions[key_num-1].name || "Supply Tree",
+                confidence: formattedSolutions[key_num-1].confidence || "NA",
+                children: [
+                    {
+                        image: "/okh.png",
+                        children: [formattedSolutions[key_num-1]],
+                    },
+                ],
+            });
+            console.log("OKW name",formattedSolutions[key_num-1].name);
+        }
+
+        // I think this triggers the "watch" method
+        // in the component
+        solutionDataHolder.value = {
+            fake: "spud",
+            image:  "/okh.png",
+            treeDataObjects: treeData,
+        };
+    } catch (err) {
+        console.error("Error generating supply tree:", err);
+        error.value = `Failed to generate supply tree: ${err instanceof Error ? err.message : String(err)}`;
+    } finally {
+        loading.value = false;
+    }
 };
 
-const treeData = ref<any>({
-  name: "Chocolate Chip Cookies",
-  children: [
-    {
-      image: "/okh.png",
-      children: [],
-    },
-  ],
+let treeData : ref<any>[] = [];
+
+
+// This class should not be needed, but due to Vue's reactive nature,
+// we have to have an object that we can set the ".value" of.
+// We actually are setting "treeData" into this object.
+const solutionDataHolder = ref<any>({
+    treeDataObjects: [],
 });
+
 
 onMounted(() => {
   // auto-load on mount; remove if you only want manual load via button
@@ -133,21 +155,36 @@ onMounted(() => {
 <template>
   <section>
     <div class="supply-tree-page">
-      <div class="section">
-        <h1>Cookie Supply Tree 1</h1>
+    <div class="section">
+    <h1>{{ selectedOKHname }}</h1>
+    <div class="content">
 
-        <div class="content">
-          <D3SupplyTree
-            :data="treeData"
-            :width="800"
+    <p>
+    </p>
+    <div>
+    <!-- In the code below, why can't I use
+solution instead of treeData?
+<div  v-for="(solution,index) in treeData">
+<p>index {{ index }}</p>
+<p>solution {{solution}}</p>
+<p>treeData {{solution}}</p>
+</div>
+ -->
+<D3SupplyTree
+v-for="(treeDataObject,index) in solutionDataHolder.treeDataObjects"
+:data="treeDataObject"
+:key="treeDataObject.key"
+            :width="808"
             :height="600"
             class="supply-tree"
-          />
-
-          <div class="right">
+/>
+    </div>
+<!--
+<div class="right">
             <button class="btn-primary">ORDER</button>
             <button class="btn-secondary">EDIT SUPPLY TREE</button>
-          </div>
+</div>
+-->
         </div>
         <div class="details">
           <div class="overview">
@@ -174,8 +211,9 @@ onMounted(() => {
         </div>
       </div>
     </div>
-    <!-- <SupplyTree :product-id="route.params.id" /> -->
-  </section>
+    </section>
+
+
 </template>
 
 <style>

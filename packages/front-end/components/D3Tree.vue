@@ -1,5 +1,13 @@
-<template>
-  <div ref="tree" style="border: 1px solid #ccc; overflow: hidden"></div>
+    <template>
+    <div class="d3-supply-tree-container">
+    <div class="right">
+            <button class="btn-primary">ORDER</button>
+    <button class="btn-secondary">EDIT SUPPLY TREE</button>
+    <h1>{{ data.name}}</h1>
+    <h2>Confidence: {{data.confidence}}</h2>
+    </div>
+    <div ref="tree" style="border: 1px solid #ccc; overflow: hidden"></div>
+    </div>
 </template>
 
 <script>
@@ -34,6 +42,8 @@ export default {
     },
   },
   mounted() {
+    console.log("D3Tree mounted fake",this.fake);
+    console.log("mounted supply tree width",this.width);
     this.drawTree();
   },
   methods: {
@@ -50,9 +60,13 @@ export default {
       // Create SVG container
       const svg = d3
         .select(this.$refs.tree)
-        .append("svg")
-        .attr("width", this.width)
-        .attr("height", this.height);
+            .append("svg")
+        .attr("width", "100%")                                    // fill container
+  .attr("height", this.height)
+  .attr("viewBox", `0 0 ${this.width} ${this.height}`)      // internal coordinate space
+  .attr("preserveAspectRatio", "xMidYMid meet");            // scale proportionally
+ //       .attr("width", this.width)
+ //       .attr("height", this.height);
 
       // Add a group for zoomable content
       const g = svg
@@ -95,7 +109,7 @@ export default {
       // Normalize for fixed-depth
       nodes.forEach((d) => {
         d.y = d.depth * 140; // Adjust spacing between levels
-        d.x = d.x * 2.5; // Increase horizontal gap
+ //       d.x = d.x * 2.5; // Increase horizontal gap
       });
 
       // JOIN: Nodes
