@@ -98,6 +98,7 @@ const sendToSupplyGraphAI = async (o: any) => {
 
             formattedSolutions.push({
                 name: String(solution.facility_name ?? "Facility"),
+                confidence: solution.confidence,
                 image: "/okw_maker.png",
                 class: "test",
                 children,
@@ -108,6 +109,7 @@ const sendToSupplyGraphAI = async (o: any) => {
             treeData.push({
                 key: key_num++,
                 name: formattedSolutions[key_num-1].name || "Supply Tree",
+                confidence: formattedSolutions[key_num-1].confidence || "NA",
                 children: [
                     {
                         image: "/okh.png",
