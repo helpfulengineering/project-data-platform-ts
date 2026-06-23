@@ -3,8 +3,7 @@
     <div class="right">
             <button class="btn-primary">ORDER</button>
     <button class="btn-secondary">EDIT SUPPLY TREE</button>
-    <h1>{{ data.name}}</h1>
-    <h2>Confidence: {{data.confidence}}</h2>
+    <h1>{{ data.name}} Confidence: {{data.confidence}}</h1>
     </div>
     <div ref="tree" style="border: 1px solid #ccc; overflow: hidden"></div>
     </div>

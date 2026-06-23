@@ -23,9 +23,11 @@ dotenv.config({ path: '../.env' });
 // make sure important environment variables are present
 const serviceName: string = process.env?.Azure_Storage_ServiceName || "";
 const OKHcontainerName: string =
-  process.env?.Azure_Storage_OKH_ContainerName || "";
+    process.env?.Azure_Storage_OKH_ContainerName || "";
 const OKWcontainerName: string =
   process.env?.Azure_Storage_OKW_ContainerName || "";
+
+
 
 if (!serviceName) {
   throw new Error("No Azure_Storage_ServiceName in process.env");
@@ -85,6 +87,8 @@ export async function listRoutes(
       );
     }
   }
+
+  context.log("XXX",OKHcontainerName);
   return { jsonBody: routes };
 }
 
