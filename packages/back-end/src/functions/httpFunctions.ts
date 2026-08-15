@@ -47,7 +47,7 @@ const routeFunctions: DICT_TYPE = {
 //  getOKHs,
 //  getExampleProducts,
   "getFile/{containerName}/{fileName}/{fileType}": getFile, // Example: "getFile/okh/bread/yml"
-    "listFiles/{containerName}": listFilesByContainerName, // Example: http://localhost:7071/api/listFiles/okw OR http://localhost:7071/api/listFiles/okh
+    "listFiles/{containerName}": listFilesByContainerName, // Example: http://0.0.0.0:7071/api/listFiles/okw OR http://0.0.0.0:7071/api/listFiles/okh
     listOKHsummaries, // This is specifically meant to provide thumbnails for the frontend
     listOKWsummaries, // This is specifically meant to provide thumbnails for the frontend
     getRelatedOKH,
