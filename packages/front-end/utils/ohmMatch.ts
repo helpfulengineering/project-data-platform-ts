@@ -11,7 +11,7 @@ const DEFAULT_OKH_BLOB_BASE = 'https://projdatablobstorage.blob.core.windows.net
 
 export function getOhmBaseUrl(): string {
   const raw =
-    import.meta.env.VITE_SUPPLY_GRAPH_AI_URL || 'http://localhost:8001';
+    import.meta.env.VITE_SUPPLY_GRAPH_AI_URL || 'https://openhardwaremanager-cooking-fe.blackdune-e38fce01.westus3.azurecontainerapps.io';
   return raw.replace(/\/$/, '');
 }
 

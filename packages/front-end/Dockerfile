@@ -8,7 +8,8 @@ RUN npm ci
 COPY . .
 
 RUN npm run build
-
+RUN mkdir -p /app/.output/server/chunks/public && \
+    cp -r /app/.output/public/* /app/.output/server/chunks/public/
 
 FROM node:22-alpine
 

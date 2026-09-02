@@ -1,10 +1,5 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
-// WARNING!!!
-// BLACK MAGIC ALERT!!!
-// Changing from "localhost" to 127.0.0.1
-// made a huge difference here.
-// This is totally unexplained and complete nonsense, but true.
-const globalBaseUrl = 'http://127.0.0.1:7071/api';
+const globalBaseUrl = 'https://backend4.blackdune-e38fce01.westus3.azurecontainerapps.io/api';
 
 export default defineNuxtConfig({
     compatibilityDate: '2024-04-03',
@@ -14,7 +9,7 @@ export default defineNuxtConfig({
         public: {
             baseUrl: process.env.BACKEND_URL ? process.env.BACKEND_URL : globalBaseUrl,
             // Supply Graph AI configuration
-            supplyGraphAiUrl: process.env.SUPPLY_GRAPH_AI_URL || 'http://localhost:8001'
+            supplyGraphAiUrl: process.env.SUPPLY_GRAPH_AI_URL || 'https://openhardwaremanager-cooking-fe.blackdune-e38fce01.westus3.azurecontainerapps.io'
 //            apiBase: '/api'
         }
     },
