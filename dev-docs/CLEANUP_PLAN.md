@@ -46,7 +46,7 @@ The repo (Nuxt 3 front end + Azure Functions/TypeScript back end, Postgres + Azu
 - [x] **Automated tests** (upgraded from the original "minimal unit tests + manual checklist" plan — see `TESTING.md` for full detail):
   - Back end (`packages/back-end`, vitest): unit tests for `getFileNameAndFileType`, `hasOverlapKeywords`, `normalizeKeywords`, `convertToProduct`; black-box API tests against the real running func host covering `/test`, `/listRoutes`, `/listOKHsummaries`, `/listOKWsummaries`, `/getFile`, `/getRelatedOKH`, `/incidents`. `npm test` → 20/20 passing.
   - Front end (`packages/e2e`, Playwright): main-workflow spec covering home → product detail → related items → supply-tree match attempt → header. 5/5 passing.
-  - Two real pre-existing bugs surfaced and captured as regression baselines while building these (see Findings above): `getRelatedOKH` always-empty, and `supplyTree.vue`'s non-reactive `selectedOKHname`.
+  - Two real pre-existing bugs surfaced and captured as regression baselines while building these (see Findings above): `getRelatedOKH` ignoring its keyword param ([#107](https://github.com/helpfulengineering/project-data-platform-ts/issues/107)), and `supplyTree.vue`'s non-reactive `selectedOKHname` ([#108](https://github.com/helpfulengineering/project-data-platform-ts/issues/108)).
 
 **Checkpoint:** CI green (still pending), `npm run build` succeeds in both packages, all tests pass. Go-ahead required before Phase 1.
 
@@ -87,13 +87,13 @@ The repo (Nuxt 3 front end + Azure Functions/TypeScript back end, Postgres + Azu
 
 ## Explicitly out of scope (tracked as GitHub issues instead)
 
-- AppHeader search box wired to non-existent `query`/`handleSearch`.
-- `login.vue`/`register.vue` no-op submit handlers.
-- Orphan pages (`detailedcrisis.vue`, `homepage.vue`, `supply-graph-api.vue`) not linked from nav.
-- CORS tightening beyond header consolidation (still wildcard for now).
-- Proper Postgres CA cert pinning.
+- AppHeader search box wired to non-existent `query`/`handleSearch` — [#109](https://github.com/helpfulengineering/project-data-platform-ts/issues/109)
+- `login.vue`/`register.vue` no-op submit handlers — [#110](https://github.com/helpfulengineering/project-data-platform-ts/issues/110)
+- Orphan pages (`detailedcrisis.vue`, `homepage.vue`, `supply-graph-api.vue`) not linked from nav — [#111](https://github.com/helpfulengineering/project-data-platform-ts/issues/111)
+- CORS tightening beyond header consolidation (still wildcard for now) — [#112](https://github.com/helpfulengineering/project-data-platform-ts/issues/112)
+- Proper Postgres CA cert pinning — [#113](https://github.com/helpfulengineering/project-data-platform-ts/issues/113)
 
-These will be filed as issues (title + description, referencing the exact files/lines above) once Phase 3/4 land, so they don't get lost but also don't block or scope-creep this cleanup.
+The two bugs surfaced while building the test suites are also filed: `getRelatedOKH` ignoring its keyword param — [#107](https://github.com/helpfulengineering/project-data-platform-ts/issues/107), and `supplyTree.vue`'s non-reactive heading — [#108](https://github.com/helpfulengineering/project-data-platform-ts/issues/108).
 
 ---
 
