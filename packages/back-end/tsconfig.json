@@ -7,5 +7,6 @@
       "esModuleInterop": true,
       "sourceMap": true,
     "strict": true
-  }
+  },
+  "exclude": ["dist", "test", "vitest.config.mts"]
 }

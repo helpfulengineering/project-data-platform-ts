@@ -1,0 +1,47 @@
+# Scope: hermetic build + unit-test gate only. Deliberately does NOT run
+# packages/back-end's test:api suite or packages/e2e's Playwright suite —
+# both need a live backend against real Azure blob data, and Playwright
+# additionally needs a browser download, neither of which fit a minimal,
+# no-external-dependency CI job. Those two suites are local-only pre-merge
+# checks; see dev-docs/TESTING.md. A green run here does not mean they pass.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  back-end:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/back-end
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: packages/back-end/package-lock.json
+      # --ignore-scripts: azure-functions-core-tools' postinstall downloads a
+      # ~1.5GB runtime binary we never need here — build/test only exercise
+      # tsc + vitest, not `func` itself.
+      - run: npm ci --ignore-scripts
+      - run: npm run build
+      - run: npm run test:unit
+
+  front-end:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/front-end
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: packages/front-end/package-lock.json
+      - run: npm ci
+      - run: npm run build

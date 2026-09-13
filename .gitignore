@@ -242,11 +242,21 @@ tests/baselines/reference/dt
 .failed-tests
 TEST-results.xml
 package-lock.json
+# Lockfiles we do want committed, for reproducible installs (npm ci in CI):
+!/packages/back-end/package-lock.json
+!/packages/front-end/package-lock.json
+!/packages/e2e/package-lock.json
 .eslintcache
 *v8.log
 /lib/
 
 docs
+
+# Playwright (packages/e2e)
+packages/e2e/test-results/
+packages/e2e/playwright-report/
+packages/e2e/blob-report/
+packages/e2e/playwright/.cache/
 
 # Misc
 .DS_Store
