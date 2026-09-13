@@ -242,6 +242,10 @@ tests/baselines/reference/dt
 .failed-tests
 TEST-results.xml
 package-lock.json
+# Lockfiles we do want committed, for reproducible installs (npm ci in CI):
+!/packages/back-end/package-lock.json
+!/packages/front-end/package-lock.json
+!/packages/e2e/package-lock.json
 .eslintcache
 *v8.log
 /lib/
