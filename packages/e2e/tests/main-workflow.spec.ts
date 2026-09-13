@@ -63,13 +63,24 @@ test("triggering a supply-tree match degrades gracefully when OHM is unreachable
   page,
   pageErrors,
 }) => {
+  // The 60s toHaveURL timeout below is meaningless without also raising the
+  // test's own timeout — Playwright's default 30s test-level timeout kills
+  // the whole test first regardless of a longer per-assertion timeout. This
+  // was a real bug: it's exactly what caused the intermittent full-suite
+  // failure observed earlier (a 36.7s run got killed at 30s while this
+  // assertion was still legitimately polling).
+  test.setTimeout(90_000);
+
   // Force the match call to fail deterministically instead of relying on
   // "OHM just isn't running on localhost:8001 in this environment" — if a
   // developer happens to have supply-graph-ai (or the mock-api stub) up
   // locally, that assumption breaks and this test would flake depending on
   // real match results. Aborting the route makes the failure path exercised
   // here environment-independent.
-  const matchRequest = page.waitForRequest("**/v1/api/match");
+  const matchRequestFailed = page.waitForEvent(
+    "requestfailed",
+    (req) => req.url().includes("/v1/api/match")
+  );
   await page.route("**/v1/api/match", (route) => route.abort("connectionrefused"));
 
   await page.goto("/");
@@ -79,10 +90,12 @@ test("triggering a supply-tree match degrades gracefully when OHM is unreachable
   await page.getByRole("button", { name: "SUPPLIERS" }).click();
   await expect(page).toHaveURL(/\/products\/.+\/supplyTree/, { timeout: 60000 });
 
-  // Wait for the (forced-failing) match request to actually fire, so the
-  // rest of this test observes the settled failure state rather than a
-  // mid-flight one.
-  await matchRequest;
+  // Wait for the match request to actually FAIL (not just fire) before
+  // asserting the settled failure state. `page.waitForRequest` only
+  // resolves when the request is created, not when the aborted request's
+  // rejection has actually propagated through the app's catch block — this
+  // waits for the real failure event instead.
+  await matchRequestFailed;
 
   // NOTE: supplyTree.vue's heading is expected to show the product name, but
   // `selectedOKHname` is assigned as a plain `var` (not a `ref`) inside
@@ -101,9 +114,20 @@ test("triggering a supply-tree match degrades gracefully when OHM is unreachable
 
 test("app header renders on every page visited above", async ({ page }) => {
   await page.goto("/");
-  // `.nav` (AppHeader.vue) is `position: fixed`, which collapses the outer
-  // <header> to zero height by design — assert on the actual visible nav
-  // content, not the (correctly) zero-height wrapper.
-  await expect(page.locator("header .nav")).toBeVisible();
-  await expect(page.getByRole("link", { name: "HELPFUL" })).toBeVisible();
+  const firstCardHref = await page
+    .locator(".product-card")
+    .first()
+    .getAttribute("href");
+
+  // Actually visit more than just "/" — this test's name claims "every page
+  // visited above" (home + product detail), so check both rather than just
+  // asserting on the home page alone.
+  for (const url of ["/", firstCardHref as string]) {
+    await page.goto(url);
+    // `.nav` (AppHeader.vue) is `position: fixed`, which collapses the outer
+    // <header> to zero height by design — assert on the actual visible nav
+    // content, not the (correctly) zero-height wrapper.
+    await expect(page.locator("header .nav")).toBeVisible();
+    await expect(page.getByRole("link", { name: "HELPFUL" })).toBeVisible();
+  }
 });

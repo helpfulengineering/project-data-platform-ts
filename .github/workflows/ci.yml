@@ -1,3 +1,9 @@
+# Scope: hermetic build + unit-test gate only. Deliberately does NOT run
+# packages/back-end's test:api suite or packages/e2e's Playwright suite —
+# both need a live backend against real Azure blob data, and Playwright
+# additionally needs a browser download, neither of which fit a minimal,
+# no-external-dependency CI job. Those two suites are local-only pre-merge
+# checks; see dev-docs/TESTING.md. A green run here does not mean they pass.
 name: CI
 
 on:

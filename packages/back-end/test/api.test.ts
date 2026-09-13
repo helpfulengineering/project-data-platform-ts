@@ -36,6 +36,26 @@ beforeAll(async () => {
   }
 }, 10000);
 
+// Discovers a real, currently-existing OKH file (rather than hardcoding one —
+// the blob contents are live data actively being migrated, issue #94) and
+// downloads its full manifest.
+async function discoverRealOkhFile() {
+  const listRes = await fetchWithTimeout(`${BASE_URL}/listOKHsummaries`);
+  const { summaries } = await listRes.json();
+  expect(summaries.length).toBeGreaterThan(0);
+  const [summary] = summaries;
+
+  // fname is "<name>.<ext>" (see getFileNameAndFileType) — split it back
+  // into the {fileName}/{fileType} path segments /getFile expects.
+  const lastDot = summary.fname.lastIndexOf(".");
+  const fileName = summary.fname.slice(0, lastDot);
+  const fileType = summary.fname.slice(lastDot + 1);
+
+  const res = await fetchWithTimeout(`${BASE_URL}/getFile/okh/${fileName}/${fileType}`);
+  const body = await res.json();
+  return { summary, res, product: body.product };
+}
+
 describe("GET /test", () => {
   it("returns the health-check body", async () => {
     const res = await fetchWithTimeout(`${BASE_URL}/test`);
@@ -86,50 +106,47 @@ describe("GET /listOKWsummaries", () => {
 
 describe("GET /getFile/{containerName}/{fileName}/{fileType}", () => {
   it("downloads a real OKH file (discovered via /listOKHsummaries) and returns it as { product }", async () => {
-    // Discover a real, currently-existing file rather than hardcoding one —
-    // the OKH/OKW blob contents are live data that's actively being migrated
-    // (issue #94), so a specific fname/title can disappear without the
-    // /getFile handler itself having changed at all.
-    const listRes = await fetchWithTimeout(`${BASE_URL}/listOKHsummaries`);
-    const { summaries } = await listRes.json();
-    expect(summaries.length).toBeGreaterThan(0);
-    const [summary] = summaries;
-
-    // fname is "<name>.<ext>" (see getFileNameAndFileType) — split it back
-    // into the {fileName}/{fileType} path segments /getFile expects.
-    const lastDot = summary.fname.lastIndexOf(".");
-    const fileName = summary.fname.slice(0, lastDot);
-    const fileType = summary.fname.slice(lastDot + 1);
-
-    const res = await fetchWithTimeout(`${BASE_URL}/getFile/okh/${fileName}/${fileType}`);
+    const { summary, res, product } = await discoverRealOkhFile();
     expect(res.status).toBe(200);
-    const body = await res.json();
-    expect(body.product).toBeTruthy();
+    expect(product).toBeTruthy();
     // Cross-check against the summary rather than a hardcoded title, so this
     // fails only if /getFile and /listOKHsummaries actually disagree about
     // the same file, not if the underlying blob content changes.
-    expect(body.product.title).toBe(summary.name);
+    expect(product.title).toBe(summary.name);
   });
 });
 
 describe("GET /getRelatedOKH", () => {
-  // Documents current (buggy) behavior: the route has no {keywords} path
-  // template, so `request.params.keywords` is always `undefined`, and
-  // `decodeURIComponent(undefined)` coerces to the literal string
-  // "undefined" — the query string is never actually read. Rather than
-  // asserting a hardcoded empty result (which is only true today because no
-  // current OKH file happens to be tagged "undefined", and would break the
-  // instant the shared blob storage changes for unrelated reasons), assert
-  // the actual property that makes this a bug: two distinct queries return
-  // identical results, proving the `keywords` param has no effect.
-  it("ignores the keywords query param (two different queries return the same result)", async () => {
-    const [resA, resB] = await Promise.all([
-      fetchWithTimeout(`${BASE_URL}/getRelatedOKH?keywords=cookies`),
-      fetchWithTimeout(`${BASE_URL}/getRelatedOKH?keywords=something-entirely-different`),
+  // CORRECTION: an earlier version of this test (and dev-docs/CLEANUP_PLAN.md,
+  // TESTING.md, AGENT.md, and issue #107) claimed this endpoint always ignores
+  // the `keywords` query param because the route has no `{keywords}` path
+  // template, reasoning that `request.params.keywords` must therefore be
+  // `undefined`. That reasoning was wrong: `HttpRequest.params` in this
+  // Azure Functions host is populated straight from the invocation's RPC
+  // binding data, and — empirically verified — that binding data includes
+  // query-string values even without a matching route template segment. So
+  // `?keywords=cookie%20-%20chocolate` genuinely reaches `request.params.keywords`
+  // and the endpoint's exact-token, case-insensitive keyword matching
+  // (`hasOverlapKeywords`/`normalizeKeywords`) works as intended. The
+  // earlier "always empty" observation was real but coincidental: every
+  // keyword tried before ("cookies", "undefined", random strings) simply
+  // didn't exact-match any real file's keyword field.
+  it("filters by keyword: an exact match returns the file, an unrelated one doesn't", async () => {
+    const { product } = await discoverRealOkhFile();
+    const [realKeyword] = product.keywords ?? [];
+    expect(realKeyword).toBeTruthy();
+
+    const [resMatch, resNoMatch] = await Promise.all([
+      fetchWithTimeout(`${BASE_URL}/getRelatedOKH?keywords=${encodeURIComponent(realKeyword)}`),
+      fetchWithTimeout(`${BASE_URL}/getRelatedOKH?keywords=no-such-keyword-${crypto.randomUUID()}`),
     ]);
-    expect(resA.status).toBe(200);
-    expect(resB.status).toBe(200);
-    expect(await resA.json()).toEqual(await resB.json());
+    expect(resMatch.status).toBe(200);
+    expect(resNoMatch.status).toBe(200);
+
+    const { relatedOKH: matched } = await resMatch.json();
+    const { relatedOKH: notMatched } = await resNoMatch.json();
+    expect(matched.some((item: { title?: string; name?: string }) => item.name === product.title)).toBe(true);
+    expect(notMatched).toEqual([]);
   });
 });
 

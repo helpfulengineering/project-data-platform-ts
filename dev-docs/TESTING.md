@@ -17,8 +17,8 @@ npm run test:api       # black-box tests against http://127.0.0.1:7071/api
 
 **What's covered:** `/test`, `/listRoutes`, `/listOKHsummaries`, `/listOKWsummaries`, `/getFile/{container}/{file}/{type}`, `/getRelatedOKH`, `/incidents`.
 
-**What these tests are (and aren't):** they assert *today's actual observed behavior* as a baseline, including two known bugs, so future refactors don't change them silently:
-- `GET /getRelatedOKH` ignores the `keywords` query param entirely — the route has no `{keywords}` path template, so `request.params.keywords` is always `undefined`, and `decodeURIComponent(undefined)` coerces to the literal string `"undefined"`. The effective keyword filter is therefore always `["undefined"]`, regardless of what was actually queried. The test asserts this by comparing two different queries and expecting identical results, rather than hardcoding today's (blob-content-dependent) empty response.
+**What these tests are (and aren't):** they assert *today's actual observed behavior* as a baseline, so future refactors don't change it silently:
+- `GET /getRelatedOKH` actually does filter by keyword — case-insensitively, exact-token match (`hasOverlapKeywords`/`normalizeKeywords`), even though the route has no `{keywords}` path template. (An earlier version of this doc claimed the opposite — that the param was ignored entirely — reasoned from "no route template means `request.params.keywords` must be `undefined`." That reasoning doesn't hold: this Azure Functions host's RPC binding data flattens query-string values into `request.params` even without a matching route segment, empirically verified. See issue #107 for the full correction.) The test discovers a real file's keyword and confirms a matching query returns it while an unrelated one doesn't.
 - `GET /incidents` has no error handling around the Postgres query; with no local DB configured it aborts/errors rather than hanging the suite (also tracked in `CLEANUP_PLAN.md` Phase 3).
 
 If either of those ever starts behaving differently, that's worth a deliberate look — not necessarily a break.
@@ -44,7 +44,7 @@ Playwright's config auto-starts the back end (`func start`) and front end (`nuxt
 
 ## Not yet done
 
-- Neither suite is wired into CI yet (`.github/workflows` doesn't exist) — that's `CLEANUP_PLAN.md` Phase 0. Once it lands, these two suites are what it should run.
+- `.github/workflows/ci.yml` exists and runs build + unit tests for both packages, but deliberately **not** these two regression suites — `test:api` needs a live backend against real Azure blob data, and Playwright needs a ~275MB browser download, neither of which fit a "keep CI minimal" hermetic build/unit gate. They remain local-only pre-merge checks.
 - No Postgres or OHM instance is stood up for local testing — both suites degrade gracefully without them by design.
 
 ## Re-running after each cleanup phase

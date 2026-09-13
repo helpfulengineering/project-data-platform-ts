@@ -17,7 +17,7 @@ The repo (Nuxt 3 front end + Azure Functions/TypeScript back end, Postgres + Azu
 - Commented-out routes and functions (`httpFunctions.ts:44-46`, `azure-storage.ts:23-53`).
 - Inconsistent CORS: some handlers set `Access-Control-Allow-Origin: *`, others set nothing, others set a fuller header set — three different patterns copy-pasted.
 - `getIncidents` has zero error handling around `pool.query` — a DB hiccup becomes an unhandled rejection.
-- `GET /getRelatedOKH` (`httpFunctions.ts:150`) always returns `{ relatedOKH: [] }` regardless of the `keywords` query param — the route is registered with no `{keywords}` path template, so `request.params.keywords` is always `undefined`, and `decodeURIComponent(undefined)` coerces to the literal string `"undefined"`, so the effective keyword filter is always `["undefined"]`, not `[]`. The empty result today is coincidental (no current OKH file is tagged `"undefined"`), not because no keywords were parsed. Confirmed live (`curl .../getRelatedOKH?keywords=cookies` → empty array) and captured as a baseline assertion in `packages/back-end/test/api.test.ts`.
+- ~~`GET /getRelatedOKH` always returns an empty list regardless of the `keywords` query param.~~ **Retracted** — this was wrong. It was reasoned from "the route has no `{keywords}` path template, so `request.params.keywords` must be `undefined`," which doesn't hold here: this Azure Functions host's RPC binding data flattens query-string values into `request.params` even without a matching route template segment (empirically verified — `?keywords=<value>` genuinely reaches the handler). The endpoint's exact-token, case-insensitive keyword matching (`hasOverlapKeywords`/`normalizeKeywords`) actually works. The original "always empty" observation was real but coincidental: every keyword tried in that investigation ("cookies", "undefined", random strings) simply didn't exact-match any real file's keyword field. See issue #107, closed with this correction.
 - Unbounded in-memory cache (`getOKHByFileName`) with a comment saying it's temporary.
 - `db.ts` hardcodes `ssl: { rejectUnauthorized: false }` unconditionally.
 - Heavy `any` typing; leftover debug logging (`context.log("XXX", ...)`, `context.log("AAA", ...)`, bare `console.log`s in `getRelatedOKH`/`listSummaries`).
@@ -32,8 +32,8 @@ The repo (Nuxt 3 front end + Azure Functions/TypeScript back end, Postgres + Azu
 - Broken stubs — **out of scope, tracked as issues instead**: `AppHeader.vue` search box wired to non-existent `query`/`handleSearch`; `login.vue`/`register.vue` no-op submit handlers; three orphan pages (`detailedcrisis.vue`, `homepage.vue`, `supply-graph-api.vue`) not linked from nav; `homepage.vue:17` has a markup typo (`<IncidentsCard />cd`).
 
 ### Repo-wide
-- No `.github/workflows` — nothing mechanically catches a regression today.
-- `package-lock.json` gitignored for `back-end`, `front-end`, `mock-api` (only `atoms` has one committed) — installs aren't reproducible.
+- ~~No `.github/workflows` — nothing mechanically catches a regression today.~~ **Done (partially)** — `.github/workflows/ci.yml` now runs build + unit tests for both packages, hermetically (see Phase 0 below); the API/E2E regression suites are deliberately still local-only, not a CI gap to close blindly.
+- ~~`package-lock.json` gitignored for `back-end`, `front-end`, `mock-api`~~ (only `atoms` has one committed) — **Done for back-end/front-end/e2e**, committed via #106. `mock-api` remains ungenerated/ignored — low priority (no build/CI step depends on it).
 - ~~Zero test files anywhere in the repo.~~ **Done** — see `TESTING.md`: `packages/back-end/test/` (vitest: unit + black-box API) and `packages/e2e` (Playwright main-workflow suite).
 
 ---
@@ -41,14 +41,15 @@ The repo (Nuxt 3 front end + Azure Functions/TypeScript back end, Postgres + Azu
 ## Phase 0 — Safety net (must land first)
 
 - [ ] **Lockfiles**: un-ignore `package-lock.json` (remove from `.gitignore`), run `npm install` in `packages/back-end`, `packages/front-end`, `packages/mock-api`, commit the generated lockfiles (no version bumps).
-- [ ] **Minimal CI** (`.github/workflows/ci.yml`): on push/PR, `npm ci && npm run build` for back-end and front-end, plus the test suites below. Catches most real regressions for free.
+- [x] **Minimal CI** (`.github/workflows/ci.yml`): on push/PR, `npm ci && npm run build` for back-end (`--ignore-scripts` — skips `azure-functions-core-tools`' ~1.5GB postinstall) and `npm run test:unit`; front-end runs `npm ci && npm run build`. Deliberately hermetic — no live Azure blob storage, Postgres, or browser download — so it does **not** run `test:api` or the Playwright suite (see `TESTING.md` for why). Green on this PR.
 - [ ] **Lint/format baseline**: add ESLint (+ `@typescript-eslint`) and Prettier to `packages/back-end` and `packages/front-end`, starting as warnings (not build-breaking) so it doesn't block on today's `any` usage. Add `lint` npm scripts.
 - [x] **Automated tests** (upgraded from the original "minimal unit tests + manual checklist" plan — see `TESTING.md` for full detail):
   - Back end (`packages/back-end`, vitest): unit tests for `getFileNameAndFileType`, `hasOverlapKeywords`, `normalizeKeywords`, `convertToProduct`; black-box API tests against the real running func host covering `/test`, `/listRoutes`, `/listOKHsummaries`, `/listOKWsummaries`, `/getFile`, `/getRelatedOKH`, `/incidents`. `npm test` → 20/20 passing.
-  - Front end (`packages/e2e`, Playwright): main-workflow spec covering home → product detail → related items → supply-tree match attempt → header. 5/5 passing.
-  - Two real pre-existing bugs surfaced and captured as regression baselines while building these (see Findings above): `getRelatedOKH` ignoring its keyword param ([#107](https://github.com/helpfulengineering/project-data-platform-ts/issues/107)), and `supplyTree.vue`'s non-reactive `selectedOKHname` ([#108](https://github.com/helpfulengineering/project-data-platform-ts/issues/108)).
+  - Front end (`packages/e2e`, Playwright): main-workflow spec covering home → product detail → related items → supply-tree match attempt → header. 5/5 passing (occasional slow-navigation flakiness observed on the supply-tree test under full-sequential-suite load in this dev sandbox — not reproducible running it in isolation; see `TESTING.md`).
+  - One real pre-existing bug surfaced and captured as a regression baseline while building these (see Findings above): `supplyTree.vue`'s non-reactive `selectedOKHname` ([#108](https://github.com/helpfulengineering/project-data-platform-ts/issues/108)). (A second suspected bug, `getRelatedOKH` ignoring its keyword param, turned out to be a misdiagnosis — retracted, see Findings above and issue #107.)
+- [x] **Lockfiles**: `back-end`, `front-end`, and `e2e` now have committed `package-lock.json`s (added via #106, merged into this branch) — `mock-api` is still gitignored/ungenerated, tracked separately, not blocking.
 
-**Checkpoint:** CI green (still pending), `npm run build` succeeds in both packages, all tests pass. Go-ahead required before Phase 1.
+**Checkpoint:** CI green on this PR (both jobs), `npm run build` succeeds in both packages, all tests pass. Lint/format baseline is the one remaining open Phase 0 item. Go-ahead required before Phase 1.
 
 ## Phase 1 — Dead code & mechanical cleanup (behavior-preserving by construction)
 
@@ -93,7 +94,7 @@ The repo (Nuxt 3 front end + Azure Functions/TypeScript back end, Postgres + Azu
 - CORS tightening beyond header consolidation (still wildcard for now) — [#112](https://github.com/helpfulengineering/project-data-platform-ts/issues/112)
 - Proper Postgres CA cert pinning — [#113](https://github.com/helpfulengineering/project-data-platform-ts/issues/113)
 
-The two bugs surfaced while building the test suites are also filed: `getRelatedOKH` ignoring its keyword param — [#107](https://github.com/helpfulengineering/project-data-platform-ts/issues/107), and `supplyTree.vue`'s non-reactive heading — [#108](https://github.com/helpfulengineering/project-data-platform-ts/issues/108).
+One real bug surfaced while building the test suites is also filed: `supplyTree.vue`'s non-reactive heading — [#108](https://github.com/helpfulengineering/project-data-platform-ts/issues/108). (A second suspected bug, `getRelatedOKH` ignoring its keyword param, was a misdiagnosis — see Findings above; issue [#107](https://github.com/helpfulengineering/project-data-platform-ts/issues/107) is closed with the correction.)
 
 ---
 
