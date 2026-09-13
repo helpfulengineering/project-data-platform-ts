@@ -59,16 +59,30 @@ test("related items section renders on the detail page without erroring", async 
   expect(pageErrors).toEqual([]);
 });
 
-test("triggering a supply-tree match degrades gracefully without OHM running", async ({
+test("triggering a supply-tree match degrades gracefully when OHM is unreachable", async ({
   page,
   pageErrors,
 }) => {
+  // Force the match call to fail deterministically instead of relying on
+  // "OHM just isn't running on localhost:8001 in this environment" — if a
+  // developer happens to have supply-graph-ai (or the mock-api stub) up
+  // locally, that assumption breaks and this test would flake depending on
+  // real match results. Aborting the route makes the failure path exercised
+  // here environment-independent.
+  const matchRequest = page.waitForRequest("**/v1/api/match");
+  await page.route("**/v1/api/match", (route) => route.abort("connectionrefused"));
+
   await page.goto("/");
   await page.locator(".product-card").first().click();
   await expect(page).toHaveURL(/\/products\/.+/);
 
   await page.getByRole("button", { name: "SUPPLIERS" }).click();
-  await expect(page).toHaveURL(/\/products\/.+\/supplyTree/);
+  await expect(page).toHaveURL(/\/products\/.+\/supplyTree/, { timeout: 60000 });
+
+  // Wait for the (forced-failing) match request to actually fire, so the
+  // rest of this test observes the settled failure state rather than a
+  // mid-flight one.
+  await matchRequest;
 
   // NOTE: supplyTree.vue's heading is expected to show the product name, but
   // `selectedOKHname` is assigned as a plain `var` (not a `ref`) inside
@@ -80,11 +94,8 @@ test("triggering a supply-tree match degrades gracefully without OHM running", a
   // document getRelatedOKH's current always-empty-array bug.
   await expect(page.locator("h1")).toHaveText("");
 
-  // Give the (failing, since OHM isn't running) match request time to settle
-  // rather than asserting mid-flight, then confirm no supply tree renders
-  // and — most importantly — nothing crashed the page.
-  await page.waitForTimeout(3000);
-  expect(await page.locator(".supply-tree").count()).toBe(0);
+  // No supply tree renders, and — most importantly — nothing crashed the page.
+  await expect(page.locator(".supply-tree")).toHaveCount(0);
   expect(pageErrors).toEqual([]);
 });
 

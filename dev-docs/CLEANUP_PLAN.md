@@ -2,7 +2,7 @@
 
 ## Context
 
-The repo (Nuxt 3 front end + Azure Functions/TypeScript back end, Postgres + Azure Blob Storage) has grown organically with no CI, no automated tests, no lint/format enforcement, and no lockfiles for any package except `atoms`. A prior audit (`ARCHITECTURE_ANALYSIS.md`) and direct code review confirmed real problems in both layers, listed below. This document is the durable, versioned record of scope, phases, and status — check off phases as they land.
+The repo (Nuxt 3 front end + Azure Functions/TypeScript back end, Postgres + Azure Blob Storage) grew organically. At the start of this effort it had no CI, no automated tests, no lint/format enforcement, and no lockfiles for any package except `atoms` — **Phase 0 below tracks closing each of those gaps**, don't take this sentence as still describing the current state. A prior audit (`ARCHITECTURE_ANALYSIS.md`) and direct code review confirmed further real problems in both layers, listed below. This document is the durable, versioned record of scope, phases, and status — check off phases as they land.
 
 **Goal:** raise the codebase to a maintainable baseline — remove dead weight, centralize config, stop obvious bugs, and add just enough safety net (lint, build check, minimal tests, a smoke-test checklist) — **without changing observable behavior of any working feature.**
 
