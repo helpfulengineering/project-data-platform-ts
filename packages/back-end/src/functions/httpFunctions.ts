@@ -127,12 +127,12 @@ export async function listFilesByContainerName(
   return { jsonBody: productsObj };
 }
 
-function hasOverlapKeywords(arr1: string[], arr2: string[]): boolean {
+export function hasOverlapKeywords(arr1: string[], arr2: string[]): boolean {
   const set1 = new Set(arr1.map(str => str.toLowerCase().trim()));
   return arr2.some(str => set1.has(str.toLowerCase().trim()));
 }
 
-function normalizeKeywords(keywords: string | string[] | null | undefined): string[] {
+export function normalizeKeywords(keywords: string | string[] | null | undefined): string[] {
   if (!keywords) {
       return []; // Return an empty array if null or undefined
   }
@@ -327,7 +327,7 @@ async function getOKHByFileName(
 }
 
 // will need proper typing once types have been shared with back-end
-function convertToProduct(fname:string, obj: any, id: number): any | null {
+export function convertToProduct(fname:string, obj: any, id: number): any | null {
   if (!obj || typeof obj !== "object") return null;
   return {
       id,

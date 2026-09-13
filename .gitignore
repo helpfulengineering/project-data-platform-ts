@@ -248,6 +248,12 @@ package-lock.json
 
 docs
 
+# Playwright (packages/e2e)
+packages/e2e/test-results/
+packages/e2e/playwright-report/
+packages/e2e/blob-report/
+packages/e2e/playwright/.cache/
+
 # Misc
 .DS_Store
 .fleet
